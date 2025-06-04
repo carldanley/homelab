@@ -1,0 +1,164 @@
+---
+version: "3"
+
+vars:
+  SYSTEM_UPGRADE_KS: "{{ .KUBERNETES_DIR }}/apps/system-upgrade/system-upgrade-controller/ks.yaml"
+  KUBERNETES_VERSION:
+    sh: yq '.spec.postBuild.substitute.KUBERNETES_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
+  TALOS_VERSION:
+    sh: yq '.spec.postBuild.substitute.TALOS_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
+  TALOS_SCHEMATIC:
+    sh: |-
+      curl --silent -X POST --data-binary @{{.TALOS_DIR}}/schematic.yaml https://factory.talos.dev/schematics \
+        | jq --raw-output '.id'
+
+tasks:
+  render-template:
+    internal: true
+    desc: Render a template file using minijinja-cli
+    cmd: minijinja-cli --config-file {{ .ROOT_DIR }}/.minijinja.toml {{ .TEMPLATE_FILE }} | op inject > {{ .OUTPUT_FILE }}
+    env:
+      KUBERNETES_VERSION: "{{ .KUBERNETES_VERSION }}"
+      TALOS_VERSION: "{{ .TALOS_VERSION }}"
+      TALOS_SCHEMATIC: "{{ .TALOS_SCHEMATIC }}"
+      ENDPOINTS: "{{ .ENDPOINTS }}"
+      NODES: "{{ .NODES }}"
+      CLUSTER_NAME: "homelab"
+    requires:
+      vars:
+        - TEMPLATE_FILE
+        - OUTPUT_FILE
+    preconditions:
+      - which minijinja-cli
+
+  apply-node:
+    desc: Apply Talos config to a node [NODE=required] [MODE=auto] [DEBUG=false]
+    cmds:
+      # Cleanup the rendered template files
+      - defer: rm -f {{ .COMMON_TEMPLATE_FILE }}
+      - defer: rm -f {{ .ROLE_TEMPLATE_FILE }}
+      - defer: rm -f {{ .NODE_TEMPLATE_FILE }}
+      - defer: rm -f {{ .COMPILED_TEMPLATE_FILE }}
+
+      # Attempt to patch together a talos machineconfig file for the node
+      - |
+        talosctl machineconfig patch "{{ .COMMON_TEMPLATE_FILE }}" \
+          --patch "@{{ .ROLE_TEMPLATE_FILE }}" \
+          --patch "@{{ .NODE_TEMPLATE_FILE }}" \
+          > {{ .COMPILED_TEMPLATE_FILE }}
+
+      # Next, debug the output of the compiled template OR apply it to the node
+      - |
+        {{ if deepEqual (.DEBUG | lower) "true" }}
+          cat {{ .COMPILED_TEMPLATE_FILE }}
+        {{ else }}
+          talosctl -n {{ .NODE }} apply-config \
+            --mode {{ .MODE }} \
+            --file {{ .COMPILED_TEMPLATE_FILE }} \
+            {{ if deepEqual (.INSECURE | lower) "true" }}--insecure {{ end -}}
+        {{ end }}
+
+      # Finally, make sure the talconfig file is written to disk
+      - task: write-talconfig
+    vars:
+      MODE: '{{ .MODE | default "auto" }}'
+      MACHINE_TYPE:
+        sh: basename $(dirname $(find '{{ .TALOS_DIR }}' -name '{{ .NODE }}.yaml.j2'))
+      COMMON_TEMPLATE_FILE:
+        sh: mktemp -t common
+      ROLE_TEMPLATE_FILE:
+        sh: mktemp -t role
+      NODE_TEMPLATE_FILE:
+        sh: mktemp -t node
+      COMPILED_TEMPLATE_FILE:
+        sh: mktemp -t compiled
+      DEBUG: '{{ .DEBUG | default "false" }}'
+      INSECURE: '{{ .INSECURE | default "false" }}'
+    deps:
+      - task: render-template
+        vars:
+          TEMPLATE_FILE: "{{ .TALOS_DIR }}/common.yaml.j2"
+          OUTPUT_FILE: "{{ .COMMON_TEMPLATE_FILE }}"
+      - task: render-template
+        vars:
+          TEMPLATE_FILE: "{{ .TALOS_DIR }}/{{ .MACHINE_TYPE }}.yaml.j2"
+          OUTPUT_FILE: "{{ .ROLE_TEMPLATE_FILE }}"
+      - task: render-template
+        vars:
+          TEMPLATE_FILE: "{{ .TALOS_DIR }}/{{ .MACHINE_TYPE }}/{{ .NODE }}.yaml.j2"
+          OUTPUT_FILE: "{{ .NODE_TEMPLATE_FILE }}"
+    requires:
+      vars:
+        - NODE
+    preconditions:
+      - which op talosctl
+
+      # make sure the schematic file exists
+      - test -f {{ .TALOS_DIR }}/schematic.yaml
+
+      # make sure a common template exists
+      - test -f {{ .TALOS_DIR }}/common.yaml.j2
+
+      # makes sure the role-specific machineconfig template exists
+      - test -f {{ .TALOS_DIR }}/{{ .MACHINE_TYPE }}.yaml.j2
+
+      # make sure we can find the node-specific template
+      - find '{{ .TALOS_DIR }}' -name '{{ .NODE }}.yaml.j2'
+
+      # make sure we're logged into onepassword
+      - op whoami --format=json &>/dev/null
+
+  write-talconfig:
+    desc: Write the Talos config to disk [FILE=optional]
+    prompt: Write Talos config to "{{ .TALOSCONFIG_PATH }}" (WILL OVERWRITE) ...?
+    cmds:
+      - task: render-template
+        vars:
+          TEMPLATE_FILE: "{{ .TALOS_DIR }}/talconfig.yaml.j2"
+          OUTPUT_FILE: "{{ .TALOSCONFIG_PATH }}"
+          ENDPOINTS: "{{ .ENDPOINTS }}"
+          NODES: "{{ .NODES }}"
+    vars:
+      TALOSCONFIG_PATH:
+        sh: |-
+          {{ if not (deepEqual (.FILE | default "" | trim) "") }}
+          echo "{{ .FILE }}"
+          {{ else }}
+          if [ -n "$TALOSCONFIG" ]; then
+            echo "$TALOSCONFIG"
+          else
+            echo "{{ .TALOS_DIR }}/talosconfig"
+          fi
+          {{ end }}
+      ENDPOINTS:
+        sh: |-
+          FILES=()
+          if [ -d "{{ .TALOS_DIR }}/controlplane" ]; then
+            for file in "{{ .TALOS_DIR }}/controlplane/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+          echo "${FILES[@]}" | tr ' ' ','
+      NODES:
+        sh: |-
+          FILES=()
+          if [ -d "{{ .TALOS_DIR }}/controlplane" ]; then
+            for file in "{{ .TALOS_DIR }}/controlplane/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+
+          if [ -d "{{ .TALOS_DIR }}/worker" ]; then
+            for file in "{{ .TALOS_DIR }}/worker/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+          echo "${FILES[@]}" | tr ' ' ','
+    preconditions:
+      - which op yq
+
+      # make sure the TALOSCONFIG environment variable is set
+      - printenv | grep -q TALOSCONFIG
+
+      # make sure we're logged into onepassword
+      - op whoami --format=json &>/dev/null

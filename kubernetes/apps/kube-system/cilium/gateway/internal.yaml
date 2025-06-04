@@ -1,0 +1,233 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal
+  annotations:
+    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7}"
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 10.50.50.1
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: *hostname
+  listeners:
+
+    ########################
+    # DOMAIN 1
+    ########################
+
+    - name: domain-1-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_1}"
+      allowedRoutes: &allowedSameNamespace
+        namespaces:
+          from: Same
+
+    - name: domain-1-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_1}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-1-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_1}"
+      allowedRoutes: &allowedAllNamespaces
+        namespaces:
+          from: All
+      tls: &tlsConfig
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-certificate-tls
+
+    - name: domain-1-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_1}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 2
+    ########################
+
+    - name: domain-2-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_2}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-2-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_2}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-2-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_2}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-2-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_2}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 3
+    ########################
+
+    - name: domain-3-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_3}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-3-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_3}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-3-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_3}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-3-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_3}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 4
+    ########################
+
+    - name: domain-4-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_4}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-4-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_4}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-4-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_4}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-4-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_4}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 5
+    ########################
+
+    - name: domain-5-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_5}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-5-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_5}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-5-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_5}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-5-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_5}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 6
+    ########################
+
+    - name: domain-6-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_6}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-6-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_6}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-6-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_6}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-6-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_6}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 7
+    ########################
+
+    - name: domain-7-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_7}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-7-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_7}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-7-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_7}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-7-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_7}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig

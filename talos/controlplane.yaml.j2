@@ -1,0 +1,81 @@
+{% set opSecretPath = "op://homelab kubernetes/talos" %}
+---
+machine:
+  type: controlplane
+  ca:
+    crt: {{ opSecretPath }}/machine-ca-crt
+    key: {{ opSecretPath }}/machine-ca-key
+  features:
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - os:admin
+      allowedKubernetesNamespaces:
+        - actions-runner-system
+        - system-upgrade
+  nodeLabels:
+    topology.kubernetes.io/zone: controlplane
+cluster:
+  ca:
+    crt: {{ opSecretPath }}/cluster-ca-crt
+    key: {{ opSecretPath }}/cluster-ca-key
+  aggregatorCA:
+    crt: {{ opSecretPath }}/cluster-aggregator-ca-crt
+    key: {{ opSecretPath }}/cluster-aggregator-ca-key
+  allowSchedulingOnControlPlanes: true
+  apiServer:
+    image: registry.k8s.io/kube-apiserver:{{ ENV.KUBERNETES_VERSION }}
+    extraArgs:
+      enable-aggregator-routing: true
+    certSANs:
+      - 127.0.0.1
+      - 10.40.1.250
+    disablePodSecurityPolicy: true
+  controllerManager:
+    image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
+    extraArgs:
+      bind-address: 0.0.0.0
+  coreDNS:
+    disabled: true
+  etcd:
+    advertisedSubnets:
+      - 10.40.1.0/24
+    ca:
+      crt: {{ opSecretPath }}/cluster-etcd-ca-crt
+      key: {{ opSecretPath }}/cluster-etcd-ca-key
+    extraArgs:
+      listen-metrics-urls: "http://0.0.0.0:2381"
+  extraManifests:
+    - # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
+      https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+    - # renovate: datasource=github-releases depName=prometheus-operator/prometheus-operator
+      https://github.com/prometheus-operator/prometheus-operator/releases/download/v0.83.0/stripped-down-crds.yaml
+    - # renovate: datasource=github-releases depName=k8snetworkplumbingwg/network-attachment-definition-client
+      https://github.com/k8snetworkplumbingwg/network-attachment-definition-client/raw/refs/tags/v1.7.6/artifacts/networks-crd.yaml
+  proxy:
+    disabled: true
+    image: registry.k8s.io/kube-proxy:{{ ENV.KUBERNETES_VERSION }}
+  secretboxEncryptionSecret: {{ opSecretPath }}/cluster-secretbox-encryption-secret
+  scheduler:
+    image: registry.k8s.io/kube-scheduler:{{ ENV.KUBERNETES_VERSION }}
+    extraArgs:
+      bind-address: 0.0.0.0
+    config:
+      apiVersion: kubescheduler.config.k8s.io/v1
+      kind: KubeSchedulerConfiguration
+      profiles:
+        - schedulerName: default-scheduler
+          plugins:
+            score:
+              disabled:
+                - name: ImageLocality
+          pluginConfig:
+            - name: PodTopologySpread
+              args:
+                defaultingType: List
+                defaultConstraints:
+                  - maxSkew: 1
+                    topologyKey: kubernetes.io/hostname
+                    whenUnsatisfiable: ScheduleAnyway
+  serviceAccount:
+    key: {{ opSecretPath }}/cluster-service-account-key

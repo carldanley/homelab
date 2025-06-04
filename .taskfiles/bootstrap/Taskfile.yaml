@@ -1,0 +1,62 @@
+---
+version: "3"
+
+tasks:
+  write-kubeconfig:
+    internal: true
+    desc: Write kubeconfig
+    cmd: talosctl kubeconfig --nodes {{ .RANDOM_CONTROLLER }} --force {{ .KUBERNETES_DIR }}
+    vars:
+      RANDOM_CONTROLLER:
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+    preconditions:
+      - which talosctl jq shuf
+
+  talos:
+    desc: Bootstrap Talos
+    prompt: Bootstrap Talos ...?
+    cmds:
+      - |
+        until output=$(talosctl --nodes {{ .RANDOM_CONTROLLER }} bootstrap 2>&1 || true) && [[ "${output}" == *"AlreadyExists"* ]]; do
+          echo "Waiting for Talos bootstrap to complete..."
+          sleep 10
+        done
+    vars:
+      RANDOM_CONTROLLER:
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+    preconditions:
+      - which talosctl shuf jq
+
+      # make sure we can get the machineconfig for the randomly selected controller
+      - talosctl --nodes {{ .RANDOM_CONTROLLER }} get machineconfig
+
+  apps:
+    desc: Bootstrap Kubernetes apps
+    prompt: Bootstrap Kubernetes apps ...?
+    cmds:
+      - op inject --in-file {{ .BOOTSTRAP_DIR }}/secrets.yaml.tpl | kubectl apply --server-side --filename -
+      - helmfile --file {{ .BOOTSTRAP_DIR }}/pre-cni.helmfile.yaml sync --hide-notes
+      - until kubectl wait nodes --for=condition=Ready=True --all --timeout=2m; do sleep 5; done
+      - helmfile --file {{ .BOOTSTRAP_DIR }}/post-cni.helmfile.yaml sync --hide-notes
+    vars:
+      RANDOM_CONTROLLER:
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+    deps:
+      - task: write-kubeconfig
+    env:
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
+    preconditions:
+      - which kubectl talosctl jq shuf helmfile op
+
+      # make sure we can get the machineconfig for the randomly selected controller
+      - talosctl --nodes {{ .RANDOM_CONTROLLER }} get machineconfig
+
+      # make sure the secrets exist
+      - test -f {{ .BOOTSTRAP_DIR }}/secrets.yaml.tpl
+
+      # make sure the helmfiles exist
+      - test -f {{ .BOOTSTRAP_DIR }}/pre-cni.helmfile.yaml
+      - test -f {{ .BOOTSTRAP_DIR }}/post-cni.helmfile.yaml
+
+      # make sure we're logged into onepassword
+      - op whoami --format=json &>/dev/null

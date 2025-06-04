@@ -1,0 +1,10 @@
+{% set opSecretPath = "op://homelab kubernetes/talos" %}
+---
+context: {{ ENV.CLUSTER_NAME }}
+contexts:
+  {{ ENV.CLUSTER_NAME }}:
+    endpoints: [{{ ENV.ENDPOINTS }}]
+    nodes: [{{ ENV.NODES }}]
+    ca: {{ opSecretPath }}/machine-ca-crt
+    crt: {{ opSecretPath }}/talosconfig-crt
+    key: {{ opSecretPath }}/talosconfig-key

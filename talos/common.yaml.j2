@@ -1,0 +1,107 @@
+{% set opSecretPath = "op://homelab kubernetes/talos" %}
+---
+version: v1alpha1
+debug: false
+persist: true
+machine:
+  token: {{ opSecretPath }}/machine-token
+  ca:
+    crt: {{ opSecretPath }}/machine-ca-crt
+  certSANs:
+    - 127.0.0.1
+    - 10.40.1.250
+  features:
+    rbac: true
+    stableHostname: true
+    apidCheckExtKeyUsage: true
+    diskQuotaSupport: true
+    kubePrism:
+      enabled: true
+      port: 7445
+    hostDNS:
+      enabled: true
+      resolveMemberNames: true
+      forwardKubeDNSToHost: false
+  files:
+    - op: create
+      path: /etc/cri/conf.d/20-customization.part
+      content: |
+        [plugins."io.containerd.cri.v1.images"]
+          discard_unpacked_layers = false
+    - op: overwrite
+      path: /etc/nfsmount.conf
+      permissions: 0o644
+      content: |
+        [ NFSMount_Global_Options ]
+        nfsvers=4.1
+        hard=True
+        nconnect=16
+        noatime=True
+        rsize=1048576
+        wsize=1048576
+  install:
+    image: factory.talos.dev/metal-installer/{{ ENV.TALOS_SCHEMATIC }}:{{ ENV.TALOS_VERSION }}
+  kernel:
+    modules:
+      - name: nbd
+  kubelet:
+    image: ghcr.io/siderolabs/kubelet:{{ ENV.KUBERNETES_VERSION }}
+    extraConfig:
+      serializeImagePulls: false
+    defaultRuntimeSeccompProfileEnabled: true
+    nodeIP:
+      validSubnets:
+      - 10.40.1.0/24
+    disableManifestsDirectory: true
+  network:
+    nameservers:
+    - 10.40.1.1
+    disableSearchDomain: true
+  nodeLabels:
+    topology.kubernetes.io/region: homelab
+  sysctls:
+    fs.inotify.max_user_watches: 1048576   # Watchdog
+    fs.inotify.max_user_instances: 8192    # Watchdog
+    net.core.default_qdisc: fq             # 10Gb/s
+    net.core.rmem_max: 67108864            # 10Gb/s | Cloudflared / QUIC
+    net.core.wmem_max: 67108864            # 10Gb/s | Cloudflared / QUIC
+    net.ipv4.tcp_congestion_control: bbr   # 10Gb/s
+    net.ipv4.tcp_fastopen: 3               # Send and accept data in the opening SYN packet
+    net.ipv4.tcp_mtu_probing: 1            # 10Gb/s | Jumbo frames
+    net.ipv4.tcp_rmem: 4096 87380 33554432 # 10Gb/s
+    net.ipv4.tcp_wmem: 4096 65536 33554432 # 10Gb/s
+    net.ipv4.tcp_window_scaling: 1         # 10Gb/s
+    user.max_user_namespaces: 11255        # User Namespaces
+    vm.nr_hugepages: 1024                  # PostgreSQL
+  time:
+    disabled: false
+    servers:
+    - "time.cloudflare.com"
+  udev:
+    rules:
+      - # GPU
+        SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
+cluster:
+  ca:
+    crt: {{ opSecretPath }}/cluster-ca-crt
+  clusterName: {{ ENV.CLUSTER_NAME }}
+  controlPlane:
+    endpoint: https://10.40.1.250:6443
+  discovery:
+    enabled: true
+    registries:
+      kubernetes:
+        disabled: true
+      service:
+        disabled: false
+  id: {{ opSecretPath }}/cluster-id
+  network:
+    cni:
+      name: none
+    dnsDomain: cluster.local
+    podSubnets:
+    - 172.22.0.0/16
+    serviceSubnets:
+    - 172.23.0.0/16
+  secret: {{ opSecretPath }}/cluster-secret
+  token: {{ opSecretPath }}/cluster-token
