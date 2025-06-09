@@ -56,7 +56,7 @@ This Git repository contains the following directories under [kubernetes](./kube
 | Device                                 | Count | OS Disk Size | Data Disk Size | RAM  | Operating System | Purpose                 |
 |----------------------------------------|-------|--------------|----------------|------|------------------|-------------------------|
 | MinisForum MS-A2 (AMD Ryzen™ 9 9955HX) | 3     | 500GB M.2    | 1.92 TB U.2    | 96GB | Talos            | Kubernetes              |
-| Synology DS918+                        | 1     | 4x8TB HDD    | -              | 4GB  | DSM 7            | NAS                     |
+| Synology DS918+                        | 1     | -            | 4x8TB HDD      | 4GB  | DSM 7            | NAS                     |
 | PiKVM (RasPi 4)                        | 1     | 64GB (SD)    | -              | 4GB  | PiKVM            | KVM                     |
 | TESmart 8 Port KVM Switch              | 1     | -            | -              | -    | -                | Network KVM (for PiKVM) |
 | UniFi UDM Pro Max                      | 1     | -            | -              | -    | UniFi OS         | Router & NVR            |
@@ -69,6 +69,26 @@ My MS-A2 workstations are configured with the following hardware:
 - [Crucial 96GB Kit (48GBx2) DDR5-5600 SODIMM](https://www.crucial.com/memory/ddr5/ct2k48g56c46s5)
 - [Crucial 500GB M.2 P3 Plus Gen4 NVMe PCIe 4.0](https://www.crucial.com/products/ssd/crucial-p3-plus-ssd) (Talos OS)
 - [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
+
+---
+
+My Synology DS918+ is configured with the following hardware:
+
+- [Seagate IronWolf 8TB 3.5 Inch SATA 6Gb/s 7200 RPM 256MB Cache](https://www.seagate.com/www-content/product-content/ironwolf/en-us/docs/100844482b.pdf) - (Synology Hybrid RAID)
+- [Samsung 990 PRO SSD 1TB PCIe 4.0 M.2 2280](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie--4-0-nvme--ssd-1tb-mz-v9p1t0b-am.html) - (SSD Read/Write Caching)
+
+---
+
+## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" alt="🖍︎" width="20" height="20"> Additional Documentation
+
+For random notes I've taken the time to jot down, see the following links:
+
+- [Configuring DNS on UDM-Pro for Ad-blocking](./docs/configuring-dns-on-udm-pro-for-adblocking.md)
+- [TESMART KVM Switch + PiKVM](./docs/tesmart-kvm-switch-and-pikvm.md)
+- [Using Cilium with UniFi BGP](./docs/using-cilium-with-unifi-bgp.md)
+- [Checking Synology SSD Cache](./docs/checking-synology-ssd-cache.md)
+
+For fonts, see [Noto Emoji Animations](https://googlefonts.github.io/noto-emoji-animation/).
 
 ---
 
