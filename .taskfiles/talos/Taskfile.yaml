@@ -13,17 +13,6 @@ vars:
         | jq --raw-output '.id'
 
 tasks:
-  check-for-cli-tools:
-    desc: Check for required CLI tools
-    internal: true
-    preconditions:
-      # we check each one individually so we know specifically which one is missing
-      - which curl
-      - which jq
-      - which minijinja-cli
-      - which op
-      - which talosctl
-
   render-template:
     internal: true
     desc: Render a template file using minijinja-cli
@@ -32,10 +21,15 @@ tasks:
       KUBERNETES_VERSION: "{{ .KUBERNETES_VERSION }}"
       TALOS_VERSION: "{{ .TALOS_VERSION }}"
       TALOS_SCHEMATIC: "{{ .TALOS_SCHEMATIC }}"
+      ENDPOINTS: "{{ .ENDPOINTS }}"
+      NODES: "{{ .NODES }}"
+      CLUSTER_NAME: "homelab"
     requires:
       vars:
         - TEMPLATE_FILE
         - OUTPUT_FILE
+    preconditions:
+      - which minijinja-cli
 
   apply-node:
     desc: Apply Talos config to a node [NODE=required] [MODE=auto] [DEBUG=false]
@@ -53,7 +47,7 @@ tasks:
           --patch "@{{ .NODE_TEMPLATE_FILE }}" \
           > {{ .COMPILED_TEMPLATE_FILE }}
 
-      # Lastly, debug the output of the compiled template OR apply it to the node
+      # Next, debug the output of the compiled template OR apply it to the node
       - |
         {{ if deepEqual (.DEBUG | lower) "true" }}
           cat {{ .COMPILED_TEMPLATE_FILE }}
@@ -63,6 +57,9 @@ tasks:
             --file {{ .COMPILED_TEMPLATE_FILE }} \
             {{ if deepEqual (.INSECURE | lower) "true" }}--insecure {{ end -}}
         {{ end }}
+
+      # Finally, make sure the talconfig file is written to disk
+      - task: write-talconfig
     vars:
       MODE: '{{ .MODE | default "auto" }}'
       MACHINE_TYPE:
@@ -78,7 +75,6 @@ tasks:
       DEBUG: '{{ .DEBUG | default "false" }}'
       INSECURE: '{{ .INSECURE | default "false" }}'
     deps:
-      - task: check-for-cli-tools
       - task: render-template
         vars:
           TEMPLATE_FILE: "{{ .TALOS_DIR }}/common.yaml.j2"
@@ -95,6 +91,8 @@ tasks:
       vars:
         - NODE
     preconditions:
+      - which op talosctl
+
       # make sure the schematic file exists
       - test -f {{ .TALOS_DIR }}/schematic.yaml
 
@@ -106,6 +104,61 @@ tasks:
 
       # make sure we can find the node-specific template
       - find '{{ .TALOS_DIR }}' -name '{{ .NODE }}.yaml.j2'
+
+      # make sure we're logged into onepassword
+      - op whoami --format=json &>/dev/null
+
+  write-talconfig:
+    desc: Write the Talos config to disk [FILE=optional]
+    prompt: Write Talos config to "{{ .TALOSCONFIG_PATH }}" (WILL OVERWRITE) ...?
+    cmds:
+      - task: render-template
+        vars:
+          TEMPLATE_FILE: "{{ .TALOS_DIR }}/talconfig.yaml.j2"
+          OUTPUT_FILE: "{{ .TALOSCONFIG_PATH }}"
+          ENDPOINTS: "{{ .ENDPOINTS }}"
+          NODES: "{{ .NODES }}"
+    vars:
+      TALOSCONFIG_PATH:
+        sh: |-
+          {{ if not (deepEqual (.FILE | default "" | trim) "") }}
+          echo "{{ .FILE }}"
+          {{ else }}
+          if [ -n "$TALOSCONFIG" ]; then
+            echo "$TALOSCONFIG"
+          else
+            echo "{{ .TALOS_DIR }}/talosconfig.yaml"
+          fi
+          {{ end }}
+      ENDPOINTS:
+        sh: |-
+          FILES=()
+          if [ -d "{{ .TALOS_DIR }}/controlplane" ]; then
+            for file in "{{ .TALOS_DIR }}/controlplane/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+          echo "${FILES[@]}" | tr ' ' ','
+      NODES:
+        sh: |-
+          FILES=()
+          if [ -d "{{ .TALOS_DIR }}/controlplane" ]; then
+            for file in "{{ .TALOS_DIR }}/controlplane/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+
+          if [ -d "{{ .TALOS_DIR }}/worker" ]; then
+            for file in "{{ .TALOS_DIR }}/worker/"*.yaml.j2; do
+              FILES+=($(basename "$file" .yaml.j2))
+            done
+          fi
+          echo "${FILES[@]}" | tr ' ' ','
+    preconditions:
+      - which op yq
+
+      # make sure the TALOSCONFIG environment variable is set
+      - printenv | grep -q TALOSCONFIG
 
       # make sure we're logged into onepassword
       - op whoami --format=json &>/dev/null

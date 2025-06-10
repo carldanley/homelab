@@ -84,7 +84,7 @@ machine:
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
-  clusterName: homelab
+  clusterName: {{ ENV.CLUSTER_NAME }}
   controlPlane:
     endpoint: https://10.0.110.250:6443
   discovery:
