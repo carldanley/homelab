@@ -1,0 +1,20 @@
+---
+version: "3"
+
+set: [pipefail]
+shopt: [globstar]
+
+vars:
+  KUBERNETES_DIR: "{{ .ROOT_DIR }}/kubernetes"
+  TALOS_DIR: "{{ .ROOT_DIR }}/talos"
+
+env:
+  TALOSCONFIG: "{{ .TALOS_DIR }}/talosconfig"
+
+includes:
+  talos: .taskfiles/talos
+
+tasks:
+  default:
+    cmd: task --list
+    silent: true
