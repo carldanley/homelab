@@ -2,6 +2,9 @@
 ---
 machine:
   type: controlplane
+  ca:
+    crt: {{ opSecretPath }}/machine-crt
+    key: {{ opSecretPath }}/machine-key
   features:
     kubernetesTalosAPIAccess:
       enabled: true

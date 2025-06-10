@@ -61,7 +61,7 @@ tasks:
           talosctl -n {{ .NODE }} apply-config \
             --mode {{ .MODE }} \
             --file {{ .COMPILED_TEMPLATE_FILE }} \
-            --dry-run
+            {{ if deepEqual (.INSECURE | lower) "true" }}--insecure {{ end -}}
         {{ end }}
     vars:
       MODE: '{{ .MODE | default "auto" }}'
@@ -75,6 +75,8 @@ tasks:
         sh: mktemp -t node
       COMPILED_TEMPLATE_FILE:
         sh: mktemp -t compiled
+      DEBUG: '{{ .DEBUG | default "false" }}'
+      INSECURE: '{{ .INSECURE | default "false" }}'
     deps:
       - task: check-for-cli-tools
       - task: render-template
