@@ -6,7 +6,10 @@ persist: true
 machine:
   token: {{ opSecretPath }}/machine-token
   ca:
-    crt: {{ opSecretPath }}/machine-crt
+    crt: {{ opSecretPath }}/machine-ca-crt
+  certSANs:
+    - 127.0.0.1
+    - 10.0.110.250
   features:
     rbac: true
     stableHostname: true
@@ -55,7 +58,7 @@ machine:
     - 10.0.110.1
     disableSearchDomain: true
   nodeLabels:
-    topology.kubernetes.io/region: k8s
+    topology.kubernetes.io/region: homelab
   sysctls:
     fs.inotify.max_user_watches: 1048576   # Watchdog
     fs.inotify.max_user_instances: 8192    # Watchdog
@@ -83,7 +86,7 @@ cluster:
     crt: {{ opSecretPath }}/cluster-ca-crt
   clusterName: homelab
   controlPlane:
-    endpoint: https://k8s.batcave:6443
+    endpoint: https://10.0.110.250:6443
   discovery:
     enabled: true
     registries:

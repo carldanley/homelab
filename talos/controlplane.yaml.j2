@@ -3,8 +3,8 @@
 machine:
   type: controlplane
   ca:
-    crt: {{ opSecretPath }}/machine-crt
-    key: {{ opSecretPath }}/machine-key
+    crt: {{ opSecretPath }}/machine-ca-crt
+    key: {{ opSecretPath }}/machine-ca-key
   features:
     kubernetesTalosAPIAccess:
       enabled: true
@@ -13,6 +13,8 @@ machine:
       allowedKubernetesNamespaces:
         - actions-runner-system
         - system-upgrade
+  nodeLabels:
+    topology.kubernetes.io/zone: controlplane
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
@@ -26,7 +28,8 @@ cluster:
     extraArgs:
       enable-aggregator-routing: true
     certSANs:
-      - k8s.batcave
+      - 127.0.0.1
+      - 10.0.110.250
     disablePodSecurityPolicy: true
   controllerManager:
     image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
