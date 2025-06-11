@@ -23,3 +23,12 @@ releases:
           - --kustomize
           - ../kubernetes/apps/kube-system/cilium/config
         showlogs: true
+
+  - name: coredns
+    namespace: kube-system
+    chart: oci://ghcr.io/coredns/charts/coredns
+    version: 1.42.2
+    values:
+      - "../kubernetes/apps/kube-system/coredns/app/helm/values.yaml"
+    needs:
+      - "kube-system/cilium"
