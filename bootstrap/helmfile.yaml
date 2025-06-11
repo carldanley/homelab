@@ -41,3 +41,21 @@ releases:
       - ../kubernetes/apps/kube-system/spegel/app/helm/values.yaml
     needs:
       - kube-system/coredns
+
+  - name: external-secrets
+    namespace: external-secrets
+    chart: oci://ghcr.io/external-secrets/charts/external-secrets
+    version: 0.17.0
+    values:
+      - ../kubernetes/apps/external-secrets/external-secrets/app/helm/values.yaml
+    needs:
+      - kube-system/spegel
+
+  - name: cert-manager
+    namespace: cert-manager
+    chart: oci://quay.io/jetstack/charts/cert-manager
+    version: v1.17.2
+    values:
+      - ../kubernetes/apps/cert-manager/cert-manager/app/helm/values.yaml
+    needs:
+      - external-secrets/external-secrets
