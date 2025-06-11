@@ -127,7 +127,7 @@ tasks:
           if [ -n "$TALOSCONFIG" ]; then
             echo "$TALOSCONFIG"
           else
-            echo "{{ .TALOS_DIR }}/talosconfig.yaml"
+            echo "{{ .TALOS_DIR }}/talosconfig"
           fi
           {{ end }}
       ENDPOINTS:

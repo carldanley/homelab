@@ -12,6 +12,7 @@ env:
   TALOSCONFIG: "{{ .TALOS_DIR }}/talosconfig"
 
 includes:
+  bootstrap: .taskfiles/bootstrap
   talos: .taskfiles/talos
 
 tasks:
