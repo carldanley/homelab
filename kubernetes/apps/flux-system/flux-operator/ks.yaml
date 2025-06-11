@@ -8,6 +8,9 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: cert-manager
+      namespace: cert-manager
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-operator/app
   prune: true

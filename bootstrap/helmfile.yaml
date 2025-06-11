@@ -58,7 +58,7 @@ releases:
     values:
       - ../kubernetes/apps/cert-manager/cert-manager/app/helm/values.yaml
     needs:
-      - external-secrets/external-secrets
+      - external-secrets/onepassword
 
   - name: flux-operator
     namespace: flux-system
