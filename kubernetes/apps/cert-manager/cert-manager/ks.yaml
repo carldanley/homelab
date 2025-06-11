@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword
+    - name: onepassword-stores
       namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/cert-manager/cert-manager/app
