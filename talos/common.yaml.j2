@@ -9,7 +9,7 @@ machine:
     crt: {{ opSecretPath }}/machine-ca-crt
   certSANs:
     - 127.0.0.1
-    - 10.0.110.250
+    - 10.40.1.250
   features:
     rbac: true
     stableHostname: true
@@ -51,11 +51,11 @@ machine:
     defaultRuntimeSeccompProfileEnabled: true
     nodeIP:
       validSubnets:
-      - 10.0.110.0/24
+      - 10.40.1.0/24
     disableManifestsDirectory: true
   network:
     nameservers:
-    - 10.0.110.1
+    - 10.40.1.1
     disableSearchDomain: true
   nodeLabels:
     topology.kubernetes.io/region: homelab
@@ -86,7 +86,7 @@ cluster:
     crt: {{ opSecretPath }}/cluster-ca-crt
   clusterName: {{ ENV.CLUSTER_NAME }}
   controlPlane:
-    endpoint: https://10.0.110.250:6443
+    endpoint: https://10.40.1.250:6443
   discovery:
     enabled: true
     registries:

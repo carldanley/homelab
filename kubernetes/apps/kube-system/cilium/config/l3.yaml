@@ -44,6 +44,6 @@ spec:
       peers:
         - name: unifi
           peerASN: 64521
-          peerAddress: 10.0.110.1
+          peerAddress: 10.40.1.1
           peerConfigRef:
             name: l3-bgp-peer-config

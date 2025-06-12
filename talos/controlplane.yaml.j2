@@ -29,7 +29,7 @@ cluster:
       enable-aggregator-routing: true
     certSANs:
       - 127.0.0.1
-      - 10.0.110.250
+      - 10.40.1.250
     disablePodSecurityPolicy: true
   controllerManager:
     image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
@@ -39,7 +39,7 @@ cluster:
     disabled: true
   etcd:
     advertisedSubnets:
-      - 10.0.110.0/24
+      - 10.40.1.0/24
     ca:
       crt: {{ opSecretPath }}/cluster-etcd-ca-crt
       key: {{ opSecretPath }}/cluster-etcd-ca-key
