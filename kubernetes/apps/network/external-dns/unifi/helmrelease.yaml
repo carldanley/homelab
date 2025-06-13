@@ -33,7 +33,7 @@ spec:
       - "${DOMAIN_6}"
       - "${DOMAIN_7}"
     podAnnotations:
-      secret.reloader.stakater.com/reload: external-dns-unifi
+      secret.reloader.stakater.com/reload: external-dns-unifi-secrets
     policy: sync
     provider:
       name: webhook
@@ -49,7 +49,7 @@ spec:
           - name: UNIFI_API_KEY
             valueFrom:
               secretKeyRef:
-                name: external-dns-unifi
+                name: external-dns-unifi-secrets
                 key: UNIFI_API_KEY
         livenessProbe:
           httpGet:
