@@ -82,5 +82,5 @@ spec:
   postBuild:
     substituteFrom:
       - kind: Secret
-        name: domain-names-secret
+        name: domains-secret
         optional: false
