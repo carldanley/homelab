@@ -47,6 +47,30 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
+  name: &app cilium-secrets
+  namespace: &namespace kube-system
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  dependsOn:
+    - name: onepassword-secrets
+      namespace: external-secrets
+  interval: 1h
+  path: ./kubernetes/apps/kube-system/cilium/secrets
+  prune: true
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
   name: &app cilium-gateway
   namespace: &namespace kube-system
 spec:
@@ -59,6 +83,8 @@ spec:
     - name: cilium
       namespace: *namespace
     - name: cilium-config
+      namespace: *namespace
+    - name: cilium-secrets
       namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/gateway
