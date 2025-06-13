@@ -1,0 +1,34 @@
+---
+originRequest:
+  originServerName: Batcave
+
+ingress:
+  - hostname: "${DOMAIN_1}"
+    service: &service https://cilium-gateway-external.kube-system.svc.cluster.local
+  - hostname: "*.${DOMAIN_1}"
+    service: *service
+  - hostname: "${DOMAIN_2}"
+    service: *service
+  - hostname: "*.${DOMAIN_2}"
+    service: *service
+  - hostname: "${DOMAIN_3}"
+    service: *service
+  - hostname: "*.${DOMAIN_3}"
+    service: *service
+  - hostname: "${DOMAIN_4}"
+    service: *service
+  - hostname: "*.${DOMAIN_4}"
+    service: *service
+  - hostname: "${DOMAIN_5}"
+    service: *service
+  - hostname: "*.${DOMAIN_5}"
+    service: *service
+  - hostname: "${DOMAIN_6}"
+    service: *service
+  - hostname: "*.${DOMAIN_6}"
+    service: *service
+  - hostname: "${DOMAIN_7}"
+    service: *service
+  - hostname: "*.${DOMAIN_7}"
+    service: *service
+  - service: http_status:404
