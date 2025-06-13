@@ -54,7 +54,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-secrets
+    - name: onepassword-stores
       namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/secrets
