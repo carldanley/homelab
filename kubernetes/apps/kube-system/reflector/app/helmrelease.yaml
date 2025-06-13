@@ -11,8 +11,6 @@ spec:
   ref:
     tag: 9.1.12
   url: oci://ghcr.io/emberstack/helm-charts/reflector
-  verify:
-    provider: cosign
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
