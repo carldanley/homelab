@@ -14,4 +14,17 @@ spec:
             apiTokenSecretRef:
               name: cloudflare-issuer-secret
               key: api-token
-        selector: {}
+        selector:
+          dnsZones:
+            - "${domain1}"
+            - "*.${domain1}"
+            - "${domain2}"
+            - "*.${domain2}"
+            - "${domain3}"
+            - "*.${domain3}"
+            - "${domain4}"
+            - "*.${domain4}"
+            - "${domain5}"
+            - "*.${domain5}"
+            - "${domain6}"
+            - "*.${domain6}"
