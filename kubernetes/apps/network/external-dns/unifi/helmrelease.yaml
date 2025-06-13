@@ -69,5 +69,5 @@ spec:
       - gateway-httproute
       - service
     triggerLoopOnEvent: true
-    txtOwnerId: main
+    txtOwnerId: k8s
     txtPrefix: "k8s."

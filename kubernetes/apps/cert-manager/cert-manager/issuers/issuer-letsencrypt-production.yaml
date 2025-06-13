@@ -28,3 +28,5 @@ spec:
             - "*.${DOMAIN_5}"
             - "${DOMAIN_6}"
             - "*.${DOMAIN_6}"
+            - "${DOMAIN_7}"
+            - "*.${DOMAIN_7}"
