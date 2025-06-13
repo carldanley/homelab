@@ -57,5 +57,4 @@ spec:
     substituteFrom:
       - kind: Secret
         name: cloudflare-issuer-secret
-        namespace: *namespace
         optional: false
