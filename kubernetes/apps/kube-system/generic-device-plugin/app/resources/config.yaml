@@ -1,0 +1,6 @@
+---
+devices:
+  - name: coral-tpu-m2
+    groups:
+      - paths:
+          - path: /dev/apex_0
