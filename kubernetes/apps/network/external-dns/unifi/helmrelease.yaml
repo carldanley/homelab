@@ -1,0 +1,73 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: external-dns-unifi
+spec:
+  interval: 30m
+  url: https://kubernetes-sigs.github.io/external-dns
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns-unifi
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: external-dns
+      version: 1.15.2
+      sourceRef:
+        kind: HelmRepository
+        name: external-dns-unifi
+      interval: 30m
+  values:
+    fullnameOverride: &name external-dns-unifi
+    logLevel: &logLevel info
+    domainFilters:
+      - batcave
+    podAnnotations:
+      secret.reloader.stakater.com/reload: external-dns-unifi
+    policy: sync
+    provider:
+      name: webhook
+      webhook:
+        image:
+          repository: ghcr.io/kashalls/external-dns-unifi-webhook
+          tag: v0.6.0
+        env:
+          - name: LOG_LEVEL
+            value: *logLevel
+          - name: UNIFI_HOST
+            value: https://10.40.1.1
+          - name: UNIFI_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: external-dns-unifi
+                key: UNIFI_API_KEY
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http-webhook
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http-webhook
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+    resources:
+      requests:
+        cpu: 16m
+        memory: 90M
+      limits:
+        memory: 90M
+    serviceMonitor:
+      enabled: true
+    sources:
+      - gateway-httproute
+      - service
+    triggerLoopOnEvent: true
+    txtOwnerId: main
+    txtPrefix: "k8s."
