@@ -11,6 +11,10 @@ spec:
   dependsOn:
     - name: onepassword-stores
       namespace: external-secrets
+    - name: cert-manager-secrets
+      namespace: cert-manager
+    - name: reflector
+      namespace: kube-system
   interval: 1h
   path: ./kubernetes/apps/network/external-dns/unifi
   prune: true
@@ -22,3 +26,8 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: true
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false

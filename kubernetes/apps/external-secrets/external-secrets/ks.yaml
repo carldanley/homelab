@@ -8,9 +8,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: spegel
-      namespace: kube-system
   interval: 1h
   path: ./kubernetes/apps/external-secrets/external-secrets/app
   prune: true

@@ -25,7 +25,13 @@ spec:
     fullnameOverride: &name external-dns-unifi
     logLevel: &logLevel info
     domainFilters:
-      - batcave
+      - "${DOMAIN_1}"
+      - "${DOMAIN_2}"
+      - "${DOMAIN_3}"
+      - "${DOMAIN_4}"
+      - "${DOMAIN_5}"
+      - "${DOMAIN_6}"
+      - "${DOMAIN_7}"
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-unifi
     policy: sync
