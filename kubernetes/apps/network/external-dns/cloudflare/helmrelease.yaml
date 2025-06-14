@@ -1,8 +1,17 @@
 ---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: external-dns-cloudflare
+  namespace: network
+spec:
+  interval: 30m
+  url: https://kubernetes-sigs.github.io/external-dns
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: external-dns-cloudflare-domain-5
+  name: external-dns-cloudflare
 spec:
   interval: 30m
   chart:
@@ -20,23 +29,29 @@ spec:
     crds: CreateReplace
     disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   values:
-    fullnameOverride: &name external-dns-cloudflare-domain-5
+    fullnameOverride: &name external-dns-cloudflare
     domainFilters:
+      - "${DOMAIN_1}"
+      - "${DOMAIN_2}"
+      - "${DOMAIN_3}"
+      - "${DOMAIN_4}"
       - "${DOMAIN_5}"
+      - "${DOMAIN_6}"
+      - "${DOMAIN_7}"
     env:
       - name: CF_API_TOKEN
         valueFrom:
           secretKeyRef:
-            name: external-dns-cloudflare-secrets
+            name: external-dns-cloudflare-secret
             key: CLOUDFLARE_API_TOKEN
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      - --gateway-name=external-domain-5
+      - --gateway-name=external
     podAnnotations:
-      secret.reloader.stakater.com/reload: external-dns-cloudflare-secrets
+      secret.reloader.stakater.com/reload: external-dns-cloudflare-secret
     policy: sync
     provider:
       name: cloudflare
