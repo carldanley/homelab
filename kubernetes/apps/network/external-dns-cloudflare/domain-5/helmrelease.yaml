@@ -32,7 +32,7 @@ spec:
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
       - --cloudflare-proxied
-      - --gateway-name=domain-5-external
+      - --gateway-name=external-domain-5
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-cloudflare-secrets
     policy: sync
