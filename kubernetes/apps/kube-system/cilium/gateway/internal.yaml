@@ -4,16 +4,34 @@ kind: Gateway
 metadata:
   name: internal-domain-5
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_5}"
+    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_2},internal.${DOMAIN_5}"
 spec:
   gatewayClassName: cilium
   addresses:
     - type: IPAddress
-      value: 10.50.51.55
+      value: 10.50.50.50
   infrastructure:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: *hostname
   listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_2}"
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_2}"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-certificate-tls
     - name: http
       protocol: HTTP
       port: 80
@@ -31,4 +49,4 @@ spec:
       tls:
         certificateRefs:
           - kind: Secret
-            name: domain-5-tls
+            name: wildcard-certificate-tls
