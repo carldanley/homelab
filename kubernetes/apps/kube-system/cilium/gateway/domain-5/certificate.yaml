@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: domain-5
+spec:
+  secretName: domain-5-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "${DOMAIN_5}"
+  dnsNames:
+    - "${DOMAIN_5}"
+    - "*.${DOMAIN_5}"
