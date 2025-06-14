@@ -7,4 +7,4 @@ components:
 resources:
   # - ./external-dns-unifi/ks.yaml
   - ./external-dns-cloudflare/ks.yaml
-  # - ./cloudflared/ks.yaml
+  - ./cloudflared/ks.yaml

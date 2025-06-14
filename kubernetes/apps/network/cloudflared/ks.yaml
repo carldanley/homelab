@@ -26,7 +26,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app cloudflared
+  name: &app cloudflared-domain-5
   namespace: &namespace network
 spec:
   commonMetadata:
