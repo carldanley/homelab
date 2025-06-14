@@ -76,7 +76,7 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
+  wait: false # skip waiting for cert-manager to issue certificates
   postBuild:
     substituteFrom:
       - kind: Secret
