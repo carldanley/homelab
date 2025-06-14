@@ -41,7 +41,7 @@ metadata:
     external-dns.alpha.kubernetes.io/controller: none
 spec:
   parentRefs:
-    - name: domain-5-external
+    - name: external-domain-5
       namespace: kube-system
       sectionName: http
   rules:
