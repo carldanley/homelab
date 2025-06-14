@@ -4,7 +4,7 @@ kind: Gateway
 metadata:
   name: internal
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_2},internal.${DOMAIN_5}"
+    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7}"
 spec:
   gatewayClassName: cilium
   addresses:
