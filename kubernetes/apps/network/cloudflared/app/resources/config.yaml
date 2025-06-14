@@ -1,6 +1,6 @@
 ---
 originRequest:
-  originServerName: Batcave
+  originServerName: external.batcave
 
 ingress:
   - hostname: "${DOMAIN_1}"
