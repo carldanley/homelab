@@ -12,3 +12,4 @@ data:
         service: &service https://cilium-gateway-external-domain-5.kube-system.svc.cluster.local
       - hostname: "*.${DOMAIN_5}"
         service: *service
+      - service: http_status:404
