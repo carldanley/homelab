@@ -3,16 +3,16 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
-  annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7}"
+  # annotations:
+    # external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7}"
 spec:
   gatewayClassName: cilium
   addresses:
     - type: IPAddress
       value: 10.50.50.50
-  infrastructure:
-    annotations:
-      external-dns.alpha.kubernetes.io/hostname: *hostname
+  # infrastructure:
+    # annotations:
+      # external-dns.alpha.kubernetes.io/hostname: *hostname
   listeners:
     ########################
     - name: domain-1-http

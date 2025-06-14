@@ -3,16 +3,16 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: external
-  annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "external.${DOMAIN_1},external.${DOMAIN_2},external.${DOMAIN_3},external.${DOMAIN_4},external.${DOMAIN_5},external.${DOMAIN_6},external.${DOMAIN_7}"
+  # annotations:
+    # external-dns.alpha.kubernetes.io/target: &hostname "external.${DOMAIN_1},external.${DOMAIN_2},external.${DOMAIN_3},external.${DOMAIN_4},external.${DOMAIN_5},external.${DOMAIN_6},external.${DOMAIN_7}"
 spec:
   gatewayClassName: cilium
   addresses:
     - type: IPAddress
       value: 10.50.50.51
-  infrastructure:
-    annotations:
-      external-dns.alpha.kubernetes.io/hostname: *hostname
+  # infrastructure:
+    # annotations:
+      # external-dns.alpha.kubernetes.io/hostname: *hostname
   listeners:
     ########################
     - name: domain-1-http
