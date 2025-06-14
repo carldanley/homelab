@@ -26,8 +26,6 @@ spec:
     logLevel: &logLevel info
     domainFilters:
       - "${DOMAIN_5}"
-    extraArgs:
-      - --gateway-name=internal
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-unifi-secrets
     policy: sync
@@ -93,8 +91,6 @@ spec:
     logLevel: &logLevel info
     domainFilters:
       - "${DOMAIN_2}"
-    extraArgs:
-      - --gateway-name=internal
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-unifi-secrets
     policy: sync
