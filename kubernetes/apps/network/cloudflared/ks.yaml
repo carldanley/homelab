@@ -57,3 +57,6 @@ spec:
       - kind: Secret
         name: domains-secret
         optional: false
+      - kind: Secret
+        name: cloudflared-secret
+        optional: false
