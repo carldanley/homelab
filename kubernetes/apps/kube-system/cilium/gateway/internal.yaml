@@ -3,83 +3,39 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal
-  # annotations:
-    # external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7}"
+  annotations:
+    external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_4},internal.${DOMAIN_5}"
 spec:
   gatewayClassName: cilium
   addresses:
     - type: IPAddress
-      value: 10.50.50.50
-  # infrastructure:
-    # annotations:
-      # external-dns.alpha.kubernetes.io/hostname: *hostname
+      value: 10.50.50.1
+  infrastructure:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: *hostname
   listeners:
+
     ########################
-    - name: domain-1-http
-      protocol: HTTP
-      port: 80
-      hostname: "*.${DOMAIN_1}"
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: domain-1-https
-      protocol: HTTPS
-      port: 443
-      hostname: "*.${DOMAIN_1}"
-      allowedRoutes:
-        namespaces:
-          from: All
-      tls:
-        certificateRefs:
-          - kind: Secret
-            name: wildcard-certificate-tls
+    # DOMAIN 4
     ########################
-    - name: domain-2-http
-      protocol: HTTP
-      port: 80
-      hostname: "*.${DOMAIN_2}"
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: domain-2-https
-      protocol: HTTPS
-      port: 443
-      hostname: "*.${DOMAIN_2}"
-      allowedRoutes:
-        namespaces:
-          from: All
-      tls:
-        certificateRefs:
-          - kind: Secret
-            name: wildcard-certificate-tls
-    ########################
-    - name: domain-3-http
-      protocol: HTTP
-      port: 80
-      hostname: "*.${DOMAIN_3}"
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: domain-3-https
-      protocol: HTTPS
-      port: 443
-      hostname: "*.${DOMAIN_3}"
-      allowedRoutes:
-        namespaces:
-          from: All
-      tls:
-        certificateRefs:
-          - kind: Secret
-            name: wildcard-certificate-tls
-    ########################
-    - name: domain-4-http
+
+    - name: domain-4-subdomain-http
       protocol: HTTP
       port: 80
       hostname: "*.${DOMAIN_4}"
       allowedRoutes:
         namespaces:
           from: Same
-    - name: domain-4-https
+
+    - name: domain-4-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_4}"
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    - name: domain-4-subdomain-https
       protocol: HTTPS
       port: 443
       hostname: "*.${DOMAIN_4}"
@@ -90,15 +46,40 @@ spec:
         certificateRefs:
           - kind: Secret
             name: wildcard-certificate-tls
+
+    - name: domain-4-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_4}"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-certificate-tls
+
     ########################
-    - name: domain-5-http
+    # DOMAIN 5
+    ########################
+
+    - name: domain-5-subdomain-http
       protocol: HTTP
       port: 80
       hostname: "*.${DOMAIN_5}"
       allowedRoutes:
         namespaces:
           from: Same
-    - name: domain-5-https
+
+    - name: domain-5-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_5}"
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+    - name: domain-5-subdomain-https
       protocol: HTTPS
       port: 443
       hostname: "*.${DOMAIN_5}"
@@ -109,37 +90,11 @@ spec:
         certificateRefs:
           - kind: Secret
             name: wildcard-certificate-tls
-    ########################
-    - name: domain-6-http
-      protocol: HTTP
-      port: 80
-      hostname: "*.${DOMAIN_6}"
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: domain-6-https
+
+    - name: domain-5-root-https
       protocol: HTTPS
       port: 443
-      hostname: "*.${DOMAIN_6}"
-      allowedRoutes:
-        namespaces:
-          from: All
-      tls:
-        certificateRefs:
-          - kind: Secret
-            name: wildcard-certificate-tls
-    ########################
-    - name: domain-7-http
-      protocol: HTTP
-      port: 80
-      hostname: "*.${DOMAIN_7}"
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: domain-7-https
-      protocol: HTTPS
-      port: 443
-      hostname: "*.${DOMAIN_7}"
+      hostname: "${DOMAIN_5}"
       allowedRoutes:
         namespaces:
           from: All
