@@ -48,8 +48,6 @@ spec:
       namespace: cert-manager
     - name: reflector
       namespace: kube-system
-    - name: external-dns-cloudflare-common
-      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/network/external-dns/cloudflare
   prune: true
