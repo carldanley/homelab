@@ -14,6 +14,7 @@ spec:
     annotations:
       external-dns.alpha.kubernetes.io/hostname: *hostname
   listeners:
+    # domain 1
     - name: http
       protocol: HTTP
       port: 80
@@ -32,6 +33,8 @@ spec:
         certificateRefs:
           - kind: Secret
             name: wildcard-certificate-tls
+
+    # domain 5
     - name: http
       protocol: HTTP
       port: 80
