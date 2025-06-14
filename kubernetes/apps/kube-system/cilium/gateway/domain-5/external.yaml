@@ -2,7 +2,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: domain-5-external
+  name: external-domain-5
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname "external.${DOMAIN_5}"
 spec:

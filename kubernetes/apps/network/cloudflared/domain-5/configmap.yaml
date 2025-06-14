@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-configmap-domain-5
+data:
+  config.yaml: |
+    originRequest:
+      originServerName: "external.${DOMAIN_5}"
+
+    ingress:
+      - hostname: "${DOMAIN_5}"
+        service: &service https://cilium-gateway-external-domain-5.kube-system.svc.cluster.local
+      - hostname: "*.${DOMAIN_5}"
+        service: *service

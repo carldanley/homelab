@@ -74,7 +74,7 @@ spec:
     persistence:
       config:
         type: configMap
-        name: cloudflared-configmap
+        name: cloudflared-configmap-domain-5
         globalMounts:
           - path: /etc/cloudflared/config.yaml
             subPath: config.yaml
