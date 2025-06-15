@@ -1,0 +1,11 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: echo-server
+spec:
+  endpoints:
+  - dnsName: "echo-server.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_5}"
