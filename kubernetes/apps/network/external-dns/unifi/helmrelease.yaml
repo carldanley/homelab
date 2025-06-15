@@ -35,6 +35,7 @@ spec:
     extraArgs:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
+      - --label-filter=dns.homelab.arpa/external!=true
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-unifi-secrets
     policy: sync

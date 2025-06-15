@@ -2,6 +2,8 @@ apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
   name: echo-server
+  labels:
+    dns.homelab.arpa/external: "true"
 spec:
   endpoints:
   - dnsName: "echo-server.${DOMAIN_5}"
