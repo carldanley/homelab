@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: cloudflared-configmap
 data:
+  # origin configuration: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/cloudflared-parameters/origin-parameters/
+  # config file docs: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/
   config.yaml: |
     tunnel: "${TUNNEL_ID}"
     no-autoupdate: true
