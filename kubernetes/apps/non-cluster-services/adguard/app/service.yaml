@@ -1,0 +1,28 @@
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: adguard
+  labels:
+    kubernetes.io/service-name: adguard
+addressType: IPv4
+ports:
+  - protocol: TCP
+    port: 8083
+    name: http
+endpoints:
+  - addresses:
+    - "10.40.1.233"
+    conditions:
+      ready: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adguard
+spec:
+ ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8083
+      name: http

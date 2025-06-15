@@ -1,0 +1,13 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: synology
+  labels:
+    dns.homelab.arpa/external: "true"
+spec:
+  endpoints:
+  - dnsName: "synology.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_5}"
