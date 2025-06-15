@@ -11,6 +11,12 @@ data:
 
     ingress:
 
+      - hostname: "plex.${DOMAIN_5}"
+        service: "http://10.10.3.123:32400"
+        originRequest:
+          originServerName: "external.${DOMAIN_5}"
+          http2Origin: true
+
       - hostname: "${DOMAIN_1}"
         service: &service https://cilium-gateway-external.kube-system.svc.cluster.local
         originRequest:
