@@ -1,0 +1,13 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: tautulli
+  labels:
+    dns.homelab.arpa/external: "false"
+spec:
+  endpoints:
+  - dnsName: "tautulli.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_5}"
