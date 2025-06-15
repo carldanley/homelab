@@ -17,7 +17,19 @@ data:
           originServerName: "external.${DOMAIN_1}"
           http2Origin: true
 
+      - hostname: "*.${DOMAIN_1}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_1}"
+          http2Origin: true
+
       - hostname: "${DOMAIN_2}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_2}"
+          http2Origin: true
+
+      - hostname: "*.${DOMAIN_2}"
         service: *service
         originRequest:
           originServerName: "external.${DOMAIN_2}"
@@ -29,7 +41,19 @@ data:
           originServerName: "external.${DOMAIN_3}"
           http2Origin: true
 
+      - hostname: "*.${DOMAIN_3}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_3}"
+          http2Origin: true
+
       - hostname: "${DOMAIN_4}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_4}"
+          http2Origin: true
+
+      - hostname: "*.${DOMAIN_4}"
         service: *service
         originRequest:
           originServerName: "external.${DOMAIN_4}"
@@ -41,13 +65,31 @@ data:
           originServerName: "external.${DOMAIN_5}"
           http2Origin: true
 
+      - hostname: "*.${DOMAIN_5}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_5}"
+          http2Origin: true
+
       - hostname: "${DOMAIN_6}"
         service: *service
         originRequest:
           originServerName: "external.${DOMAIN_6}"
           http2Origin: true
 
+      - hostname: "*.${DOMAIN_6}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_6}"
+          http2Origin: true
+
       - hostname: "${DOMAIN_7}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_7}"
+          http2Origin: true
+
+      - hostname: "*.${DOMAIN_7}"
         service: *service
         originRequest:
           originServerName: "external.${DOMAIN_7}"
