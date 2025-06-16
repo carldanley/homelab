@@ -24,6 +24,9 @@ spec:
         pod:
           hostNetwork: true
 
+        serviceAccount:
+          name: *app
+
         initContainers:
           cni-plugins:
             image:
@@ -89,9 +92,9 @@ spec:
         multus:
           type: ClusterRoleBinding
           roleRef:
-            identifier: multus
+            identifier: *app
           subjects:
-            - identifier: multus
+            - identifier: *app
 
     serviceAccount:
-      multus: {}
+      *app : {}

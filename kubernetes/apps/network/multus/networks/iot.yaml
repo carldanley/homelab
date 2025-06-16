@@ -21,6 +21,12 @@ spec:
           }
         },
         {
+          "type": "tuning",
+          "capabilities": {
+            "mac": true
+          }
+        },
+        {
           "type": "sbr"
         }
       ]
