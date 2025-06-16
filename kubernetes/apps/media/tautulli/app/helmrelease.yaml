@@ -75,7 +75,7 @@ spec:
         hostnames:
           - "tautulli.${DOMAIN_5}"
         parentRefs:
-          - name: external
+          - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
         rules:

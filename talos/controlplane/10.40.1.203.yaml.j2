@@ -28,6 +28,8 @@ machine:
               ip: 10.40.1.250
   nodeLabels:
     intel.feature.node.kubernetes.io/gpu: true
+    google.feature.node.kubernetes.io/coral-usb: true
+    google.feature.node.kubernetes.io/coral-m2: true
   sysfs:
     devices.system.cpu.intel_pstate.hwp_dynamic_boost: 1
   udev:
