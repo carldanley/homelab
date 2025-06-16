@@ -8,3 +8,4 @@ resources:
   - ./external-dns/ks.yaml
   - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
+  - ./multus/ks.yaml
