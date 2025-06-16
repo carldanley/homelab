@@ -1,0 +1,28 @@
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: plex
+  labels:
+    kubernetes.io/service-name: plex
+addressType: IPv4
+ports:
+  - protocol: TCP
+    port: 32400
+    name: http
+endpoints:
+  - addresses:
+    - "10.10.3.123"
+    conditions:
+      ready: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+spec:
+ ports:
+    - protocol: TCP
+      port: 32400
+      targetPort: 32400
+      name: http
