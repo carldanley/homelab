@@ -37,7 +37,7 @@ concurrency:
 jobs:
   renovate:
     name: Renovate
-    runs-on: homelab-runners
+    runs-on: ubuntu-latest
     steps:
       - name: Generate Token
         uses: actions/create-github-app-token@df432ceedc7162793a195dd1713ff69aefc7379e # v2.0.6
