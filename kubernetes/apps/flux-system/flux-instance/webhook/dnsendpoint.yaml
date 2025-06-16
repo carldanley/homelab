@@ -1,0 +1,13 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: flux-webhook
+  labels:
+    dns.homelab.arpa/external: "true"
+spec:
+  endpoints:
+  - dnsName: "flux-webhook.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_5}"
