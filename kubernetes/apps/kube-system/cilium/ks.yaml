@@ -65,9 +65,44 @@ spec:
     - name: cert-manager-secrets
       namespace: cert-manager
     - name: reflector
-      namespace: kube-system
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/gateway
+  prune: true
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  timeout: 5m
+  wait: false # skip waiting for cert-manager to issue certificates
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app cilium-hubble
+  namespace: &namespace kube-system
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  dependsOn:
+    - name: cilium
+      namespace: *namespace
+    - name: cert-manager-secrets
+      namespace: cert-manager
+    - name: reflector
+      namespace: *namespace
+    - name: external-dns-unifi
+      namespace: network
+  interval: 1h
+  path: ./kubernetes/apps/kube-system/cilium/hubble
   prune: true
   retryInterval: 2m
   sourceRef:
