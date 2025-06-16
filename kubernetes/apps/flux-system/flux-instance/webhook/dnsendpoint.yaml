@@ -3,7 +3,7 @@ kind: DNSEndpoint
 metadata:
   name: flux-webhook
   labels:
-    dns.homelab.arpa/external: "true"
+    dns.homelab/external: "true"
 spec:
   endpoints:
   - dnsName: "flux-webhook.${DOMAIN_5}"

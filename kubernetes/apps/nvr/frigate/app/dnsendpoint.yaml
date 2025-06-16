@@ -3,7 +3,7 @@ kind: DNSEndpoint
 metadata:
   name: frigate
   labels:
-    dns.homelab.arpa/external: "false"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "frigate.${DOMAIN_5}"

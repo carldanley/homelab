@@ -4,7 +4,7 @@ kind: DNSEndpoint
 metadata:
   name: adguard
   labels:
-    dns.homelab.arpa/external: "false"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "adguard.${DOMAIN_5}"

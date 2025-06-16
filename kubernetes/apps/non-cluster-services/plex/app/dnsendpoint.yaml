@@ -4,7 +4,7 @@ kind: DNSEndpoint
 metadata:
   name: plex-external
   labels:
-    dns.homelab.arpa/external: "true"
+    dns.homelab/external: "true"
 spec:
   endpoints:
   - dnsName: "plex.${DOMAIN_5}"
@@ -18,7 +18,7 @@ kind: DNSEndpoint
 metadata:
   name: plex-internal
   labels:
-    dns.homelab.arpa/external: "false"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "plex.${DOMAIN_5}"

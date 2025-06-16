@@ -3,7 +3,7 @@ kind: DNSEndpoint
 metadata:
   name: tautulli
   labels:
-    dns.homelab.arpa/external: "false"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "tautulli.${DOMAIN_5}"

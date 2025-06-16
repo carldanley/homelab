@@ -4,7 +4,7 @@ kind: DNSEndpoint
 metadata:
   name: cloudflared-tunnel
   labels:
-    dns.homelab.arpa/external: "true"
+    dns.homelab/external: "true"
 spec:
   endpoints:
 

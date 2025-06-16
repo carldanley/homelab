@@ -3,7 +3,7 @@ kind: DNSEndpoint
 metadata:
   name: echo-server
   labels:
-    dns.homelab.arpa/external: "true"
+    dns.homelab/external: "true"
 spec:
   endpoints:
   - dnsName: "echo-server.${DOMAIN_5}"

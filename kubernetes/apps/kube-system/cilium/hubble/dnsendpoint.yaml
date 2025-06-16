@@ -4,7 +4,7 @@ kind: DNSEndpoint
 metadata:
   name: hubble
   labels:
-    dns.homelab.arpa/external: "false"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "hubble.${DOMAIN_5}"
