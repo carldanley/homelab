@@ -36,3 +36,11 @@ machine:
     rules:
       - # Coral M.2 TPU
         SUBSYSTEM=="apex", KERNEL=="apex*", GROUP="44", MODE="0660"
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: disk.serial == "S7U8NJ0XC28279J" && !system_disk
+  minSize: 4.0TB
