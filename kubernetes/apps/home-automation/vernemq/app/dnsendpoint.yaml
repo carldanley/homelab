@@ -1,0 +1,13 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: vernemq
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "mqtt.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "10.50.10.50"
