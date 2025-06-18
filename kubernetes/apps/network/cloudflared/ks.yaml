@@ -43,6 +43,14 @@ spec:
       namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/network/cloudflared/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
+      - kind: Secret
+        name: cloudflared-secret
+        optional: false
   prune: true
   retryInterval: 2m
   sourceRef:
@@ -52,11 +60,3 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: true
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false
-      - kind: Secret
-        name: cloudflared-secret
-        optional: false

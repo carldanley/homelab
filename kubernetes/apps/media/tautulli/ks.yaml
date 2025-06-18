@@ -10,6 +10,11 @@ spec:
       app.kubernetes.io/name: *app
   interval: 1h
   path: ./kubernetes/apps/media/tautulli/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   retryInterval: 2m
   sourceRef:
@@ -19,8 +24,3 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: true
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false

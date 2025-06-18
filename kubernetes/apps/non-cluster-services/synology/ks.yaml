@@ -13,6 +13,11 @@ spec:
       namespace: network
   interval: 1h
   path: ./kubernetes/apps/non-cluster-services/synology/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   retryInterval: 2m
   sourceRef:
@@ -22,8 +27,3 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: true
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false

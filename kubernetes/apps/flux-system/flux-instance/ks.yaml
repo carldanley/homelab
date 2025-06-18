@@ -45,6 +45,11 @@ spec:
       namespace: kube-system
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/webhook
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   retryInterval: 2m
   sourceRef:
@@ -54,8 +59,3 @@ spec:
   targetNamespace: *namespace
   timeout: 5m
   wait: true
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false
