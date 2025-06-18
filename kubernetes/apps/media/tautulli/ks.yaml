@@ -8,6 +8,13 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/volsync
+  dependsOn:
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: volsync
+      namespace: volsync-system
   interval: 1h
   path: ./kubernetes/apps/media/tautulli/app
   postBuild:
@@ -15,6 +22,11 @@ spec:
       - kind: Secret
         name: domains-secret
         optional: false
+    substitute:
+      APP: *app
+      VOLSYNC_CAPACITY: 5Gi
+      VOLSYNC_CACHE_SNAPSHOTCLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
+      VOLSYNC_CACHE_STORAGECLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
   prune: true
   retryInterval: 2m
   sourceRef:

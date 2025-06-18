@@ -60,7 +60,11 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
     persistence:
       config:
-        type: emptyDir
+        existingClaim: *app
+      config-cache:
+        existingClaim: tautulli-cache
+        globalMounts:
+          - path: /config/cache
       tmpfs:
         type: emptyDir
         advancedMounts:
