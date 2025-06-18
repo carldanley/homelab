@@ -27,7 +27,7 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 25Gi
+            storage: 5Gi
         # storageClassName: openebs-hostpath
         storageClassName: ceph-block # use ceph-block until ms-a2's get here with ssd cache
     controllerServiceAccount:
