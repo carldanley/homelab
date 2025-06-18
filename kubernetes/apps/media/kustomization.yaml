@@ -6,3 +6,4 @@ components:
   - ../../components/common
 resources:
   - ./tautulli/ks.yaml
+  - ./prowlarr/ks.yaml
