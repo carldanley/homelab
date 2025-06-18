@@ -8,9 +8,13 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/volsync
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/home-automation/zigbee2mqtt/app
   postBuild:
@@ -18,6 +22,12 @@ spec:
       - kind: Secret
         name: domains-secret
         optional: false
+    substitute:
+      APP: *app
+      VOLSYNC_CAPACITY: 1Gi
+      VOLSYNC_CACHE_CAPACITY: 1Gi
+      VOLSYNC_CACHE_SNAPSHOTCLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
+      VOLSYNC_CACHE_STORAGECLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
   prune: true
   retryInterval: 2m
   sourceRef:

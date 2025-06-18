@@ -6,4 +6,4 @@ components:
   - ../../components/common
 resources:
   - ./vernemq/ks.yaml
-  # - ./zigbee2mqtt/ks.yaml
+  - ./zigbee2mqtt/ks.yaml

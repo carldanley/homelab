@@ -95,9 +95,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
     persistence:
       data:
-        type: persistentVolumeClaim
-        accessMode: ReadWriteOnce
-        size: 5Gi
+        existingClaim: *app
       config-logs:
         type: emptyDir
         globalMounts:
