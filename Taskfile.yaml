@@ -1,8 +1,10 @@
 ---
 version: "3"
 
-set: [pipefail]
-shopt: [globstar]
+set:
+  - pipefail
+shopt:
+  - globstar
 
 vars:
   KUBERNETES_DIR: "{{ .ROOT_DIR }}/kubernetes"
@@ -15,6 +17,7 @@ env:
 includes:
   bootstrap: .taskfiles/bootstrap
   talos: .taskfiles/talos
+  volsync: .taskfiles/volsync
 
 tasks:
   default:
