@@ -5,7 +5,7 @@ machine:
     diskSelector:
       serial: 50026B72836435C7
   network:
-    hostname: cp0.k8s.batcave
+    hostname: w01.k8s.batcave
     interfaces:
       - interface: bond0
         bond:
@@ -24,8 +24,6 @@ machine:
             mtu: 1500
             dhcpOptions:
               routeMetric: 4096
-            vip:
-              ip: 10.40.1.250
   nodeLabels:
     intel.feature.node.kubernetes.io/gpu: true
     google.feature.node.kubernetes.io/coral-usb: true
@@ -36,11 +34,3 @@ machine:
     rules:
       - # Coral M.2 TPU
         SUBSYSTEM=="apex", KERNEL=="apex*", GROUP="44", MODE="0660"
----
-apiVersion: v1alpha1
-kind: UserVolumeConfig
-name: local-hostpath
-provisioning:
-  diskSelector:
-    match: disk.serial == "S7U8NJ0XC28279J" && !system_disk
-  minSize: 4.0TB

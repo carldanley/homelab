@@ -1,0 +1,28 @@
+{% set opSecretPath = "op://homelab kubernetes/talos" %}
+---
+machine:
+  install:
+    diskSelector:
+      serial: S5H7NC0MC01014Z
+  network:
+    hostname: cp02.k8s.batcave
+    interfaces:
+      - interface: bond9
+        bond:
+          deviceSelectors:
+            - hardwareAddr: "00:1f:c6:9c:f3:*"
+              driver: e1000e
+          mode: 802.3ad
+          xmitHashPolicy: layer3+4
+          lacpRate: fast
+          miimon: 1000
+        dhcp: true
+        mtu: 1500
+        vlans:
+          - vlanId: 20
+            dhcp: false
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
+            vip:
+              ip: 10.40.1.250
