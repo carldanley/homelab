@@ -1,0 +1,128 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app sabnzbd
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      sabnzbd:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/sabnzbd
+              tag: 4.5.1@sha256:d57f89bf771f2236a22643482d5a80736cb6c2944c7f7d4168a15332a5a26f83
+            env:
+              SABNZBD__PORT: &port 8080
+              SABNZBD__HOST_WHITELIST_ENTRIES: >-
+                sabnzbd,
+                sabnzbd.media,
+                sabnzbd.media.svc,
+                sabnzbd.media.svc.cluster,
+                sabnzbd.media.svc.cluster.local,
+                sabnzbd.${DOMAIN_5}
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: sabnzbd-secret
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api?mode=version
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 100m
+              limits:
+                memory: 32Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+
+          gluetun:
+            image:
+              repository: ghcr.io/qdm12/gluetun
+              tag: v3.40.0@sha256:2b42bfa046757145a5155acece417b65b4443c8033fb88661a8e9dcf7fda5a00
+            env:
+              VPN_SERVICE_PROVIDER: "mullvad"
+              VPN_TYPE: "wireguard"
+              VPN_INTERFACE: "wg0"
+              WIREGUARD_ENDPOINT_PORT: 51280
+              SHADOWSOCKS: "on"
+              SERVER_CITIES: "Atlanta GA"
+              DOT: "off"
+              FIREWALL_INPUT_PORTS: *port
+              FIREWALL_DEBUG: "on"
+              FIREWALL_OUTBOUND_SUBNETS: "172.22.0.0/16,172.23.0.0/16,10.40.1.0/24"
+              LOG_LEVEL: "debug"
+            envFrom:
+              - secretRef:
+                  name: sabnzbd-secret
+            securityContext:
+              capabilities:
+                drop:
+                  - ALL
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 568
+        runAsGroup: 568
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 65536
+    persistence:
+      config:
+        existingClaim: *app
+      media:
+        type: nfs
+        server: synology.batcave
+        path: /volume1/batcave-media/downloads
+        globalMounts:
+          - path: /data/downloads
+      tmp:
+        type: emptyDir
+    route:
+      app:
+        hostnames:
+          - "sabnzbd.${DOMAIN_5}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+    service:
+      app:
+        ports:
+          http:
+            port: *port
