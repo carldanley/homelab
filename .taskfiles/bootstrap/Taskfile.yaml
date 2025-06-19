@@ -35,9 +35,9 @@ tasks:
     prompt: Bootstrap Kubernetes apps ...?
     cmds:
       - op inject --in-file {{ .BOOTSTRAP_DIR }}/secrets.yaml.tpl | kubectl apply --server-side --filename -
-      - helmfile --file {{ .BOOTSTRAP_DIR }}/pre-cni.helmfile.yaml sync --hide-notes
+      - helmfile --file {{ .BOOTSTRAP_DIR }}/pre-cni/helmfile.yaml sync --hide-notes
       - until kubectl wait nodes --for=condition=Ready=True --all --timeout=2m; do sleep 5; done
-      - helmfile --file {{ .BOOTSTRAP_DIR }}/post-cni.helmfile.yaml sync --hide-notes
+      - helmfile --file {{ .BOOTSTRAP_DIR }}/post-cni/helmfile.yaml sync --hide-notes
     vars:
       RANDOM_CONTROLLER:
         sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
@@ -55,8 +55,8 @@ tasks:
       - test -f {{ .BOOTSTRAP_DIR }}/secrets.yaml.tpl
 
       # make sure the helmfiles exist
-      - test -f {{ .BOOTSTRAP_DIR }}/pre-cni.helmfile.yaml
-      - test -f {{ .BOOTSTRAP_DIR }}/post-cni.helmfile.yaml
+      - test -f {{ .BOOTSTRAP_DIR }}/pre-cni/helmfile.yaml
+      - test -f {{ .BOOTSTRAP_DIR }}/post-cni/helmfile.yaml
 
       # make sure we're logged into onepassword
       - op whoami --format=json &>/dev/null
