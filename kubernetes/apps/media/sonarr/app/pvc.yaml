@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: radarr-mediacovers
+  name: sonarr-mediacovers
 spec:
   accessModes:
     - ReadWriteOnce
