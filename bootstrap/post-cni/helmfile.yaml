@@ -45,7 +45,7 @@ releases:
   - name: onepassword
     namespace: external-secrets
     chart: oci://ghcr.io/bjw-s-labs/helm/app-template
-    version: 4.0.1
+    version: 4.1.1
     values:
       - ../kubernetes/apps/external-secrets/onepassword/app/helm/values.yaml
     hooks:
