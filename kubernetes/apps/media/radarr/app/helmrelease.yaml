@@ -80,6 +80,13 @@ spec:
     persistence:
       config:
         existingClaim: *app
+      media-covers:
+        existingClaim: radarr-mediacovers
+        advancedMounts:
+          radarr:
+            app:
+              - path: /config/MediaCover
+                subPath: MediaCover
       media:
         type: nfs
         server: synology.batcave
