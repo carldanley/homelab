@@ -136,19 +136,6 @@ spec:
               - path: /tmp
                 subPath: tmp
 
-    route:
-      app:
-        hostnames:
-          - "vernemq.${DOMAIN_5}"
-        parentRefs:
-          - name: internal
-            namespace: kube-system
-            sectionName: domain-5-subdomain-https
-        rules:
-          - backendRefs:
-              - identifier: http
-                port: *httpPort
-
     rbac:
       roles:
         vernemq:
