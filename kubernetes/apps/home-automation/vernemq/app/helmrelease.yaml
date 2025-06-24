@@ -119,7 +119,7 @@ spec:
       http:
         ports:
           http:
-            port: 8888
+            port: &httpPort 8888
 
     persistence:
       data:
@@ -135,6 +135,19 @@ spec:
                 subPath: log
               - path: /tmp
                 subPath: tmp
+
+    route:
+      app:
+        hostnames:
+          - "vernemq.${DOMAIN_5}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+        rules:
+          - backendRefs:
+              - identifier: http
+                port: *httpPort
 
     rbac:
       roles:

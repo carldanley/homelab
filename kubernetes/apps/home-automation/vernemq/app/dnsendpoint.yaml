@@ -1,7 +1,8 @@
+---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: vernemq
+  name: vernemq-mqtt
   labels:
     dns.homelab/external: "false"
 spec:
@@ -11,3 +12,17 @@ spec:
     recordType: CNAME
     targets:
     - "10.50.10.50"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: vernemq-ui
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "vernemq.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "internal.${DOMAIN_5}"
