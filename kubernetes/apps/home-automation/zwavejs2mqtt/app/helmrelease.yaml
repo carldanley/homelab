@@ -1,0 +1,70 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app zwavejs2mqtt
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+      zwavejs2mqtt:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zwave-js/zwave-js-ui
+              tag: 10.7@sha256:52b6ee2c37fa1a3c13a8d8f59b45145b546ec31b5c85d5053e1279fc558c5a1e
+            env:
+              TZ: "America/New_York"
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
+            securityContext:
+              privileged: true
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+    persistence:
+      data:
+        existingClaim: *app
+        globalMounts:
+          - path: /usr/src/app/store
+      usb:
+        type: hostPath
+        hostPath: /dev/serial/by-id/usb-0658_0200-if00
+    route:
+      app:
+        hostnames:
+          - "zwave.${DOMAIN_5}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+    service:
+      app:
+        ports:
+          http:
+            port: 8091
