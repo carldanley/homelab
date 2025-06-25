@@ -100,6 +100,10 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /config/log
+      external-converters:
+        existingClaim: zigbee2mqtt-external-converters
+        globalMounts:
+          - path: /data/external_converters
     route:
       app:
         hostnames:
