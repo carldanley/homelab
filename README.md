@@ -53,14 +53,14 @@ This Git repository contains the following directories under [kubernetes](./kube
 
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" alt="⚙" width="20" height="20"> Hardware
 
-| Device                                 | Count | OS Disk Size | Data Disk Size | RAM  | Operating System | Purpose                 |
-|----------------------------------------|-------|--------------|----------------|------|------------------|-------------------------|
-| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX) | 3     | 500GB M.2    | 1.92 TB U.2    | 96GB | Talos            | Kubernetes              |
-| Synology DS918+                        | 1     | -            | 4x8TB HDD      | 4GB  | DSM 7            | NAS                     |
-| PiKVM (RasPi 4)                        | 1     | 64GB (SD)    | -              | 4GB  | PiKVM            | KVM                     |
-| TESmart 8 Port KVM Switch              | 1     | -            | -              | -    | -                | Network KVM (for PiKVM) |
-| UniFi UDM Pro Max                      | 1     | -            | -              | -    | UniFi OS         | Router & NVR            |
-| UniFi USW Aggregation                  | 1     | -            | -              | -    | UniFi OS         | 10G Core Switch         |
+| Device                                 | Count | OS Disk Size | Data Disk Size            | RAM  | Operating System | Purpose                 |
+|----------------------------------------|-------|--------------|---------------------------|------|------------------|-------------------------|
+| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX) | 3     | 500GB M.2    | 1.92 TB U.2 + 1.92 TB M.2 | 96GB | Talos            | Kubernetes              |
+| Synology DS918+                        | 1     | -            | 4x8TB HDD                 | 4GB  | DSM 7            | NAS                     |
+| PiKVM (RasPi 4)                        | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM            | KVM                     |
+| TESmart 8 Port KVM Switch              | 1     | -            | -                         | -    | -                | Network KVM (for PiKVM) |
+| UniFi UDM Pro Max                      | 1     | -            | -                         | -    | UniFi OS         | Router & NVR            |
+| UniFi USW Aggregation                  | 1     | -            | -                         | -    | UniFi OS         | 10G Core Switch         |
 
 ---
 
@@ -69,6 +69,7 @@ My MS-A2 workstations are configured with the following hardware:
 - [Crucial 96GB Kit (48GBx2) DDR5-5600 SODIMM](https://www.crucial.com/memory/ddr5/ct2k48g56c46s5)
 - [Crucial 500GB M.2 P3 Plus Gen4 NVMe PCIe 4.0](https://www.crucial.com/products/ssd/crucial-p3-plus-ssd) (Talos OS)
 - [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
+- [Samsung 990 Pro 2TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie-4-0-nvme-ssd-2tb-mz-v9p2t0b-am.html) - (OpenEBS Local Storage)
 
 ---
 
