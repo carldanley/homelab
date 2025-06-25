@@ -1,0 +1,28 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: alertmanager
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "alerts.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "internal.${DOMAIN_5}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: prometheus
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "prometheus.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "internal.${DOMAIN_5}"
