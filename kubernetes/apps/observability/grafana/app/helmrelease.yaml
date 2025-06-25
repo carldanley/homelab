@@ -96,6 +96,11 @@ spec:
               path: /var/lib/grafana/dashboards/default
     dashboards:
       default:
+        blackbox-exporter:
+          # renovate: depName="Prometheus Blackbox Exporter"
+          gnetId: 7587
+          revision: 3
+          datasource: Prometheus
         ceph-cluster:
           # renovate: depName="Ceph Cluster"
           gnetId: 2842

@@ -8,3 +8,4 @@ resources:
   - ./kube-prometheus-stack/ks.yaml
   - ./grafana/ks.yaml
   - ./snmp-exporter/ks.yaml
+  - ./blackbox-exporter/ks.yaml
