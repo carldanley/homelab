@@ -187,6 +187,13 @@ spec:
           gnetId: 19105
           revision: 7
           datasource: Prometheus
+        smartctl-exporter:
+          # renovate: depName="SMARTctl Exporter Dashboard"
+          gnetId: 22604
+          revision: 2
+          datasource:
+            - name: DS_PROMETHEUS
+              value: Prometheus
         synology-snmp:
           # renovate: depName="Synology SNMP"
           gnetId: 18643
