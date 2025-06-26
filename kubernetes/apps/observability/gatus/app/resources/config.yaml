@@ -1,0 +1,35 @@
+---
+connectivity:
+  checker:
+    target: 1.1.1.1:53
+    interval: 1m
+
+endpoints:
+  - name: flux-webhook
+    url: https://flux-webhook.${DOMAIN_5}
+    interval: 1m
+    client:
+      dns-resolver: tcp://1.1.1.1:53
+    conditions:
+      - "[STATUS] == 404"
+
+metrics: true
+
+storage:
+  type: postgres
+  path: postgres://${INIT_POSTGRES_USER}:${INIT_POSTGRES_PASS}@${INIT_POSTGRES_HOST}:5432/${INIT_POSTGRES_DBNAME}?sslmode=disable
+  caching: true
+
+ui:
+  title: Status | Gatus
+  header: Status
+  logo: https://avatars.githubusercontent.com/u/1470571
+  link: https://github.com/carldanley
+  buttons:
+    - name: Github
+      link: https://github.com/carldanley
+    - name: Homelab
+      link: https://github.com/carldanley/homelab
+
+web:
+  port: ${GATUS_WEB_PORT}
