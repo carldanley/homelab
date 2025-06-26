@@ -58,7 +58,7 @@ spec:
               # https://www.zigbee2mqtt.io/advanced/remote-adapter/connect_to_a_remote_adapter.html
               ZIGBEE2MQTT_CONFIG_SERIAL_PORT: tcp://zigbee-controller.batcave:6969
               ZIGBEE2MQTT_CONFIG_SERIAL_BAUDRATE: 115200
-              ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ezsp
+              ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: ember
               # ZIGBEE2MQTT_CONFIG_ADVANCED_TRANSMIT_POWER: 20
               ZIGBEE2MQTT_CONFIG_HOMEASSISTANT_ENABLED: true
               # ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: false
