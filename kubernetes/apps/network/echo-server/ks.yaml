@@ -8,6 +8,8 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  components:
+    - ../../../../components/gatus
   interval: 1h
   path: ./kubernetes/apps/network/echo-server/app
   postBuild:
@@ -15,6 +17,10 @@ spec:
       - kind: Secret
         name: domains-secret
         optional: false
+    substitute:
+      APP: *app
+      GATUS_DOMAIN: "${DOMAIN_5}"
+      GATUS_PATH: /healthz
   prune: true
   retryInterval: 2m
   sourceRef:
