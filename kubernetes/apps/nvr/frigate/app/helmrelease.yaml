@@ -123,7 +123,7 @@ spec:
       app:
         type: LoadBalancer
         annotations:
-          io.cilium/lb-ipam-ips: "10.50.100.1"
+          lbipam.cilium.io/ips: "10.50.100.1"
         ports:
           authenticated-http:
             port: &authenticatedHTTPPort 8971
