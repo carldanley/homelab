@@ -41,29 +41,29 @@ spec:
               capabilities:
                 drop:
                   - ALL
-        code-server:
-            image:
-              repository: ghcr.io/coder/code-server
-              tag: 4.101.2@sha256:5f654c1137f8d87c8cf44253318bf94b85f6f9129e426a9956da46eb602dcc5a
-            args:
-              - --auth
-              - none
-              - --disable-telemetry
-              - --disable-update-check
-              - --user-data-dir
-              - /config/.code-server
-              - --extensions-dir
-              - /config/.code-server
-              - --port
-              - "12321"
-              - /config
-            env:
-              HASS_SERVER: http://localhost:8123
-            resources:
-              requests:
-                cpu: 10m
-              limits:
-                memory: 1Gi
+          code-server:
+              image:
+                repository: ghcr.io/coder/code-server
+                tag: 4.101.2@sha256:5f654c1137f8d87c8cf44253318bf94b85f6f9129e426a9956da46eb602dcc5a
+              args:
+                - --auth
+                - none
+                - --disable-telemetry
+                - --disable-update-check
+                - --user-data-dir
+                - /config/.code-server
+                - --extensions-dir
+                - /config/.code-server
+                - --port
+                - &codeServerPort "12321"
+                - /config
+              env:
+                HASS_SERVER: http://localhost:8123
+              resources:
+                requests:
+                  cpu: 10m
+                limits:
+                  memory: 1Gi
     defaultPodOptions:
       annotations:
         k8s.v1.cni.cncf.io/networks: |
@@ -102,14 +102,30 @@ spec:
         hostnames:
           - "${DOMAIN_4}"
         parentRefs:
-          - name: external
-            namespace: kube-system
-            sectionName: domain-4-root-https
           - name: internal
             namespace: kube-system
             sectionName: domain-4-root-https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *httpPort
+      code-server:
+        hostnames:
+          - "code.${DOMAIN_4}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-4-subdomain-https
+        rules:
+          - backendRefs:
+              - identifier: code-server
+                port: *codeServerPort
     service:
       app:
         ports:
           http:
-            port: 8123
+            port: *httpPort
+      code-server:
+        ports:
+          http:
+            port: *codeServerPort
