@@ -2,7 +2,7 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: zigbee2mqtt-internal
+  name: home-assistant-internal
   labels:
     dns.homelab/external: "false"
 spec:
@@ -16,7 +16,7 @@ spec:
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: zigbee2mqtt-external
+  name: home-assistant-external
   labels:
     dns.homelab/external: "true"
 spec:

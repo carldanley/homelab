@@ -82,6 +82,9 @@ spec:
           - name: external
             namespace: kube-system
             sectionName: domain-4-root-https
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-4-root-https
     service:
       app:
         ports:
