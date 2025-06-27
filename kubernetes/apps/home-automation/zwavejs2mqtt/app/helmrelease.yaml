@@ -68,3 +68,6 @@ spec:
         ports:
           http:
             port: 8091
+          websocket:
+            port: 3000
+
