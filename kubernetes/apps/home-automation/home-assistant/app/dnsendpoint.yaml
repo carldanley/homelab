@@ -1,0 +1,28 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: zigbee2mqtt-internal
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "${DOMAIN_4}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "internal.${DOMAIN_4}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: zigbee2mqtt-external
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+  - dnsName: "${DOMAIN_4}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_4}"
