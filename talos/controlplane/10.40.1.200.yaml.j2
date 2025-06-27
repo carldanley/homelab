@@ -18,11 +18,16 @@ machine:
           miimon: 1000
         dhcp: true
         mtu: 1500
+        vip:
+          ip: 10.40.1.250
         vlans:
           - vlanId: 20
             dhcp: false
             mtu: 1500
             dhcpOptions:
               routeMetric: 4096
-            vip:
-              ip: 10.40.1.250
+          - vlanId: 50
+            dhcp: false
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096

@@ -24,6 +24,11 @@ machine:
             mtu: 1500
             dhcpOptions:
               routeMetric: 4096
+          - vlanId: 50
+            dhcp: false
+            mtu: 1500
+            dhcpOptions:
+              routeMetric: 4096
   nodeLabels:
     intel.feature.node.kubernetes.io/gpu: true
     google.feature.node.kubernetes.io/coral-usb: true
