@@ -29,6 +29,8 @@ spec:
             env:
               HOME_ASSISTANT_EXTERNAL_URL: https://${DOMAIN_4}
               TZ: America/New_York
+              VENV_FOLDER: /venv
+              HASS_HTTP_TRUSTED_PROXY_1: 172.22.0.0/16
             envFrom:
               - secretRef:
                   name: home-assistant-secret
@@ -87,7 +89,7 @@ spec:
       config-cache:
         existingClaim: home-assistant-cache
         globalMounts:
-          - path: /config/.venv
+          - path: /venv
       tmpfs:
         type: emptyDir
         advancedMounts:
