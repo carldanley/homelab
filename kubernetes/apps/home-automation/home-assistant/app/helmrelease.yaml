@@ -26,10 +26,10 @@ spec:
               tag: 2025.6.3@sha256:6f6b427121f376c92dac2ce14b99ff088010da3f082142fd8b86b4ade563328f
             env:
               HOME_ASSISTANT_EXTERNAL_URL: https://${DOMAIN_4}
-              HOME_ASSISTANT_PURGE_KEEP_DAYS: 30
-              HOME_ASSISTANT_TRUSTED_PROXIES: 172.22.0.0/16
-              HOME_ASSISTANT_UNIT_SYSTEM: us_customary
               TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: home-assistant-secret
             resources:
               requests:
                 cpu: 10m
@@ -108,7 +108,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: *httpPort
+                port: &httpPort 8123
       code-server:
         hostnames:
           - "code.${DOMAIN_4}"
