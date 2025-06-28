@@ -13,6 +13,8 @@ tasks:
       - kubectl --namespace volsync-system scale deployment volsync --replicas {{if eq .STATE "suspend"}}0{{else}}1{{end}}
     vars:
       STATE: '{{index .MATCH 0}}'
+    env:
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
     preconditions:
       - which flux kubectl
       - '[[ "{{.STATE}}" == "suspend" || "{{.STATE}}" == "resume" ]]'
@@ -26,6 +28,8 @@ tasks:
     vars:
       NS: '{{.NS | default "default"}}'
       JOB: volsync-src-{{.APP}}
+    env:
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
     requires:
       vars:
         - APP
@@ -71,6 +75,7 @@ tasks:
         sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath='{.spec.restic.moverSecurityContext.runAsUser}'
       PGID:
         sh: kubectl --namespace {{.NS}} get replicationsources/{{.APP}} --output=jsonpath='{.spec.restic.moverSecurityContext.runAsGroup}'
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
     requires:
       vars:
         - APP
