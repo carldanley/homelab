@@ -67,7 +67,7 @@ spec:
 
       coral-m2:
         type: hostPath
-        hostPath: /dev/apex_0
+        hostPath: /dev/ttyS0
         hostPathType: CharDevice
 
       config:
