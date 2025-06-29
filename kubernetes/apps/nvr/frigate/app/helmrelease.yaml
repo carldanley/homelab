@@ -26,7 +26,7 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           nodeSelector:
-            google.feature.node.kubernetes.io/coral-usb: "true"
+            devices.homelab/coral-usb: "true"
         containers:
           app:
             image:

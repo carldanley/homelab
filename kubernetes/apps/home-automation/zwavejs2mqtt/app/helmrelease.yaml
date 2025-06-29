@@ -19,6 +19,9 @@ spec:
   values:
     controllers:
       zwavejs2mqtt:
+        pod:
+          nodeSelector:
+            devices.homelab/zwave-usb: "true"
         containers:
           app:
             image:

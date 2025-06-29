@@ -29,6 +29,8 @@ machine:
           - vlanId: 50
             dhcp: false
             mtu: 1500
+  nodeLabels:
+    devices.homelab/coral-usb: "true"
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
