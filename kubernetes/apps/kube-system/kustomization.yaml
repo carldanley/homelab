@@ -13,5 +13,4 @@ resources:
   - ./reloader/ks.yaml
   - ./descheduler/ks.yaml
   - ./node-feature-discovery/ks.yaml
-  - ./intel-device-plugin/ks.yaml
-  # - ./amd-device-plugin/ks.yaml
+  - ./amd-device-plugin/ks.yaml

@@ -28,8 +28,6 @@ spec:
         optional: false
     substitute:
       APP: *app
-      VOLSYNC_CACHE_SNAPSHOTCLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
-      VOLSYNC_CACHE_STORAGECLASS: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
   prune: true
   retryInterval: 2m
   sourceRef:

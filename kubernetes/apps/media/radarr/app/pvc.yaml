@@ -9,4 +9,4 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  storageClassName: ceph-block # todo: change this to openebs-hostpath when ms-a2s get here
+  storageClassName: openebs-hostpath

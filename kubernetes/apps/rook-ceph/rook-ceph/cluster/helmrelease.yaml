@@ -64,16 +64,13 @@ spec:
         nodes:
           - name: "cp01"
             devices:
-              - name: "/dev/disk/by-id/nvme-eui.0025385c9150ddf3"
+              - name: "/dev/disk/by-id/nvme-eui.36384c30544011570025384500000001"
           - name: "cp02"
             devices:
-              - name: "/dev/disk/by-id/nvme-eui.0025385c9150de10"
+              - name: "/dev/disk/by-id/nvme-eui.36384c30544014040025384500000001"
           - name: "cp03"
             devices:
-              - name: "/dev/disk/by-id/nvme-eui.0025385c9150ff25"
-          - name: "w01"
-            devices:
-              - name: "/dev/disk/by-id/nvme-eui.0025385c41441424"
+              - name: "/dev/disk/by-id/nvme-eui.36384c30544014030025384500000001"
     cephBlockPools:
       - name: ceph-blockpool
         spec:

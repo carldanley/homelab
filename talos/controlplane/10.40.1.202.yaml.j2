@@ -3,15 +3,17 @@
 machine:
   install:
     diskSelector:
-      serial: S3ESNX0JB18914R
+      serial: 25154F5F9E66
   network:
     hostname: cp03.k8s.batcave
     interfaces:
       - interface: bond0
         bond:
           deviceSelectors:
-            - hardwareAddr: "00:1f:c6:9c:dc:*"
-              driver: e1000e
+            - hardwareAddr: "58:47:ca:7f:c6:4a"
+              driver: i40e
+            - hardwareAddr: "58:47:ca:7f:c6:4b"
+              driver: i40e
           mode: 802.3ad
           xmitHashPolicy: layer3+4
           lacpRate: fast
@@ -24,10 +26,14 @@ machine:
           - vlanId: 20
             dhcp: false
             mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
           - vlanId: 50
             dhcp: false
             mtu: 1500
-            dhcpOptions:
-              routeMetric: 4096
+---
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: local-hostpath
+provisioning:
+  diskSelector:
+    match: disk.serial == "S7KHNJ0Y200348B" && !system_disk
+  minSize: 2.0TB
