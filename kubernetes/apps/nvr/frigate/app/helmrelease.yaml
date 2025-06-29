@@ -27,7 +27,6 @@ spec:
         pod:
           nodeSelector:
             google.feature.node.kubernetes.io/coral-usb: "true"
-            intel.feature.node.kubernetes.io/gpu: "true"
         containers:
           app:
             image:
@@ -35,9 +34,9 @@ spec:
               tag: 0.15.1@sha256:c4e02d2c511847eebbda8e0e370b41c78e7b51247353de79340e06c3e95f11be
             resources:
               requests:
-                gpu.intel.com/i915: 1
+                amd.com/gpu: 1
               limits:
-                gpu.intel.com/i915: 1
+                amd.com/gpu: 1
             securityContext:
               privileged: true
             probes:
