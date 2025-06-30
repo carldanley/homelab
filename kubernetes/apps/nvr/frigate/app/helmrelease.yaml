@@ -60,66 +60,34 @@ spec:
       usb:
         type: hostPath
         hostPath: /dev/bus/usb
-
       cache:
         type: emptyDir
         medium: Memory
         sizeLimit: 2Gi
         globalMounts:
         - path: /dev/shm
-
-      coral-m2:
-        type: hostPath
-        hostPath: /dev/ttyS0
-        hostPathType: CharDevice
-
       config:
+        existingClaim: *app
+      config-model-cache:
+        existingClaim: frigate-model-cache
+        globalMounts:
+          - path: /config/model_cache
+      media-clips:
+        existingClaim: frigate-media-clips
+        globalMounts:
+          - path: /media/frigate/clips
+      media-recordings:
+        existingClaim: frigate-media-recordings
+        globalMounts:
+          - path: /media/frigate/recordings
+      media-exports:
         type: custom
         volumeSpec:
           nfs:
             server: synology.batcave
-            path: /volume1/batcave-nvr/config
-        advancedMounts:
-          app:
-            app:
-            - path: /config
-              readOnly: false
-
-      exports:
-        type: custom
-        volumeSpec:
-          nfs:
-            server: synology.batcave
-            path: /volume1/batcave-nvr/exports
-        advancedMounts:
-          app:
-            app:
-            - path: /media/frigate/exports
-              readOnly: false
-
-      recordings:
-        type: custom
-        volumeSpec:
-          nfs:
-            server: synology.batcave
-            path: /volume1/batcave-nvr/recordings
-        advancedMounts:
-          app:
-            app:
-            - path: /media/frigate/recordings
-              readOnly: false
-
-      clips:
-        type: custom
-        volumeSpec:
-          nfs:
-            server: synology.batcave
-            path: /volume1/batcave-nvr/clips
-        advancedMounts:
-          app:
-            app:
-            - path: /media/frigate/clips
-              readOnly: false
+            path: /volume1/batcave-nvr/
+        globalMounts:
+          - path: /media/frigate/exports
 
     service:
       app:
