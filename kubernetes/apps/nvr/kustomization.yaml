@@ -6,3 +6,4 @@ components:
   - ../../components/common
 resources:
   - ./frigate/ks.yaml
+  - ./go2rtc/ks.yaml
