@@ -20,8 +20,8 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 200Gi
-  storageClassName: ceph-block
+      storage: 1Ti
+  storageClassName: openebs-hostpath
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -32,5 +32,5 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 500Gi
-  storageClassName: ceph-block
+      storage: 2Ti
+  storageClassName: openebs-hostpath

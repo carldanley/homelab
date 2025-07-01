@@ -26,22 +26,21 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           nodeSelector:
-            devices.homelab/coral-usb: "true"
+            devices.homelab/coral-m2: "true"
+            intel.feature.node.kubernetes.io/gpu: "true"
         containers:
           app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
               tag: 0.15.1@sha256:c4e02d2c511847eebbda8e0e370b41c78e7b51247353de79340e06c3e95f11be
-            env:
-              LIBVA_DRIVER_NAME: radeonsi
             envFrom:
               - secretRef:
                   name: frigate-secret
             resources:
               requests:
-                amd.com/gpu: 1
+                gpu.intel.com/i915: 1
               limits:
-                amd.com/gpu: 1
+                gpu.intel.com/i915: 1
             securityContext:
               privileged: true
             probes:
@@ -59,9 +58,10 @@ spec:
               readiness: *probes
 
     persistence:
-      usb:
+      coral-m2:
         type: hostPath
-        hostPath: /dev/bus/usb
+        hostPath: /dev/apex_0
+        hostPathType: CharDevice
       cache:
         type: emptyDir
         medium: Memory
