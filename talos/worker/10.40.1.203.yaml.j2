@@ -31,7 +31,7 @@ machine:
   nodeLabels:
     devices.homelab/coral-usb: "true"
     devices.homelab/coral-m2: "true"
-    gpu.homelab/intel: "true"
+    intel.feature.node.kubernetes.io/gpu: "true"
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
