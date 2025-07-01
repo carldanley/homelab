@@ -2,18 +2,18 @@
 ---
 machine:
   install:
-    image: factory.talos.dev/metal-installer/{{ ENV.TALOS_SCHEMATIC_AMD }}:{{ ENV.TALOS_VERSION }}
+    image: factory.talos.dev/metal-installer/{{ ENV.TALOS_SCHEMATIC_INTEL }}:{{ ENV.TALOS_VERSION }}
     diskSelector:
-      serial: 25054DF4C1B4
+      serial: 50026B72836435C7
   network:
-    hostname: cp01.k8s.batcave
+    hostname: w01.k8s.batcave
     interfaces:
       - interface: bond0
         bond:
           deviceSelectors:
-            - hardwareAddr: "58:47:ca:7f:c7:fe"
+            - hardwareAddr: "58:47:ca:7a:8c:ca"
               driver: i40e
-            - hardwareAddr: "58:47:ca:7f:c7:ff"
+            - hardwareAddr: "58:47:ca:7a:8c:cb"
               driver: i40e
           mode: 802.3ad
           xmitHashPolicy: layer3+4
@@ -21,8 +21,6 @@ machine:
           miimon: 1000
         dhcp: true
         mtu: 1500
-        vip:
-          ip: 10.40.1.250
         vlans:
           - vlanId: 20
             dhcp: false
@@ -31,12 +29,14 @@ machine:
             dhcp: false
             mtu: 1500
   nodeLabels:
-    gpu.homelab/amd: "true"
+    devices.homelab/coral-usb: "true"
+    devices.homelab/coral-m2: "true"
+    gpu.homelab/intel: "true"
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
 name: local-hostpath
 provisioning:
   diskSelector:
-    match: disk.serial == "S7KHNJ0Y200351V" && !system_disk
-  minSize: 2.0TB
+    match: disk.serial == "S7U8NJ0XC28279J" && !system_disk
+  minSize: 4.0TB

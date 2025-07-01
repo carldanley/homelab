@@ -20,6 +20,16 @@ spec:
     controllers:
       amd-device-plugin:
         type: daemonset
+        pod:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                    - key: gpu.homelab/amd
+                      operator: In
+                      values:
+                        - "true"
         containers:
           app:
             image:

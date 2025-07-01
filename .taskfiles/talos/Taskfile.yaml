@@ -7,9 +7,13 @@ vars:
     sh: yq '.spec.postBuild.substitute.KUBERNETES_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
   TALOS_VERSION:
     sh: yq '.spec.postBuild.substitute.TALOS_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
-  TALOS_SCHEMATIC:
+  TALOS_SCHEMATIC_AMD:
     sh: |-
-      curl --silent -X POST --data-binary @{{.TALOS_DIR}}/schematic.yaml https://factory.talos.dev/schematics \
+      curl --silent -X POST --data-binary @{{.TALOS_DIR}}/schematic.amd.yaml https://factory.talos.dev/schematics \
+        | jq --raw-output '.id'
+  TALOS_SCHEMATIC_INTEL:
+    sh: |-
+      curl --silent -X POST --data-binary @{{.TALOS_DIR}}/schematic.intel.yaml https://factory.talos.dev/schematics \
         | jq --raw-output '.id'
 
 tasks:
@@ -20,7 +24,8 @@ tasks:
     env:
       KUBERNETES_VERSION: "{{ .KUBERNETES_VERSION }}"
       TALOS_VERSION: "{{ .TALOS_VERSION }}"
-      TALOS_SCHEMATIC: "{{ .TALOS_SCHEMATIC }}"
+      TALOS_SCHEMATIC_AMD: "{{ .TALOS_SCHEMATIC_AMD }}"
+      TALOS_SCHEMATIC_INTEL: "{{ .TALOS_SCHEMATIC_INTEL }}"
       ENDPOINTS: "{{ .ENDPOINTS }}"
       NODES: "{{ .NODES }}"
       CLUSTER_NAME: "homelab"
@@ -93,8 +98,9 @@ tasks:
     preconditions:
       - which op talosctl
 
-      # make sure the schematic file exists
-      - test -f {{ .TALOS_DIR }}/schematic.yaml
+      # make sure the schematics exist
+      - test -f {{ .TALOS_DIR }}/schematic.amd.yaml
+      - test -f {{ .TALOS_DIR }}/schematic.intel.yaml
 
       # make sure a common template exists
       - test -f {{ .TALOS_DIR }}/common.yaml.j2

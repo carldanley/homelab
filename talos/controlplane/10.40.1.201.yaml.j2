@@ -2,6 +2,7 @@
 ---
 machine:
   install:
+    image: factory.talos.dev/metal-installer/{{ ENV.TALOS_SCHEMATIC_AMD }}:{{ ENV.TALOS_VERSION }}
     diskSelector:
       serial: 25054DF4C1C5
   network:
@@ -30,7 +31,7 @@ machine:
             dhcp: false
             mtu: 1500
   nodeLabels:
-    devices.homelab/coral-usb: "true"
+    gpu.homelab/amd: "true"
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
