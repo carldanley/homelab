@@ -31,6 +31,9 @@ spec:
               TZ: America/New_York
     service:
       app:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: "10.50.100.3"
         ports:
           whisper:
             port: 10200
