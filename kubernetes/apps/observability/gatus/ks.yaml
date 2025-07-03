@@ -24,7 +24,7 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_QUERY_URL: "status.${DOMAIN_5}/health"
+      GATUS_QUERY_URL: "status.${DOMAIN_7}/health"
   prune: true
   retryInterval: 2m
   sourceRef:

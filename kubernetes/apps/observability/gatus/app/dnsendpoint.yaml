@@ -6,8 +6,8 @@ metadata:
     dns.homelab/external: "true"
 spec:
   endpoints:
-  - dnsName: "status.${DOMAIN_5}"
+  - dnsName: "status.${DOMAIN_7}"
     recordTTL: 60
     recordType: CNAME
     targets:
-    - "external.${DOMAIN_5}"
+    - "external.${DOMAIN_7}"

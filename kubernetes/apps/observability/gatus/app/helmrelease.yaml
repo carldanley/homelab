@@ -100,11 +100,11 @@ spec:
     route:
       app:
         hostnames:
-          - "status.${DOMAIN_5}"
+          - "status.${DOMAIN_7}"
         parentRefs:
           - name: external
             namespace: kube-system
-            sectionName: domain-5-subdomain-https
+            sectionName: domain-7-subdomain-https
     service:
       app:
         ports:
