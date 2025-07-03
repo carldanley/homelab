@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
-    - ../../../../components/gatus
+    - ../../../../components/gatus/external
   interval: 1h
   path: ./kubernetes/apps/network/echo-server/app
   postBuild:
@@ -19,8 +19,7 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_DOMAIN: "${DOMAIN_5}"
-      GATUS_PATH: /healthz
+      GATUS_QUERY_URL: "echo-server.${DOMAIN_5}/healthz"
   prune: true
   retryInterval: 2m
   sourceRef:

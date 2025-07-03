@@ -9,6 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
+    - ../../../../components/gatus/internal
     - ../../../../components/volsync
   dependsOn:
     - name: cert-manager-secrets
@@ -28,6 +29,8 @@ spec:
       APP: *app
       VOLSYNC_CAPACITY: 1Gi
       VOLSYNC_CACHE_CAPACITY: 1Gi
+      GATUS_QUERY_URL: "zwave.${DOMAIN_5}/status"
+      GATUS_STATUS: "404"
   prune: true
   retryInterval: 2m
   sourceRef:

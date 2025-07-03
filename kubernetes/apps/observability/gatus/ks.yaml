@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
-    - ../../../../components/gatus
+    - ../../../../components/gatus/external
   dependsOn:
     - name: cloudnative-pg-cluster
       namespace: databases
@@ -24,9 +24,7 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_SUBDOMAIN: "status"
-      GATUS_DOMAIN: "${DOMAIN_5}"
-      GATUS_PATH: /health
+      GATUS_QUERY_URL: "status.${DOMAIN_5}/health"
   prune: true
   retryInterval: 2m
   sourceRef:

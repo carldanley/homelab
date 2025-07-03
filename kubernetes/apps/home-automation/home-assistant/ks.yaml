@@ -9,6 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
+    - ../../../../components/gatus/internal
     - ../../../../components/volsync
   dependsOn:
     - name: vernemq
@@ -28,6 +29,8 @@ spec:
         optional: false
     substitute:
       APP: *app
+      GATUS_QUERY_URL: "${DOMAIN_4}/status"
+      GATUS_STATUS: "404"
   prune: true
   retryInterval: 2m
   sourceRef:
