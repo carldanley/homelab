@@ -27,7 +27,9 @@ spec:
               repository: ghcr.io/home-operations/home-assistant
               tag: 2025.7.0@sha256:2a7732da550433ac6466103f86b3e10b2e7af5139770410a9428e55c0d9f15e8
             env:
-              HOME_ASSISTANT_EXTERNAL_URL: https://${DOMAIN_4}
+              EXTERNAL_URL: https://${DOMAIN_4}
+              INTERNAL_URL: https://${DOMAIN_4}
+              SERVICE_IP: &serviceIP "10.50.100.2"
               TZ: America/New_York
               VENV_FOLDER: /venv
               HASS_HTTP_TRUSTED_PROXY_1: 172.22.0.0/16
@@ -130,7 +132,7 @@ spec:
         type: LoadBalancer
         sessionAffinity: ClientIP
         annotations:
-          lbipam.cilium.io/ips: "10.50.100.2"
+          lbipam.cilium.io/ips: *serviceIP
         ports:
           http:
             port: *httpPort
