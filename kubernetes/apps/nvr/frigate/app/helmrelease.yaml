@@ -32,7 +32,7 @@ spec:
           app:
             image:
               repository: ghcr.io/blakeblackshear/frigate
-              tag: 0.15.1@sha256:c4e02d2c511847eebbda8e0e370b41c78e7b51247353de79340e06c3e95f11be
+              tag: 0.16.0-beta3@sha256:944dbf199f1cbe99cfedc74b7cd9791daa68a334d4e9f74214a06dde58c1458a
             envFrom:
               - secretRef:
                   name: frigate-secret
