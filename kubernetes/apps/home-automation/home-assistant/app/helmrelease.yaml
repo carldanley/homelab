@@ -29,7 +29,7 @@ spec:
             env:
               EXTERNAL_URL: https://${DOMAIN_4}
               INTERNAL_URL: https://${DOMAIN_4}
-              FRIGATE_URL: http://frigate.${DOMAIN_5}
+              FRIGATE_URL: https://frigate.${DOMAIN_5}
               SERVICE_IP: &serviceIP "10.50.100.2"
               TZ: America/New_York
               VENV_FOLDER: /venv
