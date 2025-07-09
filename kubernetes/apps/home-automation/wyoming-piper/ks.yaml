@@ -8,8 +8,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  components:
-    - ../../../../components/volsync
   dependsOn:
     - name: rook-ceph-cluster
       namespace: rook-ceph
@@ -17,9 +15,6 @@ spec:
       namespace: volsync-system
   interval: 1h
   path: ./kubernetes/apps/home-automation/wyoming-piper/app
-  postBuild:
-    substitute:
-      APP: *app
   prune: true
   retryInterval: 2m
   sourceRef:

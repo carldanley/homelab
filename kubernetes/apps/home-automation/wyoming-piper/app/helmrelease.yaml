@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app wyoming-piper
+  name: wyoming-piper
 spec:
   interval: 1h
   chartRef:
@@ -39,4 +39,4 @@ spec:
             port: 10200
     persistence:
       data:
-        existingClaim: *app
+        existingClaim: wyoming-piper-cache
