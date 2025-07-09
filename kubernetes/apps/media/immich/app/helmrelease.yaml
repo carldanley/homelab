@@ -20,6 +20,7 @@ spec:
     controllers:
 
       server:
+        replicas: 2
         annotations:
           secret.reloader.stakater.com/reload: immich-secret
           configmap.reloader.stakater.com/reload: immich-configmap
@@ -52,6 +53,8 @@ spec:
                   name: immich-configmap
 
       machine-learning:
+        type: statefulset
+        replicas: 2
         annotations:
           secret.reloader.stakater.com/reload: immich-secret
           configmap.reloader.stakater.com/reload: immich-configmap
@@ -63,6 +66,18 @@ spec:
             runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/controller
+                          operator: In
+                          values:
+                            - machine-learning
+                    topologyKey: kubernetes.io/hostname
         containers:
           main:
             image:
@@ -75,6 +90,17 @@ spec:
                   name: immich-configmap
             env:
               MPLCONFIGDIR: "/cache/matplotlib"
+        statefulset:
+          volumeClaimTemplates:
+            - name: cache
+              storageClass: openebs-hostpath
+              size: 10Gi
+              accessMode: ReadWriteOnce
+              globalMounts:
+                - path: /cache
+                  subPath: cache
+                - path: /.cache
+                  subPath: dotCache
 
       redis:
         containers:
@@ -131,15 +157,6 @@ spec:
           server:
             main:
               - path: /usr/src/app/upload
-      machine-learning-cache:
-        existingClaim: immich-machine-learning-cache
-        advancedMounts:
-          machine-learning:
-            main:
-              - path: /cache
-                subPath: cache
-              - path: /.cache
-                subPath: dotCache
       tmpfs:
         type: emptyDir
         advancedMounts:
