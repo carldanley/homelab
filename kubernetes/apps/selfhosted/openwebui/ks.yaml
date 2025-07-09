@@ -28,7 +28,7 @@ spec:
     substitute:
       APP: *app
       GATUS_QUERY_URL: "${DOMAIN_5}/status"
-      GATUS_STATUS: "404"
+      GATUS_STATUS: "200"
   prune: true
   retryInterval: 2m
   sourceRef:
