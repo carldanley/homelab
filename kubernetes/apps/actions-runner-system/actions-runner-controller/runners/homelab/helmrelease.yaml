@@ -28,8 +28,7 @@ spec:
         resources:
           requests:
             storage: 5Gi
-        # storageClassName: openebs-hostpath
-        storageClassName: ceph-block # use ceph-block until ms-a2's get here with ssd cache
+        storageClassName: openebs-hostpath
     controllerServiceAccount:
       name: actions-runner-controller
       namespace: actions-runner-system
