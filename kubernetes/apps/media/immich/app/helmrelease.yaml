@@ -1,0 +1,151 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app immich
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+
+      server:
+        annotations:
+          secret.reloader.stakater.com/reload: immich-secret
+          configmap.reloader.stakater.com/reload: immich-configmap
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            runAsNonRoot: true
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17
+              pullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+        containers:
+          main:
+            image:
+              repository: ghcr.io/immich-app/immich-server
+              tag: v1.135.3@sha256:df5bbf4e29eff4688063a005708f8b96f13073200b4a7378f7661568459b31e9
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+              - configMapRef:
+                  name: immich-configmap
+
+      machine-learning:
+        annotations:
+          secret.reloader.stakater.com/reload: immich-secret
+          configmap.reloader.stakater.com/reload: immich-configmap
+        pod:
+          enableServiceLinks: false
+          securityContext:
+            runAsUser: 2000
+            runAsGroup: 2000
+            runAsNonRoot: true
+            fsGroup: 2000
+            fsGroupChangePolicy: OnRootMismatch
+        containers:
+          main:
+            image:
+              repository: ghcr.io/immich-app/immich-machine-learning
+              tag: v1.135.3@sha256:9f2f61d86af82d04926f9b896c995c502303052905517c5485dd26bf1e42a44e
+            envFrom:
+              - secretRef:
+                  name: immich-secret
+              - configMapRef:
+                  name: immich-configmap
+            env:
+              MPLCONFIGDIR: "/cache/matplotlib"
+
+      redis:
+        containers:
+          main:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 8.0.3@sha256:a1e0a3b3a6cedd74d8ba44805b2497b93851a296f08a44962fedc03f1c490b47
+            env:
+              REDIS_REPLICATION_MODE: master
+            command: ["redis-server"]
+
+    service:
+      server:
+        controller: server
+        ports:
+          http:
+            port: &port 2283
+      machine-learning:
+        controller: machine-learning
+        ports:
+          http:
+            port: 3003
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379
+
+    route:
+      internal:
+        hostnames:
+          - "photos.${DOMAIN_5}"
+        parentRefs:
+          - name: external
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+        rules:
+          - backendRefs:
+              - identifier: server
+                port: *port
+
+    persistence:
+      matplotlib:
+        type: emptyDir
+        advancedMounts:
+          server:
+            main:
+              - path: /config/matplotlib
+      library:
+        type: nfs
+        server: synology.batcave
+        path: /volume1/batcave-photos
+        advancedMounts:
+          server:
+            main:
+              - path: /usr/src/app/upload
+      machine-learning-cache:
+        existingClaim: immich-machine-learning-cache
+        advancedMounts:
+          machine-learning:
+            main:
+              - path: /cache
+                subPath: cache
+              - path: /.cache
+                subPath: dotCache
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          server:
+            main:
+              - path: /usr/src/app/.reverse-geocoding-dump
+                subPath: geocoding
+              - path: /usr/src/app/.transformers_cache
+                subPath: transformers
