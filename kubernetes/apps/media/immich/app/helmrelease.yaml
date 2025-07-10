@@ -32,6 +32,15 @@ spec:
             runAsNonRoot: true
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
+          affinity:
+            nodeAffinity: &nodeAffinity
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                    - key: gpu.homelab/amd
+                      operator: In
+                      values:
+                        - "true"
         initContainers:
           init-db:
             image:
@@ -51,6 +60,9 @@ spec:
                   name: immich-secret
               - configMapRef:
                   name: immich-configmap
+            resources:
+              limits:
+                amd.com/gpu: 1
 
       machine-learning:
         type: statefulset
@@ -67,6 +79,7 @@ spec:
             fsGroup: 2000
             fsGroupChangePolicy: OnRootMismatch
           affinity:
+            nodeAffinity: *nodeAffinity
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:
                 - weight: 100
