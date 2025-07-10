@@ -60,9 +60,6 @@ spec:
                   name: immich-secret
               - configMapRef:
                   name: immich-configmap
-            resources:
-              limits:
-                amd.com/gpu: 1
 
       machine-learning:
         type: statefulset
