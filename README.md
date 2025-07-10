@@ -79,9 +79,9 @@ My Synology DS918+ is configured with the following hardware:
 - [Seagate IronWolf 8TB 3.5 Inch SATA 6Gb/s 7200 RPM 256MB Cache](https://www.seagate.com/www-content/product-content/ironwolf/en-us/docs/100844482b.pdf) - (Synology Hybrid RAID)
 - [Samsung 990 PRO SSD 1TB PCIe 4.0 M.2 2280](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie--4-0-nvme--ssd-1tb-mz-v9p1t0b-am.html) - (SSD Read/Write Caching)
 
-UPDATE: I've decided to switch off of Synology for good. I was lucky enough to snag one of the new MinisForum N5 Pro NAS's; I'm just waiting for it to arrive.
+**UPDATE: I've decided to switch off of Synology for good. I was lucky enough to snag one of the new MinisForum N5 Pro NAS's; I'm just waiting for it to arrive.**
 
-My MinisForumn N5 Pro will be configured with the following hardware:
+My MinisForum N5 Pro will be configured with the following hardware:
 - [Seagate IronWolf PRO 20TB 3.5 Inch SATA 6GB/s 7200 RPM 256MB Cache](https://www.seagate.com/files/www-content/datasheets/pdfs/ironwolf-pro-20tb-DS1914-21-2206US-en_US.pdf)
 
 https://www.seagate.com/files/www-content/datasheets/pdfs/ironwolf-pro-20tb-DS1914-21-2206US-en_US.pdf
