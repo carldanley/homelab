@@ -12,7 +12,7 @@ spec:
     - ../../../../components/gatus/internal
     - ../../../../components/volsync
   dependsOn:
-    - name: vernemq
+    - name: mosquitto
       namespace: *namespace
     - name: multus-networks
       namespace: network
