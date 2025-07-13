@@ -50,6 +50,24 @@ spec:
               capabilities:
                 drop:
                   - ALL
+          exporter:
+            image:
+              repository: ghcr.io/kpetremann/mqtt-exporter
+              tag: 1.7.2@sha256:7e2a27e3dce10427ae46490ede2f74fb7799e9e909baae6f8642fb4d5794f1e0
+            env:
+              MQTT_ADDRESS: "127.0.0.1"
+            ports:
+              - name: metrics
+                containerPort: &metricsPort 9000
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /metrics
+                    port: *metricsPort
+              readiness: *probes
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -63,8 +81,14 @@ spec:
         annotations:
           lbipam.cilium.io/ips: 10.50.10.50
         ports:
-          http:
+          mqtt:
             port: 1883
+          metrics:
+            port: *metricsPort
+    serviceMonitor:
+      app:
+        endpoints:
+          - port: mqtt
     persistence:
       data:
         existingClaim: mosquitto-cache
