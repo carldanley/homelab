@@ -228,11 +228,6 @@ spec:
           gnetId: 11312
           revision: 9
           datasource: Prometheus
-        vernemq:
-          # renovate: depName="VerneMQ Cluster TEST"
-          gnetId: 23485
-          revision: 2
-          datasource: Prometheus
         volsync:
           # renovate: depName="VolSync Dashboard"
           gnetId: 21356
