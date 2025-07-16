@@ -20,7 +20,7 @@ spec:
     controllers:
       home-assistant:
         annotations:
-          reloader.stakater.com/auto: "true"
+          reloader.stakater.com/reload: "home-assistant-secret"
         containers:
           app:
             image:
@@ -32,7 +32,6 @@ spec:
               SERVICE_IP: &serviceIP "10.50.100.2"
               TZ: America/New_York
               VENV_FOLDER: /venv
-              HASS_HTTP_TRUSTED_PROXY_1: 172.22.0.0/16
             envFrom:
               - secretRef:
                   name: home-assistant-secret
