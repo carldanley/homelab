@@ -7,3 +7,4 @@ components:
 resources:
   - ./openwebui/ks.yaml
   - ./searxng/ks.yaml
+  - ./n8n/ks.yaml
