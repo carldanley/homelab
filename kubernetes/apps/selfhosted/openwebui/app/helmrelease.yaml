@@ -75,6 +75,11 @@ spec:
           openwebui:
             app:
               - path: /app/backend/data
+      tmpfs:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
     service:
       app:
         controller: *app
