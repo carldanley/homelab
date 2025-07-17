@@ -8,3 +8,4 @@ resources:
   - ./openwebui/ks.yaml
   - ./searxng/ks.yaml
   - ./n8n/ks.yaml
+  - ./crawl4ai/ks.yaml
