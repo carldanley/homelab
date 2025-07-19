@@ -73,19 +73,6 @@ spec:
             namespace: kube-system
             sectionName: domain-5-subdomain-https
 
-      webhooks:
-        hostnames:
-          - "n8n-webhook.${DOMAIN_5}"
-        parentRefs:
-          - name: external
-            namespace: kube-system
-            sectionName: domain-5-subdomain-https
-        rules:
-          - matches:
-              - path:
-                  value: /webhook
-            backendRefs: [{}]
-
     persistence:
       data:
         existingClaim: *app
