@@ -33,12 +33,14 @@ spec:
       type: Recreate
     admin:
       existingSecret: grafana-secret
+
     env:
       GF_DATE_FORMATS_USE_BROWSER_LOCALE: true
       GF_EXPLORE_ENABLED: true
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: natel-discrete-panel,pr0ps-trackmap-panel,panodata-map-panel
       GF_SECURITY_ANGULAR_SUPPORT_ENABLED: true
       GF_SERVER_ROOT_URL: "https://grafana.${DOMAIN_5}"
+
     grafana.ini:
       analytics:
         check_for_updates: false
@@ -51,6 +53,7 @@ spec:
         org_role: Viewer
       news:
         news_feed_enabled: false
+
     datasources:
       datasources.yaml:
         apiVersion: 1
@@ -82,6 +85,7 @@ spec:
             access: proxy
             url: http://prometheus-operated.observability.svc.cluster.local:9090
             isDefault: true
+
     dashboardProviders:
       dashboardproviders.yaml:
         apiVersion: 1
@@ -94,6 +98,7 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/default
+
     dashboards:
       default:
         blackbox-exporter:
@@ -235,6 +240,7 @@ spec:
           datasources:
             - name: DS_PROMETHEUS
               value: Prometheus
+
     sidecar:
       image:
         registry: ghcr.io
@@ -254,6 +260,7 @@ spec:
         searchNamespace: ALL
         labelValue: ""
         label: grafana_datasource
+
     plugins:
       - grafana-clock-panel
       - grafana-piechart-panel
@@ -261,8 +268,10 @@ spec:
       - natel-discrete-panel
       - pr0ps-trackmap-panel
       - vonage-status-panel
+
     serviceMonitor:
       enabled: true
+
     route:
       main:
         enabled: true
@@ -272,7 +281,9 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     persistence:
       enabled: false
+
     testFramework:
       enabled: false

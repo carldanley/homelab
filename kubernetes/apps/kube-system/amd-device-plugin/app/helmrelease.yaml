@@ -30,6 +30,7 @@ spec:
                       operator: In
                       values:
                         - "true"
+
         containers:
           app:
             image:
@@ -46,11 +47,13 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       priorityClassName: system-node-critical
       tolerations:
         - key: CriticalAddonsOnly
           operator: Exists
+
     persistence:
       dev:
         type: hostPath

@@ -82,11 +82,13 @@ spec:
                   - ALL
         serviceAccount:
           name: *app
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
+
     persistence:
       config:
         type: emptyDir
@@ -97,6 +99,7 @@ spec:
           - path: /config/config.yaml
             subPath: config.yaml
             readOnly: true
+
     route:
       app:
         hostnames:
@@ -105,11 +108,13 @@ spec:
           - name: external
             namespace: kube-system
             sectionName: domain-7-subdomain-https
+
     service:
       app:
         ports:
           http:
             port: *port
+
     serviceMonitor:
       app:
         endpoints:

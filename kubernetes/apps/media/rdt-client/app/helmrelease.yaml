@@ -49,6 +49,7 @@ spec:
             resources:
               requests:
                 cpu: 100m
+
     defaultPodOptions:
       securityContext:
         fsGroup: 568
@@ -58,6 +59,7 @@ spec:
           - name: ndots
             value: "1"
       hostname: rdt
+
     persistence:
       data:
         existingClaim: *app
@@ -67,6 +69,7 @@ spec:
         path: /volume1/batcave-media/downloads
         globalMounts:
           - path: /data/downloads
+
     route:
       app:
         hostnames:
@@ -75,6 +78,7 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     service:
       app:
         ports:

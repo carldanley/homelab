@@ -32,6 +32,7 @@ spec:
       retries: 3
   values:
     deploymentMode: SingleBinary
+
     loki:
       auth_enabled: false
       analytics:
@@ -69,12 +70,14 @@ spec:
             local:
               directory: /rules
           rule_path: /rules/fake
+
     singleBinary:
       replicas: 1
       persistence:
         enabled: true
         storageClass: ceph-block
         size: 50Gi
+
     gateway:
       replicas: 0
     backend:
@@ -91,6 +94,7 @@ spec:
       enabled: false
     test:
       enabled: false
+
     sidecar:
       image:
         repository: ghcr.io/home-operations/k8s-sidecar

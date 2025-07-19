@@ -51,6 +51,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -58,6 +59,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
+
     persistence:
       config:
         existingClaim: *app
@@ -74,6 +76,7 @@ spec:
                 subPath: logs
               - path: /tmp
                 subPath: tmp
+
     route:
       app:
         hostnames:
@@ -86,6 +89,7 @@ spec:
           - backendRefs:
               - name: *app
                 port: *port
+
     service:
       app:
         ports:

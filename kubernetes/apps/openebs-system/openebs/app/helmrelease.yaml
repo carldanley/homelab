@@ -44,17 +44,20 @@ spec:
       helperPod:
         image:
           registry: quay.io/
+
     openebs-crds:
       csi:
         volumeSnapshots:
           enabled: false
           keep: false
+
     zfs-localpv:
       enabled: false
     lvm-localpv:
       enabled: false
     mayastor:
       enabled: false
+
     engines:
       local:
         lvm:
@@ -64,6 +67,7 @@ spec:
       replicated:
         mayastor:
           enabled: false
+
     loki:
       enabled: false
     alloy:

@@ -29,6 +29,7 @@ spec:
               - en_US-ryan-high
             env:
               TZ: America/New_York
+
     service:
       app:
         type: LoadBalancer
@@ -37,6 +38,7 @@ spec:
         ports:
           whisper:
             port: 10200
+
     persistence:
       data:
         existingClaim: wyoming-piper-cache

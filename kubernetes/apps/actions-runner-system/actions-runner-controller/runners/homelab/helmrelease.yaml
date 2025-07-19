@@ -20,6 +20,7 @@ spec:
     githubConfigSecret: homelab-runners-secret
     minRunners: 1
     maxRunners: 3
+
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
@@ -29,9 +30,11 @@ spec:
           requests:
             storage: 5Gi
         storageClassName: openebs-hostpath
+
     controllerServiceAccount:
       name: actions-runner-controller
       namespace: actions-runner-system
+
     template:
       spec:
         securityContext:
@@ -52,7 +55,9 @@ spec:
               - mountPath: /var/run/secrets/talos.dev
                 name: talos
                 readOnly: true
+
         serviceAccountName: *app
+
         volumes:
           - name: talos
             secret:

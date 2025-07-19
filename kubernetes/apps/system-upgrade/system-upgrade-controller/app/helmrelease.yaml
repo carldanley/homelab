@@ -44,8 +44,10 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
         serviceAccount:
           name: *app
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true

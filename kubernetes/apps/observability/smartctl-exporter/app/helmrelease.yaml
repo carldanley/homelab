@@ -32,6 +32,7 @@ spec:
     fullnameOverride: *app
     prometheusRules:
       enabled: false
+
     serviceMonitor:
       enabled: true
       relabelings:

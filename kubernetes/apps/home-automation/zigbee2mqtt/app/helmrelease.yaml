@@ -21,6 +21,7 @@ spec:
       zigbee2mqtt:
         annotations:
           reloader.stakater.com/auto: "true"
+
         containers:
           app:
             image:
@@ -86,6 +87,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -93,6 +95,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
+
     persistence:
       data:
         existingClaim: *app
@@ -104,6 +107,7 @@ spec:
         existingClaim: zigbee2mqtt-external-converters
         globalMounts:
           - path: /data/external_converters
+
     route:
       app:
         hostnames:
@@ -112,6 +116,7 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     service:
       app:
         ports:

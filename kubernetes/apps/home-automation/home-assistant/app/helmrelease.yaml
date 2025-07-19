@@ -21,6 +21,7 @@ spec:
       home-assistant:
         annotations:
           reloader.stakater.com/reload: "home-assistant-secret"
+
         containers:
           app:
             image:
@@ -46,6 +47,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
           code-server:
               image:
                 repository: ghcr.io/coder/code-server
@@ -69,6 +71,7 @@ spec:
                   cpu: 10m
                 limits:
                   memory: 1Gi
+
     defaultPodOptions:
       annotations:
         k8s.v1.cni.cncf.io/networks: |
@@ -84,6 +87,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
+
     persistence:
       config:
         existingClaim: *app
@@ -102,6 +106,7 @@ spec:
                 subPath: tts
               - path: /tmp
                 subPath: tmp
+
     route:
       app:
         hostnames:
@@ -125,6 +130,7 @@ spec:
           - backendRefs:
               - identifier: code-server
                 port: *codeServerPort
+
     service:
       app:
         primary: true

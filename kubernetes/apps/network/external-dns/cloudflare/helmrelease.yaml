@@ -38,12 +38,14 @@ spec:
       - "${DOMAIN_5}"
       - "${DOMAIN_6}"
       - "${DOMAIN_7}"
+
     env:
       - name: CF_API_TOKEN
         valueFrom:
           secretKeyRef:
             name: external-dns-cloudflare-secret
             key: CLOUDFLARE_API_TOKEN
+
     extraArgs:
       - --cloudflare-dns-records-per-page=1000
       - --cloudflare-proxied
@@ -51,19 +53,23 @@ spec:
       - --crd-source-kind=DNSEndpoint
       - --label-filter=dns.homelab/external=true
       - --gateway-name=external
+
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-cloudflare-secret
     policy: sync
     provider:
       name: cloudflare
+
     resources:
       requests:
         cpu: 13m
         memory: 42M
       limits:
         memory: 42M
+
     serviceMonitor:
       enabled: true
+
     sources:
       - crd
     triggerLoopOnEvent: true

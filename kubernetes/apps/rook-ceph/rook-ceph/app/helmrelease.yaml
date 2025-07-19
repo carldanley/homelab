@@ -36,10 +36,12 @@ spec:
       enableLiveness: true
       serviceMonitor:
         enabled: true
+
     image:
       repository: ghcr.io/rook/ceph
     monitoring:
       enabled: true
+
     resources:
       requests:
         cpu: 100m # unchangable

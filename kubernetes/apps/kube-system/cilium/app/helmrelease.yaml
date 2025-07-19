@@ -49,14 +49,17 @@ spec:
           enabled: true
         dashboards:
           enabled: true
+
       relay:
         enabled: true
         rollOutPods: true
         prometheus:
           serviceMonitor:
             enabled: true
+
       ui:
         enabled: true
         rollOutPods: true
+
     operator:
       tolerations: []

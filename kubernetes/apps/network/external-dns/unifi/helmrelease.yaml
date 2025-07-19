@@ -24,6 +24,7 @@ spec:
   values:
     fullnameOverride: &name external-dns-unifi
     logLevel: &logLevel info
+
     domainFilters:
       - "${DOMAIN_1}"
       - "${DOMAIN_2}"
@@ -32,13 +33,16 @@ spec:
       - "${DOMAIN_5}"
       - "${DOMAIN_6}"
       - "${DOMAIN_7}"
+
     extraArgs:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
       - --label-filter=dns.homelab/external!=true
+
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-unifi-secrets
     policy: sync
+
     provider:
       name: webhook
       webhook:
@@ -67,14 +71,17 @@ spec:
             port: http-webhook
           initialDelaySeconds: 10
           timeoutSeconds: 5
+
     resources:
       requests:
         cpu: 16m
         memory: 90M
       limits:
         memory: 90M
+
     serviceMonitor:
       enabled: true
+
     sources:
       - crd
       - service

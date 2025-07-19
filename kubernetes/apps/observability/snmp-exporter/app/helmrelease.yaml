@@ -30,6 +30,7 @@ spec:
       retries: 3
   values:
     fullnameOverride: *app
+
     serviceMonitor:
       enabled: true
       params:

@@ -34,6 +34,7 @@ spec:
       capabilities:
         add:
           - NET_RAW
+
     config:
       modules:
         http_2xx:
@@ -55,5 +56,6 @@ spec:
           timeout: 5s
           tcp:
             preferred_ip_protocol: ipv4
+
     serviceMonitor:
       enabled: true

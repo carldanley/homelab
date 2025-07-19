@@ -66,11 +66,13 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
+
     persistence:
       config:
         type: configMap
@@ -79,11 +81,13 @@ spec:
           - path: /etc/cloudflared/config.yaml
             subPath: config.yaml
             readOnly: true
+
     service:
       app:
         ports:
           http:
             port: *port
+
     serviceMonitor:
       app:
         endpoints:

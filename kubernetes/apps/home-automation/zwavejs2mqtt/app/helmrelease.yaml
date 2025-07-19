@@ -22,6 +22,7 @@ spec:
         pod:
           nodeSelector:
             devices.homelab/zwave-usb: "true"
+
         containers:
           app:
             image:
@@ -46,10 +47,12 @@ spec:
                 memory: 256Mi
             securityContext:
               privileged: true
+
     defaultPodOptions:
       securityContext:
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
+
     persistence:
       data:
         existingClaim: *app
@@ -58,6 +61,7 @@ spec:
       usb:
         type: hostPath
         hostPath: /dev/serial/by-id/usb-0658_0200-if00
+
     route:
       app:
         hostnames:
@@ -66,6 +70,7 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     service:
       app:
         ports:

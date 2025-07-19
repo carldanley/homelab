@@ -68,11 +68,13 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
+
     persistence:
       config:
         existingClaim: *app
@@ -83,6 +85,7 @@ spec:
             app:
               - path: /tmp
                 subPath: tmp
+
     route:
       app:
         hostnames:
@@ -91,6 +94,7 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     service:
       app:
         ports:

@@ -21,6 +21,7 @@ spec:
       mosquitto:
         annotations:
           reloader.stakater.com/auto: "true"
+
         containers:
           app:
             image:
@@ -50,6 +51,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
           exporter:
             image:
               repository: ghcr.io/kpetremann/mqtt-exporter
@@ -68,6 +70,7 @@ spec:
                     path: /metrics
                     port: *metricsPort
               readiness: *probes
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -75,6 +78,7 @@ spec:
         runAsGroup: 568
         fsGroup: 568
         fsGroupChangePolicy: OnRootMismatch
+
     service:
       app:
         type: LoadBalancer
@@ -85,10 +89,12 @@ spec:
             port: 1883
           metrics:
             port: *metricsPort
+
     serviceMonitor:
       app:
         endpoints:
           - port: mqtt
+
     persistence:
       data:
         existingClaim: mosquitto-cache

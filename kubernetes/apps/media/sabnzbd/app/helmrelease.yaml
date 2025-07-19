@@ -66,6 +66,7 @@ spec:
               capabilities:
                 drop:
                   - ALL
+
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
@@ -75,6 +76,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
         supplementalGroups:
           - 65536
+
     persistence:
       config:
         existingClaim: *app
@@ -99,6 +101,7 @@ spec:
           - path: /data/downloads
       tmp:
         type: emptyDir
+
     route:
       app:
         hostnames:
@@ -107,6 +110,7 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+
     service:
       app:
         ports:
