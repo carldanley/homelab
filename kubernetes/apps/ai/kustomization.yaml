@@ -6,3 +6,4 @@ components:
   - ../../components/common
 resources:
   - ./qdrant/ks.yaml
+  - ./crawl4ai/ks.yaml
