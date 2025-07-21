@@ -93,7 +93,7 @@ spec:
     serviceMonitor:
       app:
         endpoints:
-          - port: mqtt
+          - port: metrics
 
     persistence:
       data:
