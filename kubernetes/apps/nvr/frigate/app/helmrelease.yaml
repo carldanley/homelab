@@ -86,8 +86,8 @@ spec:
         type: custom
         volumeSpec:
           nfs:
-            server: synology.batcave
-            path: /volume1/batcave-nvr/
+            server: nas.batcave
+            path: /mnt/zpool/frigate-exports
         globalMounts:
           - path: /media/frigate/exports
 
