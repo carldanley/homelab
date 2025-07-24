@@ -91,8 +91,8 @@ spec:
                 subPath: MediaCover
       media:
         type: nfs
-        server: synology.batcave
-        path: /volume1/batcave-media
+        server: nas.batcave
+        path: /mnt/zpool/media
       tmpfs:
         type: emptyDir
         advancedMounts:
