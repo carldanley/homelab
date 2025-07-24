@@ -65,8 +65,8 @@ spec:
         existingClaim: *app
       media:
         type: nfs
-        server: synology.batcave
-        path: /volume1/batcave-media/downloads
+        server: nas.batcave
+        path: /mnt/zpool/media/downloads
         globalMounts:
           - path: /data/downloads
 
