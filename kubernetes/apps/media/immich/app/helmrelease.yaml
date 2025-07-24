@@ -164,8 +164,8 @@ spec:
               - path: /config/matplotlib
       library:
         type: nfs
-        server: synology.batcave
-        path: /volume1/batcave-photos
+        server: nas.batcave
+        path: /mnt/zpool/immich
         advancedMounts:
           server:
             main:
