@@ -5,7 +5,7 @@ metadata:
   name: postgres
 spec:
   instances: 3
-  imageName: ghcr.io/cloudnative-pg/postgresql:${POSTGRESQL_VERSION}
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.5-bookworm
   primaryUpdateStrategy: unsupervised
   storage:
     size: 20Gi
@@ -36,7 +36,7 @@ spec:
       destinationPath: s3://batcave-cloudnative-pg/
       endpointURL: https://d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
       # Note: serverName version needs to be incremented when recovering from an existing cnpg cluster
-      serverName: postgres-v3
+      serverName: postgres-v4
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -48,7 +48,7 @@ spec:
   # # cluster when recovering from an existing cnpg cluster
   # bootstrap:
   #   recovery:
-  #     source: &previousCluster postgres-v2
+  #     source: &previousCluster postgres-v3
   # # Note: externalClusters is needed when recovering from an existing cnpg cluster
   # externalClusters:
   #   - name: *previousCluster
