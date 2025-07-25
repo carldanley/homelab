@@ -76,6 +76,7 @@ My MS-A2 workstations are configured with the following hardware:
 My MinisForum N5 Pro is configured with the following hardware:
 - [Seagate IronWolf PRO 20TB 3.5 Inch SATA 6GB/s 7200 RPM 256MB Cache](https://www.seagate.com/files/www-content/datasheets/pdfs/ironwolf-pro-20tb-DS1914-21-2206US-en_US.pdf)
 - [Samsung 990 PRO SSD 1TB PCIe 4.0 M.2 2280](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie--4-0-nvme--ssd-1tb-mz-v9p1t0b-am.html) - (Mirrored SLOG)
+- [SPARKLE Intel Arc A310 ECO](https://www.sparkle.com.tw/files/20240729114820639.pdf) - (up to 4x simultaneous 4k Transcodes with Plex)
 
 ---
 
