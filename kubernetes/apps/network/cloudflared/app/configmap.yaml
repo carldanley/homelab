@@ -16,12 +16,6 @@ data:
         originRequest:
           originServerName: "external.${DOMAIN_5}"
 
-      - hostname: "synology.${DOMAIN_5}"
-        service: "${SYNOLOGY_PROXY_ADDRESS}"
-        originRequest:
-          originServerName: "external.${DOMAIN_5}"
-          noTLSVerify: true
-
       - hostname: "${DOMAIN_1}"
         service: &service https://cilium-gateway-external.kube-system.svc.cluster.local
         originRequest:
