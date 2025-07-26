@@ -14,5 +14,4 @@ resources:
   - ./overseerr/ks.yaml
   - ./sabnzbd/ks.yaml
   - ./rdt-client/ks.yaml
-  - ./maintainerr/ks.yaml
   - ./immich/ks.yaml
