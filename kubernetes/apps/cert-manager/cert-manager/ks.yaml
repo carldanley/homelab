@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-stores
+    - name: onepassword-store
       namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/cert-manager/cert-manager/app
@@ -33,7 +33,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-stores
+    - name: onepassword-store
       namespace: external-secrets
   interval: 1h
   path: ./kubernetes/apps/cert-manager/cert-manager/secrets
@@ -61,7 +61,7 @@ spec:
       namespace: *namespace
     - name: cert-manager-secrets
       namespace: *namespace
-    - name: onepassword-stores
+    - name: onepassword-store
       namespace: external-secrets
   healthCheckExprs:
     - apiVersion: cert-manager.io/v1

@@ -9,7 +9,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-stores
+    - name: onepassword-store
       namespace: external-secrets
     - name: cert-manager-secrets
       namespace: cert-manager
@@ -42,7 +42,7 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: onepassword-stores
+    - name: onepassword-store
       namespace: external-secrets
     - name: cert-manager-secrets
       namespace: cert-manager
