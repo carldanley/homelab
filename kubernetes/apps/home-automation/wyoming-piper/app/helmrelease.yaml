@@ -41,4 +41,4 @@ spec:
 
     persistence:
       data:
-        existingClaim: wyoming-piper-cache
+        existingClaim: "{{ .Release.Name }}-cache"

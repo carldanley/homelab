@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app openwebui
+  name: openwebui
 spec:
   interval: 1h
   chartRef:
@@ -28,7 +28,7 @@ spec:
               tag: 17
             envFrom: &envFrom
               - secretRef:
-                  name: openwebui-secret
+                  name: "{{ .Release.Name }}-secret"
         containers:
           app:
             image:
@@ -65,7 +65,7 @@ spec:
     route:
       app:
         hostnames:
-          - "openwebui.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: internal
             namespace: kube-system
@@ -73,7 +73,7 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
         advancedMounts:
           openwebui:
             app:
@@ -86,7 +86,6 @@ spec:
 
     service:
       app:
-        controller: *app
         ports:
           http:
             port: *port

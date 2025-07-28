@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app bazarr
+  name: bazarr
 spec:
   interval: 1h
   chartRef:
@@ -64,27 +64,25 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
       media:
         type: nfs
         server: nas.batcave
         path: /mnt/zpool/media
       tmpfs:
         type: emptyDir
-        advancedMounts:
-          bazarr:
-            app:
-              - path: /config/cache
-                subPath: cache
-              - path: /config/log
-                subPath: log
-              - path: /tmp
-                subPath: tmp
+        globalMounts:
+          - path: /config/cache
+            subPath: cache
+          - path: /config/log
+            subPath: log
+          - path: /tmp
+            subPath: tmp
 
     route:
       app:
         hostnames:
-          - "bazarr.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: internal
             namespace: kube-system

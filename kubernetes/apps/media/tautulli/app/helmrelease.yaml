@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app tautulli
+  name: tautulli
 spec:
   interval: 1h
   chartRef:
@@ -62,32 +62,30 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
       config-cache:
-        existingClaim: tautulli-cache
+        existingClaim: "{{ .Release.Name }}-cache"
         globalMounts:
           - path: /config/cache
       tmpfs:
         type: emptyDir
-        advancedMounts:
-          tautulli:
-            app:
-              - path: /config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
+        globalMounts:
+          - path: /config/logs
+            subPath: logs
+          - path: /tmp
+            subPath: tmp
 
     route:
       app:
         hostnames:
-          - "tautulli.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
         rules:
           - backendRefs:
-              - name: *app
+              - name: "{{ .Release.Name }}"
                 port: *port
 
     service:

@@ -97,7 +97,7 @@ spec:
 
     persistence:
       data:
-        existingClaim: mosquitto-cache
+        existingClaim: "{{ .Release.Name }}"
       config-file:
         type: configMap
         name: mosquitto-configmap

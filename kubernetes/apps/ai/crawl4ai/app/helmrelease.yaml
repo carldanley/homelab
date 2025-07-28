@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app crawl4ai
+  name: crawl4ai
 spec:
   interval: 1h
   chartRef:
@@ -18,7 +18,7 @@ spec:
       retries: 3
   values:
     controllers:
-      *app :
+      crawl4ai:
         pod:
           enableServiceLinks: false
           securityContext:
@@ -54,9 +54,7 @@ spec:
                   - ALL
 
     service:
-      *app :
-        primary: true
-        controller: *app
+      crawl4ai:
         ports:
           http:
             port: *httpPort
@@ -69,7 +67,7 @@ spec:
         globalMounts:
         - path: /dev/shm
       data:
-        existingClaim: crawl4ai-data
+        existingClaim: "{{ .Release.Name }}-data"
         globalMounts:
           - path: /home/appuser
       tmpfs:

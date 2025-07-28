@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app prowlarr
+  name: prowlarr
 spec:
   interval: 1h
   chartRef:
@@ -28,7 +28,7 @@ spec:
               tag: 17
             envFrom: &envFrom
               - secretRef:
-                  name: prowlarr-secret
+                  name: "{{ .Release.Name }}-secret"
         containers:
           app:
             image:
@@ -77,19 +77,17 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
       tmpfs:
         type: emptyDir
-        advancedMounts:
-          prowlarr:
-            app:
-              - path: /tmp
-                subPath: tmp
+        globalMounts:
+          - path: /tmp
+            subPath: tmp
 
     route:
       app:
         hostnames:
-          - "prowlarr.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: internal
             namespace: kube-system

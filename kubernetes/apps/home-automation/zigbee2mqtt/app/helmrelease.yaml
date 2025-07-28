@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app zigbee2mqtt
+  name: zigbee2mqtt
 spec:
   interval: 1h
   chartRef:
@@ -65,7 +65,7 @@ spec:
               # ZIGBEE2MQTT_CONFIG_SERIAL_DISABLE_LED: false
             envFrom:
               - secretRef:
-                  name: zigbee2mqtt-secret
+                  name: "{{ .Release.Name }}-secret"
             probes:
               liveness:
                 enabled: true
@@ -98,13 +98,13 @@ spec:
 
     persistence:
       data:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
       config-logs:
         type: emptyDir
         globalMounts:
           - path: /config/log
       external-converters:
-        existingClaim: zigbee2mqtt-external-converters
+        existingClaim: "{{ .Release.Name }}-external-converters"
         globalMounts:
           - path: /data/external_converters
 

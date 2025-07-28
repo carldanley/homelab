@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app overseerr
+  name: overseerr
 spec:
   interval: 1h
   chartRef:
@@ -63,27 +63,25 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
         globalMounts:
           - path: /app/config
       config-cache:
-        existingClaim: overseerr-cache
+        existingClaim: "{{ .Release.Name }}-cache"
         globalMounts:
           - path: /app/config/cache
       tmpfs:
         type: emptyDir
-        advancedMounts:
-          overseerr:
-            app:
-              - path: /app/config/logs
-                subPath: logs
-              - path: /tmp
-                subPath: tmp
+        globalMounts:
+          - path: /app/config/logs
+            subPath: logs
+          - path: /tmp
+            subPath: tmp
 
     route:
       app:
         hostnames:
-          - "overseerr.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: external
             namespace: kube-system

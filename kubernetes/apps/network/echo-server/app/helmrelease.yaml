@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &appName echo-server
+  name: echo-server
 spec:
   interval: 1h
   chartRef:
@@ -65,14 +65,14 @@ spec:
     route:
       app:
         hostnames:
-          - "echo-server.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: external
             namespace: kube-system
             sectionName: domain-5-subdomain-https
         rules:
           - backendRefs:
-              - name: *appName
+              - name: "{{ .Release.Name }}"
                 port: *port
 
     service:

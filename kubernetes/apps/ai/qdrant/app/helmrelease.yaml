@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app qdrant
+  name: qdrant
 spec:
   interval: 1h
   chartRef:
@@ -41,7 +41,7 @@ spec:
               QDRANT__TELEMETRY__DISABLE: "true"
             envFrom:
               - secretRef:
-                  name: qdrant-secret
+                  name: "{{ .Release.Name }}-secret"
             ports:
               - name: http
                 containerPort: *httpPort
@@ -79,8 +79,7 @@ spec:
           type: RuntimeDefault
 
     service:
-      *app :
-        controller: *app
+      qdrant:
         ports:
           http:
             port: *httpPort
@@ -90,14 +89,14 @@ spec:
     route:
       app:
         hostnames:
-          - "qdrant.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_5}"
         parentRefs:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
         rules:
           - backendRefs:
-              - identifier: *app
+              - identifier: qdrant
                 port: *httpPort
 
     serviceMonitor:
@@ -112,11 +111,9 @@ spec:
 
     persistence:
       data:
-        existingClaim: *app
-        advancedMounts:
-          *app :
-            app:
-              - path: /qdrant/storage
-                subPath: storage
-              - path: /qdrant/snapshots
-                subPath: snapshots
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /qdrant/storage
+            subPath: storage
+          - path: /qdrant/snapshots
+            subPath: snapshots

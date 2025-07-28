@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app homelab-runners
+  name: homelab-runners
 spec:
   interval: 1h
   chartRef:
@@ -56,9 +56,9 @@ spec:
                 name: talos
                 readOnly: true
 
-        serviceAccountName: *app
+        serviceAccountName: homelab-runners
 
         volumes:
           - name: talos
             secret:
-              secretName: *app
+              secretName: homelab-runners

@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app home-assistant
+  name: home-assistant
 spec:
   interval: 1h
   chartRef:
@@ -20,7 +20,7 @@ spec:
     controllers:
       home-assistant:
         annotations:
-          reloader.stakater.com/reload: "home-assistant-secret"
+          reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
 
         containers:
           app:
@@ -35,7 +35,7 @@ spec:
               VENV_FOLDER: /venv
             envFrom:
               - secretRef:
-                  name: home-assistant-secret
+                  name: "{{ .Release.Name }}-secret"
             resources:
               requests:
                 cpu: 10m
@@ -90,9 +90,9 @@ spec:
 
     persistence:
       config:
-        existingClaim: *app
+        existingClaim: "{{ .Release.Name }}"
       config-cache:
-        existingClaim: home-assistant-cache
+        existingClaim: "{{ .Release.Name }}-cache"
         globalMounts:
           - path: /venv
       tmpfs:

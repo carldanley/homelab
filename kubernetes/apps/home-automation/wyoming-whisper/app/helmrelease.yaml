@@ -48,4 +48,4 @@ spec:
         globalMounts:
           - path: /tmp
       data:
-        existingClaim: wyoming-whisper-cache
+        existingClaim: "{{ .Release.Name }}-cache"

@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app n8n
+  name: n8n
 spec:
   interval: 1h
   chartRef:
@@ -43,13 +43,13 @@ spec:
               N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: false
               N8N_PROTOCOL: "https"
               N8N_PORT: &port 8080
-              N8N_HOST: &hostName "n8n.${DOMAIN_5}"
+              N8N_HOST: &hostName "{{ .Release.Name }}.${DOMAIN_5}"
               N8N_LOG_LEVEL: info
               N8N_LOG_OUTPUT: console
               N8N_ENCRYPTION_KEY:
                 valueFrom:
                   secretKeyRef:
-                    name: n8n-secret
+                    name: "{{ .Release.Name }}-secret"
                     key: N8N_ENCRYPTION_KEY
             resources:
               requests:
@@ -75,8 +75,6 @@ spec:
 
     persistence:
       data:
-        existingClaim: *app
-        advancedMounts:
-          n8n:
-            app:
-              - path: /home/node/.n8n
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /home/node/.n8n

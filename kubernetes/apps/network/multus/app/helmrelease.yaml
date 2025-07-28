@@ -18,7 +18,7 @@ spec:
       retries: 3
   values:
     controllers:
-      multus:
+      *app :
         type: daemonset
 
         pod:
@@ -34,7 +34,7 @@ spec:
               tag: 1.7.1
 
         containers:
-          multus:
+          app:
             image:
               repository: ghcr.io/k8snetworkplumbingwg/multus-cni
               tag: v4.2.2
@@ -62,7 +62,7 @@ spec:
 
     rbac:
       roles:
-        multus:
+        *app :
           type: ClusterRole
           rules:
             - apiGroups:
@@ -89,7 +89,7 @@ spec:
                 - "patch"
                 - "update"
       bindings:
-        multus:
+        *app :
           type: ClusterRoleBinding
           roleRef:
             identifier: *app

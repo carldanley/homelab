@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app immich
+  name: immich
 spec:
   interval: 1h
   chartRef:
@@ -22,8 +22,8 @@ spec:
       server:
         replicas: 2
         annotations:
-          secret.reloader.stakater.com/reload: immich-secret
-          configmap.reloader.stakater.com/reload: immich-configmap
+          secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
+          configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-configmap"
         pod:
           enableServiceLinks: false
           securityContext:
@@ -49,24 +49,24 @@ spec:
               pullPolicy: IfNotPresent
             envFrom:
               - secretRef:
-                  name: immich-secret
+                  name: "{{ .Release.Name }}-secret"
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/immich-app/immich-server
               tag: v1.136.0@sha256:8c9633b96ca5b748b10875a99c498ee6f1e5d7f7d1df2bf341909cacb88ad672
             envFrom:
               - secretRef:
-                  name: immich-secret
+                  name: "{{ .Release.Name }}-secret"
               - configMapRef:
-                  name: immich-configmap
+                  name: "{{ .Release.Name }}-configmap"
 
       machine-learning:
         type: statefulset
         replicas: 2
         annotations:
-          secret.reloader.stakater.com/reload: immich-secret
-          configmap.reloader.stakater.com/reload: immich-configmap
+          secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
+          configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-configmap"
         pod:
           enableServiceLinks: false
           securityContext:
@@ -89,15 +89,15 @@ spec:
                             - machine-learning
                     topologyKey: kubernetes.io/hostname
         containers:
-          main:
+          app:
             image:
               repository: ghcr.io/immich-app/immich-machine-learning
               tag: v1.136.0@sha256:198d52734136fe9840866cc2f48a8141e0d002c2a25be7e35cd28ef7936b6c67
             envFrom:
               - secretRef:
-                  name: immich-secret
+                  name: "{{ .Release.Name }}-secret"
               - configMapRef:
-                  name: immich-configmap
+                  name: "{{ .Release.Name }}-configmap"
             env:
               MPLCONFIGDIR: "/cache/matplotlib"
         statefulset:
@@ -114,13 +114,14 @@ spec:
 
       redis:
         containers:
-          main:
+          app:
             image:
               repository: public.ecr.aws/docker/library/redis
               tag: 8.0.3@sha256:f957ce918b51f3ac10414244bedd0043c47db44a819f98b9902af1bd9d0afcea
             env:
               REDIS_REPLICATION_MODE: master
-            command: ["redis-server"]
+            command:
+              - redis-server
 
     service:
       server:
@@ -160,7 +161,7 @@ spec:
         type: emptyDir
         advancedMounts:
           server:
-            main:
+            app:
               - path: /config/matplotlib
       library:
         type: nfs
@@ -168,13 +169,13 @@ spec:
         path: /mnt/zpool/immich
         advancedMounts:
           server:
-            main:
+            app:
               - path: /usr/src/app/upload
       tmpfs:
         type: emptyDir
         advancedMounts:
           server:
-            main:
+            app:
               - path: /usr/src/app/.reverse-geocoding-dump
                 subPath: geocoding
               - path: /usr/src/app/.transformers_cache
