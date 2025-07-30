@@ -16,8 +16,17 @@ spec:
       namespace: external-secrets
     - name: rook-ceph-cluster
       namespace: rook-ceph
+    - name: openebs
+      namespace: openebs-system
     - name: volsync
       namespace: volsync-system
+    - name: external-dns-unifi
+      namespace: network
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *app
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/ai/openwebui/app
   postBuild:
@@ -37,4 +46,3 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
