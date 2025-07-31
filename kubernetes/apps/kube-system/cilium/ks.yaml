@@ -8,6 +8,11 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *app
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/app
   prune: true
@@ -18,7 +23,6 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -64,8 +68,6 @@ spec:
       namespace: external-secrets
     - name: cert-manager-secrets
       namespace: cert-manager
-    - name: reflector
-      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/kube-system/cilium/gateway
   postBuild:
@@ -116,4 +118,4 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: false # skip waiting for cert-manager to issue certificates
+  wait: true
