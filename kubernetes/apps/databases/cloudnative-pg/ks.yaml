@@ -8,9 +8,11 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *app
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/databases/cloudnative-pg/app
   prune: true
@@ -21,7 +23,6 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -37,6 +38,11 @@ spec:
       namespace: cert-manager
     - name: cloudnative-pg
       namespace: *namespace
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: barman-cloud
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/databases/cloudnative-pg/barman-cloud
   postBuild:
@@ -51,7 +57,6 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -63,15 +68,21 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
     - name: cloudnative-pg
       namespace: *namespace
     - name: cloudnative-pg-barman-cloud
       namespace: *namespace
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: openebs
+      namespace: openebs-system
   healthCheckExprs:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
       failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
       current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
@@ -88,4 +99,3 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
