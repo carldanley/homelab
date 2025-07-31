@@ -13,6 +13,11 @@ spec:
       namespace: *namespace
     - name: onepassword-store
       namespace: external-secrets
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *app
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/app
   prune: true
@@ -23,7 +28,6 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -43,8 +47,19 @@ spec:
       namespace: external-secrets
     - name: cert-manager-secrets
       namespace: cert-manager
-    - name: reflector
+    - name: cilium
       namespace: kube-system
+    - name: external-dns-cloudflare
+      namespace: network
+  healthCheckExprs:
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+    - apiVersion: notification.toolkit.fluxcd.io/v1
+      kind: Receiver
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/flux-system/flux-instance/webhook
   postBuild:
@@ -64,4 +79,3 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
