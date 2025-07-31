@@ -10,4 +10,4 @@ spec:
   targets:
     staticConfig:
       static:
-        - synology.batcave:2049
+        - nas.batcave:2049
