@@ -8,6 +8,7 @@ components:
 resources:
   - ./gatus/ks.yaml
   - ./smartctl-exporter/ks.yaml
+  - ./truenas-exporter/ks.yaml
   - ./blackbox-exporter/ks.yaml
   - ./unpoller/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
