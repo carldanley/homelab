@@ -37,8 +37,6 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: external-secrets
-      namespace: *namespace
     - name: onepassword
       namespace: *namespace
   healthCheckExprs:

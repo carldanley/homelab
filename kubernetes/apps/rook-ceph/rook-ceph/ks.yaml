@@ -11,6 +11,11 @@ spec:
   dependsOn:
     - name: snapshot-controller
       namespace: volsync-system
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: rook-ceph-operator
+      namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/rook-ceph/rook-ceph/app
   prune: true
@@ -21,7 +26,6 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 5m
-  wait: true
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -38,11 +42,7 @@ spec:
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
-      name: rook-ceph-cluster
-      namespace: *namespace
-    - apiVersion: ceph.rook.io/v1
-      kind: CephCluster
-      name: rook-ceph
+      name: *app
       namespace: *namespace
   healthCheckExprs:
     - apiVersion: ceph.rook.io/v1
@@ -59,4 +59,3 @@ spec:
     namespace: flux-system
   targetNamespace: *namespace
   timeout: 15m
-  wait: true

@@ -12,18 +12,12 @@ spec:
     - ../../../../components/gatus/internal
     - ../../../../components/volsync
   dependsOn:
-    - name: onepassword-store
-      namespace: external-secrets
-    - name: openebs
-      namespace: openebs-system
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
+    - name: cert-manager-secrets
+      namespace: cert-manager
     - name: multus-networks
       namespace: network
     - name: volsync
       namespace: volsync-system
-    - name: external-dns-unifi
-      namespace: network
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease

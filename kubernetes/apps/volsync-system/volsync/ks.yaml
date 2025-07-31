@@ -11,6 +11,10 @@ spec:
   dependsOn:
     - name: snapshot-controller
       namespace: *namespace
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
+    - name: openebs
+      namespace: openebs-system
   interval: 1h
   path: ./kubernetes/apps/volsync-system/volsync/app
   prune: true
