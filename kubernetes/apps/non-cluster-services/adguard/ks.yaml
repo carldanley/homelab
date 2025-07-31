@@ -11,8 +11,8 @@ spec:
   components:
     - ../../../../components/gatus/internal
   dependsOn:
-    - name: external-dns-cloudflare
-      namespace: network
+    - name: cert-manager-secrets
+      namespace: cert-manager
   interval: 1h
   path: ./kubernetes/apps/non-cluster-services/adguard/app
   postBuild:
