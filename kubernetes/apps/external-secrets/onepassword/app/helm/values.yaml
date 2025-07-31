@@ -49,6 +49,7 @@ controllers:
           capabilities:
             drop:
               - ALL
+
       sync:
         image:
           repository: docker.io/1password/connect-sync
@@ -84,16 +85,19 @@ controllers:
               initialDelaySeconds: 15
         resources: *resources
         securityContext: *securityContext
+
 defaultPodOptions:
   securityContext:
     runAsNonRoot: true
     runAsUser: 999
     runAsGroup: 999
+
 persistence:
   config:
     type: emptyDir
     globalMounts:
       - path: *configDir
+
 service:
   app:
     ports:
