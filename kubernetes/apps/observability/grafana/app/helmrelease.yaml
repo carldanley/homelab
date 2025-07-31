@@ -199,6 +199,26 @@ spec:
           datasource:
             - name: DS_PROMETHEUS
               value: Prometheus
+        truenas-scale:
+          url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale.json
+          datasource:
+            - name: DS_MIMIR
+              value: Prometheus
+        truenas-scale-cgroups:
+          url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_cgroups.json
+          datasource:
+            - name: DS_MIMIR
+              value: Prometheus
+        truenas-scale-disk-insights:
+          url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_disk_insights.json
+          datasource:
+            - name: DS_MIMIR
+              value: Prometheus
+        truenas-scale-disk-temperatures:
+          url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_disk_temperatures.json
+          datasource:
+            - name: DS_MIMIR
+              value: Prometheus
         unifi-insights:
           # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
           gnetId: 11315
