@@ -54,13 +54,14 @@ This Git repository contains the following directories under [kubernetes](./kube
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/2699_fe0f/512.gif" alt="⚙" width="20" height="20"> Hardware
 
 | Device                                 | Count | OS Disk Size | Data Disk Size            | RAM  | Operating System  | Purpose                 |
-|----------------------------------------|-------|--------------|---------------------------|------|-------------------|-------------------------|
-| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX) | 3     | 500GB M.2    | 1.92 TB U.2 + 1.92 TB M.2 | 96GB | Talos             | Kubernetes              |
-| MinisForum N5 Pro                      | 1     | 64GB         | 5x20TB HDD                | 96GB | TrueNAS Community | NAS                     |
-| PiKVM (RasPi 4)                        | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM             | KVM                     |
-| TESmart 8 Port KVM Switch              | 1     | -            | -                         | -    | -                 | Network KVM (for PiKVM) |
-| UniFi UDM Pro Max                      | 1     | -            | -                         | -    | UniFi OS          | Router & NVR            |
-| UniFi USW Aggregation                  | 1     | -            | -                         | -    | UniFi OS          | 10G Core Switch         |
+|-----------------------------------------|-------|--------------|---------------------------|------|-------------------|-------------------------|
+| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 3     | 500GB M.2    | 1.92 TB U.2 + 1.92 TB M.2 | 96GB | Talos             | Kubernetes              |
+| MinisForum MS-01 (Intel Core i9-13900H) | 1     | 1GB M.2      | 4GB M.2                   | 32GB | Talos             | Kubernetes (NVR)        |
+| MinisForum N5 Pro                       | 1     | 64GB         | 5x20TB HDD                | 96GB | TrueNAS Community | NAS                     |
+| PiKVM (RasPi 4)                         | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM             | KVM                     |
+| TESmart 8 Port KVM Switch               | 1     | -            | -                         | -    | -                 | Network KVM (for PiKVM) |
+| UniFi UDM Pro Max                       | 1     | -            | -                         | -    | UniFi OS          | Router & NVR            |
+| UniFi USW Aggregation                   | 1     | -            | -                         | -    | UniFi OS          | 10G Core Switch         |
 
 ---
 
@@ -70,6 +71,14 @@ My MS-A2 workstations are configured with the following hardware:
 - [Crucial 500GB M.2 P3 Plus Gen4 NVMe PCIe 4.0](https://www.crucial.com/products/ssd/crucial-p3-plus-ssd) (Talos OS)
 - [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
 - [Samsung 990 Pro 2TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie-4-0-nvme-ssd-2tb-mz-v9p2t0b-am.html) - (OpenEBS Local Storage)
+
+---
+
+My MS-01 workstation is configured with the following hardware:
+
+- [Kingston 1TB M.2 Gen4 NVMe PCIe 4.0](https://www.kingston.com/en/industrial-ssd/m2-2230-pcie-nvme?capacity=1tb&form%20factor=m.2%202230&interface=nvme&nand=tlc)
+- [Samsung SSD 990 EVO Plus 4TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-evo-plus-gen5-pcie-nvmetm-ssd-4tb-mz-v9s4t0b-am/) - (Frigate NVR)
+- [Google Coral M.2 Accelerator with Dual Edge TPU](https://coral.ai/products/m2-accelerator-dual-edgetpu/)
 
 ---
 
