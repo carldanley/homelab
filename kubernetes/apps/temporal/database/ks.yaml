@@ -13,11 +13,6 @@ spec:
       namespace: databases
     - name: rook-ceph-cluster
       namespace: rook-ceph
-  healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: *app
-      namespace: *namespace
   healthCheckExprs:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
