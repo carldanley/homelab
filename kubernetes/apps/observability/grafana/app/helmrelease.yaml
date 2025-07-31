@@ -199,13 +199,6 @@ spec:
           datasource:
             - name: DS_PROMETHEUS
               value: Prometheus
-        synology-snmp:
-          # renovate: depName="Synology SNMP"
-          gnetId: 18643
-          revision: 1
-          datasource:
-            - name: DS_PROMETHEUS
-              value: Prometheus
         unifi-insights:
           # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
           gnetId: 11315
