@@ -10,4 +10,4 @@ resources:
   - ./cloudflared/ks.yaml
   - ./echo-server/ks.yaml
   - ./multus/ks.yaml
-  - ./tailscale/ks.yaml
+  - ./tailscale-operator/ks.yaml
