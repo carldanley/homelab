@@ -74,6 +74,9 @@ spec:
           http:
             port: &uiHttpPort 8080
 
+    defaultPodOptions:
+      hostUsers: false
+
     route:
       ui:
         hostnames:

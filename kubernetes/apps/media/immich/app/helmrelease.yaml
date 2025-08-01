@@ -25,13 +25,6 @@ spec:
           secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
           configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-configmap"
         pod:
-          enableServiceLinks: false
-          securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
-            fsGroup: 2000
-            fsGroupChangePolicy: OnRootMismatch
           affinity:
             nodeAffinity: &nodeAffinity
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -68,13 +61,6 @@ spec:
           secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
           configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-configmap"
         pod:
-          enableServiceLinks: false
-          securityContext:
-            runAsUser: 2000
-            runAsGroup: 2000
-            runAsNonRoot: true
-            fsGroup: 2000
-            fsGroupChangePolicy: OnRootMismatch
           affinity:
             nodeAffinity: *nodeAffinity
             podAntiAffinity:
@@ -139,6 +125,15 @@ spec:
         ports:
           http:
             port: 6379
+
+    defaultPodOptions:
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 2000
+        runAsGroup: 2000
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
 
     route:
       internal:

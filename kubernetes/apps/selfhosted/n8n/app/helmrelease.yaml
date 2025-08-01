@@ -58,6 +58,9 @@ spec:
               limits:
                 memory: 2Gi
 
+    defaultPodOptions:
+      hostUsers: false
+
     service:
       app:
         ports:

@@ -84,6 +84,7 @@ spec:
           name: gatus
 
     defaultPodOptions:
+      hostUsers: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 568

@@ -67,11 +67,11 @@ spec:
                   - DAC_OVERRIDE
 
       redis:
+        strategy: RollingUpdate
         pod:
           securityContext:
             runAsUser: 65534
             runAsGroup: 65534
-        strategy: RollingUpdate
         containers:
           app:
             image:
