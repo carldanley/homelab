@@ -18,35 +18,43 @@ spec:
       retries: 3
   values:
     controllers:
-      *app :
+      multus:
         type: daemonset
-
-        pod:
-          hostNetwork: true
-
-        serviceAccount:
-          name: *app
-
         initContainers:
           cni-plugins:
             image:
               repository: ghcr.io/home-operations/cni-plugins
-              tag: 1.7.1
-
+              tag: 1.7.1@sha256:4bd4e77e3fbc21dd63b9826a011cead1333b6975efa4d1d2631ca932bfd27371
         containers:
           app:
             image:
               repository: ghcr.io/k8snetworkplumbingwg/multus-cni
-              tag: v4.2.2
+              tag: v4.2.2@sha256:7591a27cd28eeafd6dfb197618b06dabd9446a7026164b9b21fee67adc925761
             args:
               - --cleanup-config-on-exit=true
+              - --multus-cni-conf-dir=/tmp
             resources:
               requests:
-                cpu: "10m"
+                cpu: 10m
               limits:
-                memory: "512Mi"
+                memory: 64Mi
             securityContext:
-              privileged: true
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                add:
+                  - NET_ADMIN
+                drop:
+                  - ALL
+        serviceAccount:
+          name: *app
+
+    defaultPodOptions:
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
 
     persistence:
       etc-cni-net-d:
@@ -59,6 +67,11 @@ spec:
         hostPath: /opt/cni/bin
         globalMounts:
           - path: /host/opt/cni/bin
+      tmp:
+        type: emptyDir
+
+    serviceAccount:
+      *app : {}
 
     rbac:
       roles:
@@ -95,6 +108,3 @@ spec:
             identifier: *app
           subjects:
             - identifier: *app
-
-    serviceAccount:
-      *app : {}
