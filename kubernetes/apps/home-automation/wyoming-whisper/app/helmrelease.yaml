@@ -36,6 +36,9 @@ spec:
                 drop:
                   - ALL
 
+    defaultPodOptions:
+      hostUsers: false
+
     service:
       app:
         ports:

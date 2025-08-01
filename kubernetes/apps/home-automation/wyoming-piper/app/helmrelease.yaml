@@ -30,6 +30,9 @@ spec:
             env:
               TZ: America/New_York
 
+    defaultPodOptions:
+      hostUsers: false
+
     service:
       app:
         type: LoadBalancer
