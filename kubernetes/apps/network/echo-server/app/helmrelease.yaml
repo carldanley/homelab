@@ -67,10 +67,14 @@ spec:
       app:
         hostnames:
           - "{{ .Release.Name }}.${DOMAIN_5}"
+          - "{{ .Release.Name }}.${DOMAIN_2}"
         parentRefs:
           - name: external
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+          - name: external
+            namespace: kube-system
+            sectionName: domain-2-subdomain-https
         rules:
           - backendRefs:
               - name: "{{ .Release.Name }}"

@@ -1,7 +1,8 @@
+---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: echo-server
+  name: echo-server-domain-5
   labels:
     dns.homelab/external: "true"
 spec:
@@ -11,3 +12,17 @@ spec:
     recordType: CNAME
     targets:
     - "external.${DOMAIN_5}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: echo-server-domain-2
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+  - dnsName: "echo-server.${DOMAIN_2}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_2}"
