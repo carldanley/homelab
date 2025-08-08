@@ -166,6 +166,12 @@ spec:
           server:
             app:
               - path: /usr/src/app/upload
+      rdb-data:
+        type: emptyDir
+        advancedMounts:
+          redis:
+            app:
+              - path: /data
       tmpfs:
         type: emptyDir
         advancedMounts:
