@@ -1,0 +1,124 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: docmost
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  install:
+    remediation:
+      retries: -1
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    controllers:
+
+      docmost:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17
+              pullPolicy: IfNotPresent
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/ahinko/docmost
+              tag: 0.22.2
+            env:
+              APP_URL: "https://docs.${DOMAIN_5}"
+              MAIL_DRIVER: "smtp"
+              MAIL_FROM_ADDRESS: "docmost@mail.${DOMAIN_5}"
+              MAIL_FROM_NAME: "Docmost"
+              SMTP_SECURE: "true"
+              REDIS_URL: "redis://{{ .Release.Name }}-redis:6379"
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 5
+
+      redis:
+        containers:
+          app:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 8.2.0@sha256:b0efb06f6b4d8c1e2fd1b7c1e89e178d787b432b7b09286b4e7ea3dcdbac777a
+            env:
+              REDIS_REPLICATION_MODE: master
+            command:
+              - redis-server
+
+    defaultPodOptions:
+      hostUsers: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+    service:
+      docmost:
+        controller: docmost
+        ports:
+          http:
+            port: &port 3000
+      redis:
+        controller: redis
+        ports:
+          http:
+            port: 6379
+
+    route:
+      internal:
+        hostnames:
+          - "docs.${DOMAIN_5}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+        rules:
+          - backendRefs:
+              - identifier: docmost
+                port: *port
+
+    persistence:
+      storage:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          docmost:
+            app:
+              - path: /app/data/storage
+      rdb-data:
+        type: emptyDir
+        advancedMounts:
+          redis:
+            app:
+              - path: /data
