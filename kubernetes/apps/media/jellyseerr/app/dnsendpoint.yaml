@@ -1,0 +1,13 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: jellyseerr
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+  - dnsName: "jellyseerr.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_5}"
