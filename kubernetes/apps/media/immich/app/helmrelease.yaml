@@ -47,7 +47,7 @@ spec:
           app:
             image:
               repository: ghcr.io/immich-app/immich-server
-              tag: v1.141.1@sha256:6d48910532cb8e2bc85737e52a633c2e65eeb499f6307e106cd131c5778ec634
+              tag: v1.142.0@sha256:da945d506e2da1525bcd9039d4e93b66163e79420b982addd197531debecaa7f
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
