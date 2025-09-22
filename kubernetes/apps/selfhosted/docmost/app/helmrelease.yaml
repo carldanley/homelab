@@ -35,7 +35,7 @@ spec:
           app:
             image:
               repository: ghcr.io/ahinko/docmost
-              tag: 0.23.1
+              tag: 0.23.2
             env:
               APP_URL: "https://docs.${DOMAIN_5}"
               MAIL_DRIVER: "smtp"
