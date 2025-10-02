@@ -24,12 +24,11 @@ spec:
     kind: OCIRepository
     name: cilium
   install:
-    remediation:
-      retries: -1
+    strategy:
+      name: RetryOnFailure
   upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
+    strategy:
+      name: RetryOnFailure
   valuesFrom:
     - kind: ConfigMap
       name: cilium-values

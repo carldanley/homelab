@@ -9,12 +9,11 @@ spec:
     kind: OCIRepository
     name: gha-runner-scale-set
   install:
-    remediation:
-      retries: -1
+    strategy:
+      name: RetryOnFailure
   upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
+    strategy:
+      name: RetryOnFailure
   values:
     githubConfigUrl: https://github.com/carldanley/homelab
     githubConfigSecret: homelab-runners-secret
