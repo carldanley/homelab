@@ -23,10 +23,8 @@ spec:
         name: external-dns-cloudflare
       interval: 30m
   install:
-    crds: CreateReplace
     disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   upgrade:
-    crds: CreateReplace
     disableSchemaValidation: true # Ref: https://github.com/kubernetes-sigs/external-dns/issues/5206
   values:
     fullnameOverride: &name external-dns-cloudflare

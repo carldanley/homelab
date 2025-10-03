@@ -23,12 +23,8 @@ spec:
     name: loki
   install:
     crds: Skip
-    strategy:
-      name: RetryOnFailure
   upgrade:
     crds: Skip
-    strategy:
-      name: RetryOnFailure
   values:
     deploymentMode: SingleBinary
 

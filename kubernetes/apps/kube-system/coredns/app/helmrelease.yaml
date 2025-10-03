@@ -23,12 +23,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: coredns
-  install:
-    strategy:
-      name: RetryOnFailure
-  upgrade:
-    strategy:
-      name: RetryOnFailure
   valuesFrom:
     - kind: ConfigMap
       name: coredns-values

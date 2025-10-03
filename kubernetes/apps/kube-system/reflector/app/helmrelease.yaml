@@ -21,9 +21,3 @@ spec:
   chartRef:
     kind: OCIRepository
     name: reflector
-  install:
-    strategy:
-      name: RetryOnFailure
-  upgrade:
-    strategy:
-      name: RetryOnFailure

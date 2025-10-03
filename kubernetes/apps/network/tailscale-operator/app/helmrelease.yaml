@@ -21,14 +21,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: tailscale-operator
-  install:
-    crds: CreateReplace
-    strategy:
-      name: RetryOnFailure
-  upgrade:
-    crds: CreateReplace
-    strategy:
-      name: RetryOnFailure
   values:
     oauthSecretVolume:
       secret:

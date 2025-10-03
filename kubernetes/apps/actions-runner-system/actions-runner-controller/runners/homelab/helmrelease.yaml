@@ -8,12 +8,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: gha-runner-scale-set
-  install:
-    strategy:
-      name: RetryOnFailure
-  upgrade:
-    strategy:
-      name: RetryOnFailure
   values:
     githubConfigUrl: https://github.com/carldanley/homelab
     githubConfigSecret: homelab-runners-secret

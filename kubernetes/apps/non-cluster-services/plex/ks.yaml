@@ -25,11 +25,9 @@ spec:
       GATUS_QUERY_URL: "plex.${DOMAIN_5}/status"
       GATUS_STATUS: "403"
   prune: true
-  retryInterval: 2m
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: *namespace
-  timeout: 5m
   wait: true

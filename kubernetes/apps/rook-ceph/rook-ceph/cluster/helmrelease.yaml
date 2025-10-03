@@ -22,12 +22,6 @@ spec:
   chartRef:
     kind: OCIRepository
     name: rook-ceph-cluster
-  install:
-    strategy:
-      name: RetryOnFailure
-  upgrade:
-    strategy:
-      name: RetryOnFailure
   values:
     monitoring:
       enabled: true
