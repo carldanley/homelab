@@ -1,0 +1,127 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tandoor
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      tandoor:
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 17
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+
+        pod:
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            fsGroupChangePolicy: "OnRootMismatch"
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/tandoorrecipes/recipes
+              tag: 2.2.7@sha256:bbafaa18a39292e3e2cf032e090d17d0fcc1deb71a2b98425fec99cb05e8532d
+            env:
+              COMMENT_PREF_DEFAULT: "0"
+              DEBUG: "1"
+              ALLOWED_HOSTS: "*"
+              ENABLE_SIGNUP: "1"
+              FRACTION_PREF_DEFAULT: "1"
+              GUNICORN_MEDIA: "0"
+              MAX_OWNED_SPACES_PREF_DEFAULT: "100"
+              SHOPPING_MIN_AUTOSYNC_INTERVAL: "5"
+              TANDOOR_TIMEZONE: "America/New_York"
+              TANDOOR_PORT: &tandoorPort 8888
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+
+          nginx:
+            image:
+              repository: ghcr.io/nginxinc/nginx-unprivileged
+              tag: 1.27.4
+
+    defaultPodOptions:
+      hostUsers: false
+
+    service:
+      app:
+        ports:
+          http:
+            port: *tandoorPort
+          nginx:
+            port: &nginxPort 8080
+
+    route:
+      app:
+        hostnames:
+          - "recipes.${DOMAIN_4}"
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-4-subdomain-https
+          - name: external
+            namespace: kube-system
+            sectionName: domain-4-subdomain-https
+        rules:
+          - backendRefs:
+              - name: tandoor
+                port: *nginxPort
+
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        advancedMounts:
+          tandoor:
+            app:
+              - path: /opt/recipes/mediafiles
+            nginx:
+              - path: /media
+        globalMounts:
+          - path: /home/node/.n8n
+      static-files:
+        type: emptyDir
+        advancedMounts:
+          tandoor:
+            app:
+              - path: /opt/recipes/staticfiles
+                subPath: staticfiles
+            nginx:
+              - path: /static
+                subPath: staticfiles
+      nginx-config:
+        type: configMap
+        name: "{{ .Release.Name }}-configmap"
+        advancedMounts:
+          tandoor:
+            nginx:
+              - path: /etc/nginx/nginx.conf
+                subPath: nginx.conf
+                readOnly: true
+      cache:
+        type: emptyDir
+        advancedMounts:
+          tandoor:
+            nginx:
+              - path: /var/cache/nginx
