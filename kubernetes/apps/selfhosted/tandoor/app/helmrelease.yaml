@@ -24,21 +24,16 @@ spec:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
 
-        pod:
-          securityContext:
-            runAsUser: 568
-            runAsGroup: 568
-
         containers:
           app:
             image:
               repository: ghcr.io/tandoorrecipes/recipes
               tag: 2.3.3@sha256:af6bd76e703d644748a93d581da05c25159d742b94b2da9eddadaaec93555858
             env:
-              COMMENT_PREF_DEFAULT: "0"
-              DEBUG: "1"
+              COMMENT_PREF_DEFAULT: "1"
+              DEBUG: "0"
               ALLOWED_HOSTS: "*"
-              ENABLE_SIGNUP: "1"
+              ENABLE_SIGNUP: "0"
               FRACTION_PREF_DEFAULT: "1"
               GUNICORN_MEDIA: "0"
               MAX_OWNED_SPACES_PREF_DEFAULT: "100"
@@ -59,9 +54,6 @@ spec:
             image:
               repository: ghcr.io/nginxinc/nginx-unprivileged
               tag: 1.27.4
-
-    defaultPodOptions:
-      hostUsers: false
 
     service:
       app:
