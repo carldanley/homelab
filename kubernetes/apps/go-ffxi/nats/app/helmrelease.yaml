@@ -23,5 +23,8 @@ spec:
         name: nats
       interval: 30m
   values:
-  # https://artifacthub.io/packages/helm/nats/nats
-  # https://github.com/nats-io/k8s/blob/main/helm/charts/nats/values.yaml
+    # https://artifacthub.io/packages/helm/nats/nats
+    # https://github.com/nats-io/k8s/blob/main/helm/charts/nats/values.yaml
+    config:
+      cluster:
+        enabled: true
