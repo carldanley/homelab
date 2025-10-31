@@ -1,0 +1,50 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: login-server
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      auth:
+        replicas: 3
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            image:
+              repository: ghcr.io/goffxi/login-server
+              tag: v0.1.0
+            args: >-
+              --role=auth
+            env:
+              SERVER_PORT: &authPort "54230"
+            envFrom:
+              - configMapRef:
+                  name: "{{ .Release.Name }}-config"
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+
+    defaultPodOptions:
+      hostUsers: false
+
+    service:
+      auth:
+        type: LoadBalancer
+        sessionAffinity: ClientIP
+        annotations:
+          lbipam.cilium.io/ips: "10.50.100.7"
+        ports:
+          tcp:
+            port: *authPort

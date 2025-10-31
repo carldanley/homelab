@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: login-server-config
+data:
+  NATS_URL: "nats://nats:4222"
+  LOG_LEVEL: "debug"
