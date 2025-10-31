@@ -1,0 +1,19 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: login-server
+spec:
+  commonName: login-server
+  dnsNames:
+    - login-server
+  duration: 2160h
+  isCA: false
+  issuerRef:
+    name: login-server
+    kind: Issuer
+    group: cert-manager.io
+  renewBefore: 360h
+  secretName: login-server-tls
+  usages:
+    - server auth

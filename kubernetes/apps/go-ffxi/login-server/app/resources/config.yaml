@@ -1,0 +1,2 @@
+NATS_URL: "nats://nats.go-ffxi.svc.cluster.local:4222"
+LOG_LEVEL: "debug"
