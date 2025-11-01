@@ -11,7 +11,7 @@ spec:
     recordTTL: 60
     recordType: CNAME
     targets:
-    - "external.${DOMAIN_3}"
+    - "games.${DOMAIN_3}"
 ---
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
