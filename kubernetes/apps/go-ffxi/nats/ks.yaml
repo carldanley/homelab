@@ -15,6 +15,11 @@ spec:
       namespace: *namespace
   interval: 1h
   path: ./kubernetes/apps/go-ffxi/nats/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository

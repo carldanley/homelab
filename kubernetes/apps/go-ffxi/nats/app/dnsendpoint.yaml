@@ -1,0 +1,14 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: nats-internal
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "nats.${DOMAIN_3}"
+    recordTTL: 60
+    recordType: A
+    targets:
+    - "10.50.100.6"
