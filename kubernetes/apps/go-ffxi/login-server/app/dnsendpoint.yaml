@@ -1,0 +1,28 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: login-server-external
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+  - dnsName: "ffxi.${DOMAIN_3}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "external.${DOMAIN_3}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: login-server-internal
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "ffxi.${DOMAIN_3}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "10.50.100.6"
