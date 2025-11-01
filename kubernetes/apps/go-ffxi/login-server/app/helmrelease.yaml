@@ -20,8 +20,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/goffxi/login-server
-              tag: v0.1.1
+              repository: &imageRepo ghcr.io/goffxi/login-server
+              tag: &imageTag v0.1.2
             args: >-
               --role=auth
             env:
@@ -38,11 +38,62 @@ spec:
               limits:
                 memory: 256Mi
 
+      data:
+        replicas: 1
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            image:
+              repository: *imageRepo
+              tag: *imageTag
+            args: >-
+              --role=data
+            env:
+              SERVER_PORT: &dataPort "54230"
+            envFrom:
+              - configMapRef:
+                  name: "{{ .Release.Name }}-config"
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+
+      view:
+        replicas: 1
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            image:
+              repository: *imageRepo
+              tag: *imageTag
+            args: >-
+              --role=view
+            env:
+              SERVER_PORT: &viewPort "54001"
+            envFrom:
+              - configMapRef:
+                  name: "{{ .Release.Name }}-config"
+            resources:
+              requests:
+                cpu: 5m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+
     defaultPodOptions:
       hostUsers: false
 
     service:
       auth:
+        controller: auth
         type: LoadBalancer
         sessionAffinity: ClientIP
         annotations:
@@ -50,6 +101,26 @@ spec:
         ports:
           tcp:
             port: *authPort
+
+      data:
+        controller: data
+        type: LoadBalancer
+        sessionAffinity: ClientIP
+        annotations:
+          lbipam.cilium.io/ips: "10.50.100.8"
+        ports:
+          tcp:
+            port: *dataPort
+
+      view:
+        controller: view
+        type: LoadBalancer
+        sessionAffinity: ClientIP
+        annotations:
+          lbipam.cilium.io/ips: "10.50.100.9"
+        ports:
+          tcp:
+            port: *viewPort
 
     persistence:
       tls-certs:
