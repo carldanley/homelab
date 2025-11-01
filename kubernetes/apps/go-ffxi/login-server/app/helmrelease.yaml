@@ -26,6 +26,8 @@ spec:
               --role=auth
             env:
               SERVER_PORT: &authPort "54230"
+              AUTH_SERVER_TLS_CERT_PATH: "/app/tls.crt"
+              AUTH_SERVER_TLS_KEY_PATH: "/app/tls.key"
             envFrom:
               - configMapRef:
                   name: "{{ .Release.Name }}-config"
@@ -48,3 +50,17 @@ spec:
         ports:
           tcp:
             port: *authPort
+
+    persistence:
+      tls-certs:
+        type: secret
+        name: "{{ .Release.Name }}-tls"
+        advancedMounts:
+          auth:
+            app:
+              - path: /app/tls.crt
+                subPath: tls.crt
+                readOnly: true
+              - path: /app/tls.key
+                subPath: tls.key
+                readOnly: true
