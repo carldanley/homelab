@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: &imageRepo ghcr.io/goffxi/login-server
-              tag: &imageTag v0.1.3
+              tag: &imageTag v0.1.4
             args: >-
               --role=auth
             env:
