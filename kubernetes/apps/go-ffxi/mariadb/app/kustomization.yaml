@@ -2,10 +2,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: go-ffxi
-components:
-  - ../../components/common
 resources:
-  - ./mariadb/ks.yaml
-  - ./nats/ks.yaml
-  - ./login-server/ks.yaml
+  - ./externalsecret.yaml
+  - ./mariadb.yaml
+  - ./physicalbackup.yaml

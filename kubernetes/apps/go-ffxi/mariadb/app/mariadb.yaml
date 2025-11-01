@@ -1,0 +1,96 @@
+# HA Guide:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/high_availability.md
+#
+# Backup & Recovery:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/physical_backup.md
+#
+# Upgrade Strategy:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/updates.md
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: mariadb-secret
+    key: ROOT_PASSWORD
+  storage:
+    size: 50Gi
+  replicas: 3
+  galera:
+    enabled: true
+  service:
+    type: LoadBalancer
+    metadata:
+      annotations:
+        lbipam.cilium.io/ips: "10.50.100.10"
+  metrics:
+    enabled: true
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+  resources:
+    requests:
+      cpu: 1
+      memory: 4Gi
+    limits:
+      memory: 4Gi
+  livenessProbe:
+    periodSeconds: 5
+    timeoutSeconds: 5
+  readinessProbe:
+    periodSeconds: 5
+    timeoutSeconds: 5
+  startupProbe:
+    failureThreshold: 10
+    periodSeconds: 5
+    timeoutSeconds: 5
+  # innodb_buffer_pool_size: 80% of memory limits.
+  myCnf: |
+    [mariadb]
+    bind-address=*
+    default_storage_engine=InnoDB
+    binlog_format=row
+    innodb_autoinc_lock_mode=2
+    innodb_buffer_pool_size=3200MB
+    max_allowed_packet=1GB
+  nodeSelector:
+    topology.kubernetes.io/zone: controlplane
+  affinity:
+    antiAffinityEnabled: true
+  podDisruptionBudget:
+    maxUnavailable: 66%
+  priorityClassName: system-node-critical
+
+  # Recreate the MariaDB resource and bootstrap from a physical backup in S3.
+  # bootstrapFrom:
+  #   s3:
+  #     bucket: physicalbackups
+  #     prefix: mariadb
+  #     endpoint: minio.minio.svc.cluster.local:9000
+  #     accessKeyIdSecretKeyRef:
+  #       name: minio
+  #       key: access-key-id
+  #     secretAccessKeySecretKeyRef:
+  #       name: minio
+  #       key: secret-access-key
+  #     tls:
+  #       enabled: true
+  #       caSecretKeyRef:
+  #         name: minio-ca
+  #         key: ca.crt
+  #   backupContentType: Physical
+  #   targetRecoveryTime: 2023-12-19T09:00:00Z
+  #   stagingStorage:
+  #     persistentVolumeClaim:
+  #       resources:
+  #         requests:
+  #           storage: 10Gi
+  #       accessModes:
+  #         - ReadWriteOnce
+  #   restoreJob:
+  #     resources:
+  #       requests:
+  #         cpu: 100m
+  #         memory: 128Mi
+  #       limits:
+  #         memory: 1Gi
