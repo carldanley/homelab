@@ -1,0 +1,15 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Database
+metadata:
+  name: go-ffxi
+spec:
+  name: goffxi
+  mariaDbRef:
+    name: mariadb
+  characterSet: utf8mb4
+  collate: utf8mb4_general_ci
+  # Delete the resource in the database whenever the CR gets deleted.
+  # Alternatively, you can specify Skip in order to omit deletion.
+  cleanupPolicy: Delete
+  requeueInterval: 10h
+  retryInterval: 30s

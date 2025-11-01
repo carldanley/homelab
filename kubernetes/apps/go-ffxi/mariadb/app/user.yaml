@@ -1,0 +1,16 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: go-ffxi
+spec:
+  name: goffxi
+  mariaDbRef:
+    name: mariadb
+  passwordSecretKeyRef:
+    name: mariadb-secret
+    key: USER_GOFFXI_PASSWORD
+  maxUserConnections: 1000
+  host: "%"
+  cleanupPolicy: Delete
+  requeueInterval: 10h
+  retryInterval: 30s

@@ -6,3 +6,6 @@ resources:
   - ./externalsecret.yaml
   - ./mariadb.yaml
   - ./physicalbackup.yaml
+  - ./database.yaml
+  - ./user.yaml
+  - ./grant.yaml
