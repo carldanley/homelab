@@ -16,6 +16,11 @@ data:
         originRequest:
           originServerName: "external.${DOMAIN_5}"
 
+      - hostname: "ffxi.${DOMAIN_3}"
+        service: "tcp://login-server.go-ffxi.svc.cluster.local:54230"
+        originRequest:
+          originServerName: "external.${DOMAIN_3}"
+
       - hostname: "${DOMAIN_1}"
         service: &service https://cilium-gateway-external.kube-system.svc.cluster.local
         originRequest:
