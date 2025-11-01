@@ -3,7 +3,6 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: nats
-  namespace: go-ffxi
 spec:
   interval: 30m
   url: https://nats-io.github.io/k8s/helm/charts/
