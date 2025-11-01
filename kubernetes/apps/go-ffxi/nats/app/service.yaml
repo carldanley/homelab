@@ -12,5 +12,9 @@ spec:
       port: 4222
       targetPort: 4222
       protocol: TCP
+    - name: monitor
+      port: 8222
+      targetPort: 8222
+      protocol: TCP
   selector:
     app.kubernetes.io/name: nats
