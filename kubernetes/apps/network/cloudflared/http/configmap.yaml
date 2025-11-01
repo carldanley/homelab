@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cloudflared-configmap
+  name: cloudflared-http-configmap
 data:
   # origin configuration: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/configure-tunnels/cloudflared-parameters/origin-parameters/
   # config file docs: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/configuration-file/
@@ -15,11 +15,6 @@ data:
         service: "${PLEX_PROXY_ADDRESS}"
         originRequest:
           originServerName: "external.${DOMAIN_5}"
-
-      - hostname: "ffxi.${DOMAIN_3}"
-        service: "tcp://login-server.go-ffxi.svc.cluster.local:54231"
-        originRequest:
-          originServerName: "external.${DOMAIN_3}"
 
       - hostname: "${DOMAIN_1}"
         service: &service https://cilium-gateway-external.kube-system.svc.cluster.local

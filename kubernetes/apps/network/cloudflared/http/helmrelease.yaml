@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: cloudflared
+  name: cloudflared-http
   annotations:
     kustomize.toolkit.fluxcd.io/substitute: disabled
 spec:
@@ -64,8 +64,8 @@ spec:
       hostUsers: false
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
+        runAsUser: 1000
+        runAsGroup: 1000
 
     persistence:
       config:

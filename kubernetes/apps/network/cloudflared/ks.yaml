@@ -28,7 +28,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app cloudflared
+  name: &app cloudflared-http
   namespace: &namespace network
 spec:
   commonMetadata:
@@ -43,14 +43,14 @@ spec:
       name: *app
       namespace: *namespace
   interval: 1h
-  path: ./kubernetes/apps/network/cloudflared/app
+  path: ./kubernetes/apps/network/cloudflared/http
   postBuild:
     substituteFrom:
       - kind: Secret
         name: domains-secret
         optional: false
       - kind: Secret
-        name: cloudflared-secret
+        name: cloudflared-http-secret
         optional: false
   prune: true
   sourceRef:
