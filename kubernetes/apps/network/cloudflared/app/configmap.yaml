@@ -17,7 +17,7 @@ data:
           originServerName: "external.${DOMAIN_5}"
 
       - hostname: "ffxi.${DOMAIN_3}"
-        service: "tcp://login-server.go-ffxi.svc.cluster.local:54230"
+        service: "tcp://login-server.go-ffxi.svc.cluster.local:54231"
         originRequest:
           originServerName: "external.${DOMAIN_3}"
 

@@ -25,7 +25,7 @@ spec:
             args: >-
               --role=auth
             env:
-              SERVER_PORT: &authPort "54230"
+              SERVER_PORT: &authPort "54231"
               AUTH_SERVER_TLS_CERT_PATH: "/app/tls.crt"
               AUTH_SERVER_TLS_KEY_PATH: "/app/tls.key"
             envFrom:
