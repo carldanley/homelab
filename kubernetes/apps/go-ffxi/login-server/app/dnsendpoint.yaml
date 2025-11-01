@@ -23,6 +23,6 @@ spec:
   endpoints:
   - dnsName: "ffxi.${DOMAIN_3}"
     recordTTL: 60
-    recordType: CNAME
+    recordType: A
     targets:
     - "10.50.100.7"
