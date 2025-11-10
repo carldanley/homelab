@@ -1,0 +1,19 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: lobby-auth
+spec:
+  commonName: lobby-auth
+  dnsNames:
+    - lobby-auth
+  duration: 2160h
+  isCA: false
+  issuerRef:
+    name: goffxi
+    kind: Issuer
+    group: cert-manager.io
+  renewBefore: 360h
+  secretName: lobby-auth-tls
+  usages:
+    - server auth

@@ -1,7 +1,7 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: User
 metadata:
-  name: go-ffxi
+  name: goffxi
 spec:
   name: goffxi
   mariaDbRef:

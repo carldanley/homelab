@@ -1,7 +1,7 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
-  name: grant-go-ffxi-db-access
+  name: grant-goffxi-db-access
 spec:
   mariaDbRef:
     name: mariadb

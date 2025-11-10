@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lobby-auth-config
+data:
+  DB_CONNECTION_STRING: "goffxi:${USER_GOFFXI_PASSWORD}@tcp(mariadb-internal:3306)/goffxi?parseTime=true"
+  NATS_URL: "nats://nats:4222"
+  LOG_LEVEL: "debug"
+  NATS_CLIENT_PREFIX: "" # the hostname from k8s will include "lobby-auth-<num>" which is sufficient
+  SERVER_TLS_CERT_PATH: "/app/tls.crt"
+  SERVER_TLS_KEY_PATH: "/app/tls.key"

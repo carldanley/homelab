@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: login-server-config
-data:
-  NATS_URL: "nats://nats:4222"
-  LOG_LEVEL: "debug"
-  NATS_CLIENT_PREFIX: "" # the hostname from k8s will include "login-server-<role>-<num>" which is sufficient

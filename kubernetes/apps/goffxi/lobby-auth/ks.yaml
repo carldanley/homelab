@@ -1,0 +1,40 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app lobby-auth
+  namespace: &namespace goffxi
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  dependsOn:
+    - name: common
+      namespace: *namespace
+    - name: nats
+      namespace: *namespace
+    - name: mariadb
+      namespace: *namespace
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: *app
+      namespace: *namespace
+  interval: 1h
+  path: ./kubernetes/apps/goffxi/lobby-auth/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
+      - kind: Secret
+        name: mariadb-secret
+        optional: false
+    substitute:
+      LOAD_BALANCER_IP: "10.50.100.7"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace

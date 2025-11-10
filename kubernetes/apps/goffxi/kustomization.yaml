@@ -1,0 +1,14 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: goffxi
+components:
+  - ../../components/common
+resources:
+  - ./mariadb/ks.yaml
+  - ./nats/ks.yaml
+  - ./common/ks.yaml
+  - ./lobby-auth/ks.yaml
+  - ./lobby-data/ks.yaml
+  - ./lobby-view/ks.yaml

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lobby-view-config
+data:
+  DB_CONNECTION_STRING: "goffxi:${USER_GOFFXI_PASSWORD}@tcp(mariadb-internal:3306)/goffxi?parseTime=true"
+  NATS_URL: "nats://nats:4222"
+  LOG_LEVEL: "debug"
+  NATS_CLIENT_PREFIX: "" # the hostname from k8s will include "lobby-view-<num>" which is sufficient

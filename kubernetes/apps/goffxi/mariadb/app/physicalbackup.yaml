@@ -7,7 +7,7 @@ spec:
     name: mariadb
   storage:
     s3:
-      bucket: batcave-go-ffxi-mariadb
+      bucket: batcave-goffxi-mariadb
       endpoint: d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
       accessKeyIdSecretKeyRef:
         name: mariadb-secret
