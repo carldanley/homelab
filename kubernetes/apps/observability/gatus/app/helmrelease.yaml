@@ -15,32 +15,18 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          init-db:
+          gatus-sidecar:
             image:
-              repository: ghcr.io/home-operations/postgres-init
-              tag: 18
-            envFrom: &envFrom
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
-              - secretRef:
-                  name: domains-secret
-          init-config:
-            dependsOn: init-db
-            image:
-              repository: ghcr.io/home-operations/k8s-sidecar
-              tag: 2.1.4@sha256:438df334bf9b195efc8251967248b9b12e02192a19a65021bee1da408a670383
-            env:
-              FOLDER: /config
-              LABEL: gatus.io/enabled
-              NAMESPACE: ALL
-              RESOURCE: both
-              UNIQUE_FILENAMES: true
-              METHOD: WATCH
-            resources: &resources
+              repository: ghcr.io/home-operations/gatus-sidecar
+              tag: 0.0.12@sha256:83bf82d422e9b0529a8076cb584d557a12158d9d8a4c373b4d27afcb87a17569
+            args:
+              - --auto-httproute
+              - --enable-httproute
+            resources:
               requests:
                 cpu: 10m
               limits:
-                memory: 128Mi
+                memory: 32Mi
             restartPolicy: Always
         containers:
           app:
@@ -52,7 +38,6 @@ spec:
               GATUS_CONFIG_PATH: /config
               GATUS_DELAY_START_SECONDS: 5
               TZ: America/New_York
-            envFrom: *envFrom
             probes:
               liveness: &probes
                 enabled: true
@@ -66,7 +51,11 @@ spec:
                   timeoutSeconds: 1
                   failureThreshold: 3
               readiness: *probes
-            resources: *resources
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 256Mi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
@@ -80,8 +69,8 @@ spec:
       hostUsers: false
       securityContext:
         runAsNonRoot: true
-        runAsUser: 568
-        runAsGroup: 568
+        runAsUser: 1000
+        runAsGroup: 1000
 
     persistence:
       config:
