@@ -86,6 +86,13 @@ spec:
           - name: external
             namespace: kube-system
             sectionName: domain-5-subdomain-https
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
+        rules:
+          - backendRefs:
+              - name: "{{ .Release.Name }}"
+                port: *port
 
     service:
       app:
