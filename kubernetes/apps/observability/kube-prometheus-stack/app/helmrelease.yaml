@@ -22,12 +22,6 @@ spec:
     kind: OCIRepository
     name: kube-prometheus-stack
   values:
-    crds:
-      enabled: true
-      upgradeJob:
-        enabled: true
-        forceConflicts: true
-
     cleanPrometheusOperatorObjectNames: true
 
     alertmanager:
@@ -73,10 +67,12 @@ spec:
               namespace: kube-system
               sectionName: domain-5-subdomain-https
       prometheusSpec:
+        externalUrl: "https://prometheus.${DOMAIN_5}"
+        version: v2.55.1 # override 'unsupported Prometheus version' error
         image:
           registry: docker.io
           repository: prompp/prompp
-          tag: 2.53.2-0.3.4
+          tag: 0.7.0
         securityContext:
           runAsNonRoot: true
           runAsUser: 64535
@@ -87,7 +83,6 @@ spec:
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
-        externalUrl: "https://prometheus.${DOMAIN_5}"
         retention: 14d
         retentionSize: 50GB
         resources:
@@ -105,26 +100,9 @@ spec:
 
     prometheus-node-exporter:
       fullnameOverride: node-exporter
-      prometheus: &prometheus
-        monitor:
-          enabled: true
-          relabelings:
-            - action: replace
-              regex: (.*)
-              replacement: $1
-              sourceLabels:
-                - __meta_kubernetes_pod_node_name
-              targetLabel: kubernetes_node
 
     kube-state-metrics:
       fullnameOverride: kube-state-metrics
-      metricLabelsAllowlist:
-        - pods=[*]
-        - deployments=[*]
-        - persistentvolumeclaims=[*]
-      prometheus:
-        <<: *prometheus
 
     grafana:
       enabled: false
-      forceDeployDashboards: true

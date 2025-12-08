@@ -7,8 +7,9 @@ spec:
   route:
     groupBy:
       - alertname
+      - cluster
       - job
-    groupInterval: 10m
+    groupInterval: 5m
     groupWait: 1m
     receiver: "null"
     repeatInterval: 12h
