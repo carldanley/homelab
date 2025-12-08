@@ -12,5 +12,6 @@ resources:
   - ./blackbox-exporter/ks.yaml
   - ./unpoller/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
+  - ./fluent-bit/ks.yaml
   - ./victoria-logs/ks.yaml
   - ./grafana/ks.yaml
