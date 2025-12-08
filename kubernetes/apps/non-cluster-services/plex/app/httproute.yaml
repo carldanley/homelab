@@ -5,7 +5,7 @@ metadata:
   name: plex
   annotations:
     gatus.home-operations.com/endpoint: |-
-      conditions: ["[STATUS] == 200"]
+      conditions: ["[STATUS] == 401"]
 spec:
   parentRefs:
   - name: internal

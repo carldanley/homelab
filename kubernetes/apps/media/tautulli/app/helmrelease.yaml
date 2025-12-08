@@ -79,6 +79,7 @@ spec:
       app:
         annotations:
           gatus.home-operations.com/endpoint: |-
+            url: https://{{ .Release.Name }}.${DOMAIN_5}/status
             conditions: ["[STATUS] == 200"]
         hostnames:
           - "{{ .Release.Name }}.${DOMAIN_5}"
