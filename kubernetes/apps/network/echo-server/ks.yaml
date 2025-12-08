@@ -8,8 +8,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  components:
-    - ../../../../components/gatus/external
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
@@ -27,7 +25,6 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_QUERY_URL: "echo-server.${DOMAIN_5}/healthz"
   prune: true
   sourceRef:
     kind: GitRepository

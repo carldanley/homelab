@@ -34,8 +34,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  components:
-    - ../../../../components/gatus/external
   dependsOn:
     - name: flux-instance
       namespace: *namespace
@@ -59,8 +57,6 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_QUERY_URL: "flux-webhook.${DOMAIN_5}"
-      GATUS_STATUS: "404"
   prune: true
   sourceRef:
     kind: GitRepository

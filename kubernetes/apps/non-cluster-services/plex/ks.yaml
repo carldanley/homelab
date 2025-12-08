@@ -8,8 +8,6 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  components:
-    - ../../../../components/gatus/external
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
@@ -22,8 +20,6 @@ spec:
         optional: false
     substitute:
       APP: *app
-      GATUS_QUERY_URL: "plex.${DOMAIN_5}/status"
-      GATUS_STATUS: "403"
   prune: true
   sourceRef:
     kind: GitRepository
