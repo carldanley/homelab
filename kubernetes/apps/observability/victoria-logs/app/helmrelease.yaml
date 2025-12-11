@@ -42,14 +42,15 @@ spec:
           - name: internal
             namespace: kube-system
             sectionName: domain-5-subdomain-https
-        # filters:
-        #   - type: RequestRedirect
-        #     requestRedirect:
-        #       path:
-        #         type: ReplaceFullPath
-        #         replaceFullPath: /select/vmui/
-        #       statusCode: 302
-        matches:
-          - path:
-              type: Exact
-              value: /
+        extraRules:
+          - filters:
+              - type: RequestRedirect
+                requestRedirect:
+                  path:
+                    type: ReplaceFullPath
+                    replaceFullPath: /select/vmui/
+                  statusCode: 302
+            matches:
+              - path:
+                  type: Exact
+                  value: /
