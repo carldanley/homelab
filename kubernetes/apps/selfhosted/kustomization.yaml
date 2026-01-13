@@ -11,3 +11,4 @@ resources:
   - ./docmost/ks.yaml
   - ./tandoor/ks.yaml
   - ./paperless/ks.yaml
+  - ./teslamate/ks.yaml
