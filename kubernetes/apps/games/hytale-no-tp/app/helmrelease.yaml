@@ -1,0 +1,64 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hytale-no-tp
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      app:
+        replicas: 1
+        strategy: RollingUpdate
+        annotations:
+          reloader.stakater.com/auto: "true"
+
+        containers:
+          app:
+            stdin: true
+            tty: true
+            image:
+              repository: ghcr.io/logikoz/hytale-server
+              tag: latest
+            ports:
+            - containerPort: &udpPort 5520
+              protocol: UDP
+            env:
+              - name: JAVA_OPTS
+                value: >
+                  -Djava.net.preferIPv4Stack=true
+                  -Djava.net.preferIPv4Addresses=true
+                  -Xms8G
+                  -Xmx8G
+                  -XX:+UseG1GC
+                  -XX:MaxGCPauseMillis=50
+                  -XX:+AlwaysPreTouch
+            resources:
+              requests:
+                cpu: 4000m
+                memory: 8Gi
+              limits:
+                memory: 12Gi
+
+    defaultPodOptions:
+      hostUsers: false
+
+    service:
+      app:
+        type: LoadBalancer
+        sessionAffinity: ClientIP
+        annotations:
+          lbipam.cilium.io/ips: "${LOAD_BALANCER_IP}"
+        ports:
+          udp:
+            port: *udpPort
+
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}"
+        globalMounts:
+          - path: /hytale/data

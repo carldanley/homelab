@@ -1,0 +1,14 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: hytale-no-tp-internal
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+  - dnsName: "hytale-no-tp.${DOMAIN_3}"
+    recordTTL: 60
+    recordType: A
+    targets:
+    - "${LOAD_BALANCER_IP}"
