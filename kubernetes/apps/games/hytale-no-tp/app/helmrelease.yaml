@@ -27,13 +27,6 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
 
-        # initContainers:
-        #   touch-auth-enc:
-        #     image:
-        #       repository: busybox
-        #       tag: "1.37.0"
-        #     command: ["sh", "-c", "touch /home/container/auth.enc && chown 1000:1000 /home/container/auth.enc || true"]
-
         containers:
           app:
             stdin: true
@@ -107,15 +100,6 @@ spec:
           hytale:
             app:
               - path: /home/container/game
-      # auth:
-      #   existingClaim: "{{ .Release.Name }}-auth"
-      #   advancedMounts:
-      #     hytale:
-      #       # touch-auth-enc:
-      #       #   - path: /home/container
-      #       app:
-      #         - path: /home/container/auth.enc
-      #           subPath: auth.enc
       mods:
         type: custom
         volumeSpec:
