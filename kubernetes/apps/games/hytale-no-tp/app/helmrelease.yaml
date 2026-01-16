@@ -10,33 +10,48 @@ spec:
     name: app-template
     namespace: flux-system
   values:
+
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
     controllers:
-      app:
+      hytale:
+        type: statefulset
         replicas: 1
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
+
+        # initContainers:
+        #   touch-auth-enc:
+        #     image:
+        #       repository: busybox
+        #       tag: "1.37.0"
+        #     command: ["sh", "-c", "touch /home/container/auth.enc && chown 1000:1000 /home/container/auth.enc || true"]
 
         containers:
           app:
             stdin: true
             tty: true
             image:
-              repository: ghcr.io/logikoz/hytale-server
-              tag: latest
+              repository: deinfreu/hytale-server
+              tag: experimental-0.1.2.1
             ports:
             - containerPort: &udpPort 5520
               protocol: UDP
             env:
-              - name: JAVA_OPTS
-                value: >
-                  -Djava.net.preferIPv4Stack=true
-                  -Djava.net.preferIPv4Addresses=true
-                  -Xms8G
-                  -Xmx8G
-                  -XX:+UseG1GC
-                  -XX:MaxGCPauseMillis=50
-                  -XX:+AlwaysPreTouch
+              SERVER_IP: "0.0.0.0"
+              SERVER_PORT: *udpPort
+              PROD: "FALSE"
+              DEBUG: "FALSE"
+              TZ: "America/New_York"
+              HYTALE_ACCEPT_EARLY_PLUGINS: "TRUE"
+              HYTALE_AUTH_MODE: "TRUE"
             resources:
               requests:
                 cpu: 4000m
@@ -44,11 +59,8 @@ spec:
               limits:
                 memory: 12Gi
 
-    defaultPodOptions:
-      hostUsers: false
-
     service:
-      app:
+      hytale:
         type: LoadBalancer
         sessionAffinity: ClientIP
         annotations:
@@ -56,9 +68,61 @@ spec:
         ports:
           udp:
             port: *udpPort
+            protocol: UDP
 
     persistence:
+      bans-json:
+        type: configMap
+        name: "{{ .Release.Name }}-server-configs"
+        advancedMounts:
+          hytale:
+            app:
+              - path: /home/container/bans.json
+                subPath: bans.json
+                readOnly: true
+      machine-id:
+        type: configMap
+        name: "{{ .Release.Name }}-server-configs"
+        advancedMounts:
+          hytale:
+            app:
+              - path: /etc/machine-id
+                subPath: machine-id
+                readOnly: true
       data:
         existingClaim: "{{ .Release.Name }}"
-        globalMounts:
-          - path: /hytale/data
+        advancedMounts:
+          hytale:
+            app:
+              - path: /home/container
+      logs:
+        existingClaim: "{{ .Release.Name }}-logs"
+        advancedMounts:
+          hytale:
+            app:
+              - path: /home/container/logs
+      assets:
+        existingClaim: "{{ .Release.Name }}-assets"
+        advancedMounts:
+          hytale:
+            app:
+              - path: /home/container/game
+      # auth:
+      #   existingClaim: "{{ .Release.Name }}-auth"
+      #   advancedMounts:
+      #     hytale:
+      #       # touch-auth-enc:
+      #       #   - path: /home/container
+      #       app:
+      #         - path: /home/container/auth.enc
+      #           subPath: auth.enc
+      mods:
+        type: custom
+        volumeSpec:
+          nfs:
+            server: nas.batcave
+            path: /mnt/zpool/hytale-no-tp
+        advancedMounts:
+          hytale:
+            app:
+              - path: /home/container/mods
