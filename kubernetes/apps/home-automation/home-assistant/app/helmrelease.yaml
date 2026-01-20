@@ -29,6 +29,11 @@ spec:
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            ports:
+              - name: http
+                containerPort: &httpPort 8123
+              - name: sonos
+                containerPort: &sonosPort 1400
             resources:
               requests:
                 cpu: 10m
@@ -59,6 +64,9 @@ spec:
                 - /config
               env:
                 HASS_SERVER: http://localhost:8123
+              ports:
+                - name: http
+                  containerPort: 12321
               resources:
                 requests:
                   cpu: 10m
@@ -112,7 +120,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: app
-                port: &httpPort 8123
+                port: *httpPort
       code-server:
         hostnames:
           - "code.${DOMAIN_4}"
@@ -136,7 +144,7 @@ spec:
           http:
             port: *httpPort
           sonos:
-            port: 1400
+            port: *sonosPort
       code-server:
         ports:
           http:
