@@ -46,7 +46,7 @@ spec:
                 drop:
                   - ALL
 
-          code-server:
+          codeserver:
               image:
                 repository: ghcr.io/coder/code-server
                 tag: 4.108.1@sha256:867b9a9dedd68f1b46e308cad9525e419db7b0ce0c83831f6a350f37ee7ff6fd
@@ -65,7 +65,7 @@ spec:
               env:
                 HASS_SERVER: http://localhost:8123
               ports:
-                - name: http
+                - name: codeserver
                   containerPort: 12321
               resources:
                 requests:
@@ -121,7 +121,7 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *httpPort
-      code-server:
+      codeserver:
         hostnames:
           - "code.${DOMAIN_4}"
         parentRefs:
@@ -130,8 +130,8 @@ spec:
             sectionName: domain-4-subdomain-https
         rules:
           - backendRefs:
-              - identifier: code-server
-                port: *codeServerPort
+              - identifier: codeserver
+                port: http
 
     service:
       app:
@@ -142,10 +142,10 @@ spec:
           lbipam.cilium.io/ips: *serviceIP
         ports:
           http:
-            port: *httpPort
+            port: http
           sonos:
-            port: *sonosPort
-      code-server:
+            port: sonos
+      codeserver:
         ports:
           http:
-            port: *codeServerPort
+            port: codeserver
