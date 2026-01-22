@@ -51,6 +51,24 @@ spec:
                 -XX:InitiatingHeapOccupancyPercent=15 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem
                 -XX:MaxTenuringThreshold=1 -XX:+UseCompactObjectHeaders -Djava.net.preferIPv4Stack=true
                 -Dfile.encoding=UTF-8
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - /bin/sh
+                      - -c
+                      - |
+                        ss -H -u -l -p -n 2>/dev/null \
+                          | grep -F ':5520' \
+                          | grep -F '("java"'
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness: *probes
             resources:
               requests:
                 cpu: 4000m
