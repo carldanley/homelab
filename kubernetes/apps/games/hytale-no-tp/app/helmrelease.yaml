@@ -75,8 +75,8 @@ spec:
                         fi
 
                         exit 0
-                  initialDelaySeconds: 5
-                  periodSeconds: 10
+                  initialDelaySeconds: 3
+                  periodSeconds: 5
                   timeoutSeconds: 2
                   failureThreshold: 3
               readiness: *probes
