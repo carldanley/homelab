@@ -70,7 +70,7 @@ spec:
                         [ -n "$latest" ] && [ -r "$latest" ] || exit 1
 
                         # If shutdown markers are present, fail liveness (forces restart).
-                        if grep -Fq 'Removing players...' "$latest" || grep -Fq 'Stopping background threads...' "$latest"; then
+                        if grep -Fq 'Stopping world default...' "$latest"; then
                           exit 1
                         fi
 
