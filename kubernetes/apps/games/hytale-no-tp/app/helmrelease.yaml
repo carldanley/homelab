@@ -64,7 +64,7 @@ spec:
                         ss -H -u -l -p -n 2>/dev/null \
                           | grep -F ':5520' \
                           | grep -F '("java"'
-                  initialDelaySeconds: 10
+                  initialDelaySeconds: 5
                   periodSeconds: 10
                   timeoutSeconds: 2
                   failureThreshold: 3
