@@ -61,9 +61,20 @@ spec:
                       - /bin/sh
                       - -c
                       - |
-                        ss -H -u -l -p -n 2>/dev/null \
-                          | grep -F ':5520' \
-                          | grep -F '("java"'
+                        LOGDIR="$HOME/logs"
+
+                        # Find newest server log (excluding .lck). Exit 1 if none exist.
+                        latest="$(
+                          ls -1t "$LOGDIR"/*_server.log 2>/dev/null | head -n1
+                        )"
+                        [ -n "$latest" ] && [ -r "$latest" ] || exit 1
+
+                        # If shutdown markers are present, fail liveness (forces restart).
+                        if grep -Fq 'Removing players...' "$latest" || grep -Fq 'Stopping background threads...' "$latest"; then
+                          exit 1
+                        fi
+
+                        exit 0
                   initialDelaySeconds: 5
                   periodSeconds: 10
                   timeoutSeconds: 2
