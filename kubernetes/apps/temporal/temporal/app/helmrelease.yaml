@@ -35,7 +35,7 @@ spec:
           app:
             image:
               repository: temporalio/ui
-              tag: 2.44.1@sha256:0240f934c5f4204656c68651f384d656b6cfa2e737cd8fd85a03640b72b9b4e7
+              tag: 2.45.0@sha256:71c179ad90958e090ad0f3a22f0fc535ff3c6df117e80e17d130832cb7233692
             env:
               TEMPORAL_ADDRESS: &temporalAddress temporal-server:7233
               TEMPORAL_CORS_ORIGINS: http://localhost:3000
