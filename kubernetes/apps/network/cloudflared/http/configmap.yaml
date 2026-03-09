@@ -10,7 +10,6 @@ data:
     no-autoupdate: true
 
     ingress:
-
       - hostname: "plex.${DOMAIN_5}"
         service: "${PLEX_PROXY_ADDRESS}"
         originRequest:
