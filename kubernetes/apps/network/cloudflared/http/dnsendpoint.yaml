@@ -42,3 +42,8 @@ spec:
       recordType: CNAME
       targets:
       - "${TUNNEL_ID}.cfargotunnel.com"
+
+    - dnsName: "external.${DOMAIN_8}"
+      recordType: CNAME
+      targets:
+      - "${TUNNEL_ID}.cfargotunnel.com"

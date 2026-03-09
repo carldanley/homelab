@@ -35,6 +35,7 @@ spec:
       - "${DOMAIN_5}"
       - "${DOMAIN_6}"
       - "${DOMAIN_7}"
+      - "${DOMAIN_8}"
 
     env:
       - name: CF_API_TOKEN

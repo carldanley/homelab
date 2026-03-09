@@ -33,6 +33,7 @@ spec:
       - "${DOMAIN_5}"
       - "${DOMAIN_6}"
       - "${DOMAIN_7}"
+      - "${DOMAIN_8}"
 
     extraArgs:
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
