@@ -30,3 +30,5 @@ spec:
             - "*.${DOMAIN_6}"
             - "${DOMAIN_7}"
             - "*.${DOMAIN_7}"
+            - "${DOMAIN_8}"
+            - "*.${DOMAIN_8}"

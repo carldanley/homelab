@@ -4,7 +4,7 @@ kind: Gateway
 metadata:
   name: external
   annotations:
-    external-dns.alpha.kubernetes.io/target: &hostname "external.${DOMAIN_1},external.${DOMAIN_2},external.${DOMAIN_3},external.${DOMAIN_4},external.${DOMAIN_5},external.${DOMAIN_6},external.${DOMAIN_7}"
+    external-dns.alpha.kubernetes.io/target: &hostname "external.${DOMAIN_1},external.${DOMAIN_2},external.${DOMAIN_3},external.${DOMAIN_4},external.${DOMAIN_5},external.${DOMAIN_6},external.${DOMAIN_7},external.${DOMAIN_8}"
 spec:
   gatewayClassName: cilium
   addresses:
@@ -229,5 +229,35 @@ spec:
       protocol: HTTPS
       port: 443
       hostname: "${DOMAIN_7}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    ########################
+    # DOMAIN 8
+    ########################
+
+    - name: domain-8-subdomain-http
+      protocol: HTTP
+      port: 80
+      hostname: "*.${DOMAIN_8}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-8-root-http
+      protocol: HTTP
+      port: 80
+      hostname: "${DOMAIN_8}"
+      allowedRoutes: *allowedSameNamespace
+
+    - name: domain-8-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_8}"
+      allowedRoutes: *allowedAllNamespaces
+      tls: *tlsConfig
+
+    - name: domain-8-root-https
+      protocol: HTTPS
+      port: 443
+      hostname: "${DOMAIN_8}"
       allowedRoutes: *allowedAllNamespaces
       tls: *tlsConfig
