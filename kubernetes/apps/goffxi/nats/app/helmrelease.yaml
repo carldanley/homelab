@@ -16,7 +16,7 @@ spec:
   chart:
     spec:
       chart: nats
-      version: 2.12.4
+      version: 2.12.5
       sourceRef:
         kind: HelmRepository
         name: nats
