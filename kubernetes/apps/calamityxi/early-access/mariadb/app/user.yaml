@@ -1,0 +1,16 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: calamityxi-early-access
+spec:
+  name: calamityxi-early-access
+  mariaDbRef:
+    name: calamityxi-mariadb-early-access
+  passwordSecretKeyRef:
+    name: calamityxi-mariadb-early-access-secret
+    key: USER_CALAMITYXI_PASSWORD
+  maxUserConnections: 1000
+  host: "%"
+  cleanupPolicy: Delete
+  requeueInterval: 10h
+  retryInterval: 30s
