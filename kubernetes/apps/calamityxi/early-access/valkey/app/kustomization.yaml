@@ -2,10 +2,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: calamityxi
-components:
-  - ../../components/common
 resources:
-  - ./branding/ks.yaml
-  - ./early-access/mariadb/ks.yaml
-  - ./early-access/valkey/ks.yaml
+  - ./helmrelease.yaml
