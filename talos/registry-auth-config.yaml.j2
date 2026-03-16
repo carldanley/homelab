@@ -1,0 +1,8 @@
+{% set ghcrSecretPath = "op://homelab kubernetes/talos-private-packages" %}
+---
+apiVersion: v1alpha1
+kind: RegistryAuthConfig
+name: ghcr.io
+username: {{ ghcrSecretPath }}/username
+password: {{ ghcrSecretPath }}/ghcr-token
+
