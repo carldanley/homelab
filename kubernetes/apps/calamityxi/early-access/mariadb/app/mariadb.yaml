@@ -9,10 +9,10 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: MariaDB
 metadata:
-  name: calamityxi-mariadb-early-access
+  name: early-access-mariadb
 spec:
   rootPasswordSecretKeyRef:
-    name: calamityxi-mariadb-early-access-secret
+    name: early-access-mariadb-secret
     key: ROOT_PASSWORD
   storage:
     size: 100Gi
@@ -53,6 +53,7 @@ spec:
     innodb_autoinc_lock_mode=2
     innodb_buffer_pool_size=3200MB
     max_allowed_packet=1GB
+    log_bin_trust_function_creators=1
   nodeSelector:
     topology.kubernetes.io/zone: controlplane
   affinity:

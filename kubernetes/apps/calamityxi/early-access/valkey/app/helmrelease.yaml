@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: calamityxi-early-access-valkey
+  name: early-access-valkey
 spec:
   interval: 1h
   chartRef:

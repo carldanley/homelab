@@ -1,11 +1,11 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: Database
 metadata:
-  name: calamityxi-early-access
+  name: early-access-mariadb
 spec:
-  name: calamityxi-early-access
+  name: early-access-mariadb
   mariaDbRef:
-    name: calamityxi-mariadb-early-access
+    name: early-access-mariadb
   characterSet: utf8mb4
   collate: utf8mb4_general_ci
   # Delete the resource in the database whenever the CR gets deleted.

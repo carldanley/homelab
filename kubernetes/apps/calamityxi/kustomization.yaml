@@ -7,5 +7,11 @@ components:
   - ../../components/common
 resources:
   - ./branding/ks.yaml
-  - ./early-access/mariadb/ks.yaml
   - ./early-access/valkey/ks.yaml
+  - ./early-access/mariadb/ks.yaml
+  - ./early-access/game-server/common/ks.yaml
+  - ./early-access/game-server/bootstrap/ks.yaml
+  - ./early-access/game-server/world/ks.yaml
+  - ./early-access/game-server/connect/ks.yaml
+  - ./early-access/game-server/search/ks.yaml
+  - ./early-access/game-server/map/ks.yaml

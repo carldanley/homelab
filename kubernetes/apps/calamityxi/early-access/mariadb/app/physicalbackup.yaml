@@ -1,19 +1,19 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: PhysicalBackup
 metadata:
-  name: calamityxi-mariadb-early-access-scheduled-backup
+  name: early-access-mariadb-scheduled-backup
 spec:
   mariaDbRef:
-    name: calamityxi-mariadb-early-access
+    name: early-access-mariadb
   storage:
     s3:
       bucket: calamityxi-mariadb-early-access
       endpoint: d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
       accessKeyIdSecretKeyRef:
-        name: calamityxi-mariadb-early-access-secret
+        name: &secretName early-access-mariadb-secret
         key: S3_ACCESS_KEY_ID
       secretAccessKeySecretKeyRef:
-        name: calamityxi-mariadb-early-access-secret
+        name: *secretName
         key: S3_SECRET_ACCESS_KEY
       tls:
         enabled: true

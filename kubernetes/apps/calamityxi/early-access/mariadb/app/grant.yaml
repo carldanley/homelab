@@ -1,13 +1,13 @@
 apiVersion: k8s.mariadb.com/v1alpha1
 kind: Grant
 metadata:
-  name: grant-calamityxi-early-access-db-access
+  name: grant-early-access-mariadb-access
 spec:
   mariaDbRef:
-    name: calamityxi-mariadb-early-access
+    name: early-access-mariadb
   privileges:
     - "ALL PRIVILEGES"
-  database: calamityxi-early-access
+  database: early-access-mariadb
   table: "*"
   username: calamityxi-early-access
   grantOption: true

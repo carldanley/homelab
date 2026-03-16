@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./issuer.yaml
+configMapGenerator:
+  - name: early-access-game-server-common-configmap
+    files:
+      - ./scripts/wait-for-bootstrap.sh
+      - ./scripts/wait-for-world.sh
+      - ./scripts/seed-meshes.sh
+generatorOptions:
+  disableNameSuffixHash: true
