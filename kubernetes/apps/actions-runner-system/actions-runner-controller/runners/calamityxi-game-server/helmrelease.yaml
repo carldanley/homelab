@@ -1,0 +1,42 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: calamityxi-game-server-runners
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
+  values:
+    githubConfigUrl: https://github.com/CalamityFFXI/game-server
+    githubConfigSecret: calamityxi-game-server-runners-secret
+    runnerScaleSetName: calamityxi-game-server-runners
+    minRunners: 1
+    maxRunners: 3
+
+    containerMode:
+      type: dind
+
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+
+    template:
+      spec:
+        securityContext:
+          fsGroup: 123 #docker
+        containers:
+          - name: runner
+            image: ghcr.io/home-operations/actions-runner:2.332.0@sha256:577ec3d514700203d07a8b14ac9238e2c8bf7565969f9d3bddf5dac1c60c43b7
+            command:
+              - /home/runner/run.sh
+            env:
+              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+                value: "false"
+              - name: NODE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+
+        serviceAccountName: calamityxi-game-server-runners
