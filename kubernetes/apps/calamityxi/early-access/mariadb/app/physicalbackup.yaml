@@ -5,6 +5,8 @@ metadata:
 spec:
   mariaDbRef:
     name: early-access-mariadb
+    waitForIt: false
+  target: PreferReplica
   storage:
     s3:
       bucket: calamityxi-mariadb-early-access

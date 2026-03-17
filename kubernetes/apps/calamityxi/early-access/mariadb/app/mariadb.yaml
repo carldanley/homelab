@@ -16,9 +16,7 @@ spec:
     key: ROOT_PASSWORD
   storage:
     size: 100Gi
-  replicas: 3
-  galera:
-    enabled: true
+  replicas: 1
   service:
     type: LoadBalancer
     metadata:
@@ -48,18 +46,13 @@ spec:
   myCnf: |
     [mariadb]
     bind-address=*
-    default_storage_engine=InnoDB
-    binlog_format=row
-    innodb_autoinc_lock_mode=2
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_general_ci
     innodb_buffer_pool_size=3200MB
     max_allowed_packet=1GB
     log_bin_trust_function_creators=1
   nodeSelector:
     topology.kubernetes.io/zone: controlplane
-  affinity:
-    antiAffinityEnabled: true
-  podDisruptionBudget:
-    maxUnavailable: 66%
   priorityClassName: system-node-critical
 
   # Recreate the MariaDB resource and bootstrap from a physical backup in S3.
