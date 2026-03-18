@@ -90,3 +90,9 @@ spec:
         globalMounts:
           - path: /scripts
             readOnly: true
+      settings:
+        type: configMap
+        name: early-access-game-server-settings
+        globalMounts:
+          - path: /server/settings/default
+            readOnly: true
