@@ -108,3 +108,9 @@ spec:
         type: emptyDir
         globalMounts:
           - path: /server/navmeshes
+      settings:
+        type: configMap
+        name: early-access-game-server-settings
+        globalMounts:
+          - path: /server/settings/default
+            readOnly: true

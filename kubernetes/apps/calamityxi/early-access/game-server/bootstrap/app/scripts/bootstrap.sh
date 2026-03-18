@@ -17,9 +17,6 @@ until mysql_cmd -e "SELECT 1" >/dev/null 2>&1; do
   sleep 5
 done
 
-echo "Running dbtool update..."
-python /server/tools/dbtool.py update full
-
 echo "Getting public IP address..."
 PUBLIC_IP="$(wget -qO- https://api.ipify.org)"
 echo "Detected IP: $PUBLIC_IP"

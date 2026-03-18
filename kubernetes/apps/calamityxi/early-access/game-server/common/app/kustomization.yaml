@@ -12,5 +12,14 @@ configMapGenerator:
       - ./scripts/wait-for-bootstrap.sh
       - ./scripts/wait-for-world.sh
       - ./scripts/seed-meshes.sh
+  - name: early-access-game-server-settings
+    files:
+      - ./settings/logging.lua
+      - ./settings/login.lua
+      - ./settings/main.lua
+      - ./settings/map.lua
+      - ./settings/network.lua
+      - ./settings/search.lua
+      - ./settings/test.lua
 generatorOptions:
   disableNameSuffixHash: true

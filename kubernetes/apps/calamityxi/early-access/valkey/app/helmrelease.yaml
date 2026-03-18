@@ -48,6 +48,16 @@ spec:
 
     service:
       valkey:
+        type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 10.50.100.31
         ports:
           http:
             port: 6379
+
+    persistence:
+      data:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /data
