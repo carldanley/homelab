@@ -15,3 +15,4 @@ resources:
   - ./early-access/game-server/connect/ks.yaml
   - ./early-access/game-server/search/ks.yaml
   - ./early-access/game-server/map/ks.yaml
+  - ./api-server/ks.yaml
