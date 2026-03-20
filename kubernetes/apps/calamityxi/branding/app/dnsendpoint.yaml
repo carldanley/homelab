@@ -4,11 +4,11 @@ kind: DNSEndpoint
 metadata:
   name: branding
   labels:
-    dns.homelab/external: "true"
+    dns.homelab/external: "false"
 spec:
   endpoints:
   - dnsName: "branding.${DOMAIN_8}"
     recordTTL: 60
     recordType: CNAME
     targets:
-    - "external.${DOMAIN_8}"
+    - "internal.${DOMAIN_8}"
