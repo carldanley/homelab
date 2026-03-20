@@ -13,7 +13,7 @@ spec:
     githubConfigSecret: calamityxi-game-server-runners-secret
     runnerScaleSetName: calamityxi-game-server-runners
     minRunners: 1
-    maxRunners: 3
+    maxRunners: 2
 
     containerMode:
       type: dind
