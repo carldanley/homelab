@@ -19,8 +19,8 @@ spec:
         initContainers:
           wait-for-bootstrap:
             image:
-              repository: ghcr.io/calamityffxi/game-server
-              tag: 2026.03.16-2
+              repository: ghcr.io/calamityffxi/custom-game-server
+              tag: v0.1.0
             envFrom:
               - secretRef:
                   name: "early-access-game-server-common-credentials-secret"
@@ -29,8 +29,8 @@ spec:
               - /scripts/wait-for-bootstrap.sh
           wait-for-world:
             image:
-              repository: ghcr.io/calamityffxi/game-server
-              tag: 2026.03.16-2
+              repository: ghcr.io/calamityffxi/custom-game-server
+              tag: v0.1.0
             env:
               - name: XI_NETWORK_ZMQ_IP
                 value: &zmqIP early-access-game-server-world
@@ -43,8 +43,8 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/calamityffxi/game-server
-              tag: 2026.03.16-2
+              repository: ghcr.io/calamityffxi/custom-game-server
+              tag: v0.1.0
             env:
               - name: XI_NETWORK_ZMQ_IP
                 value: *zmqIP
