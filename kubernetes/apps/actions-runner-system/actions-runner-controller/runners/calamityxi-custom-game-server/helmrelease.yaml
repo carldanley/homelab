@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: calamityxi-game-server-runners
+  name: calamityxi-custom-game-server-runners
 spec:
   interval: 1h
   chartRef:
@@ -10,8 +10,8 @@ spec:
     name: gha-runner-scale-set
   values:
     githubConfigUrl: https://github.com/CalamityFFXI/custom-game-server
-    githubConfigSecret: calamityxi-game-server-runners-secret
-    runnerScaleSetName: calamityxi-game-server-runners
+    githubConfigSecret: calamityxi-custom-game-server-runners-secret
+    runnerScaleSetName: calamityxi-custom-game-server-runners
     minRunners: 1
     maxRunners: 2
 
@@ -39,4 +39,4 @@ spec:
                   fieldRef:
                     fieldPath: spec.nodeName
 
-        serviceAccountName: calamityxi-game-server-runners
+        serviceAccountName: calamityxi-custom-game-server-runners
