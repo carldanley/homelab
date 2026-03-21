@@ -9,7 +9,7 @@ spec:
     kind: OCIRepository
     name: gha-runner-scale-set
   values:
-    githubConfigUrl: https://github.com/CalamityFFXI/game-server
+    githubConfigUrl: https://github.com/CalamityFFXI/custom-game-server
     githubConfigSecret: calamityxi-game-server-runners-secret
     runnerScaleSetName: calamityxi-game-server-runners
     minRunners: 1
