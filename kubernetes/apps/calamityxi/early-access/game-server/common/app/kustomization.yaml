@@ -11,6 +11,5 @@ configMapGenerator:
     files:
       - ./scripts/wait-for-bootstrap.sh
       - ./scripts/wait-for-world.sh
-      - ./scripts/seed-meshes.sh
 generatorOptions:
   disableNameSuffixHash: true

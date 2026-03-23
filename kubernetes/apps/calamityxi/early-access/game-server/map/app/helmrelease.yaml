@@ -40,16 +40,6 @@ spec:
             args:
               - /bin/sh
               - /scripts/wait-for-world.sh
-          seed-meshes:
-            image:
-              repository: ghcr.io/landsandboat/ximeshes
-              tag: latest
-            envFrom:
-              - secretRef:
-                  name: "early-access-game-server-common-credentials-secret"
-            args:
-              - /bin/sh
-              - /scripts/seed-meshes.sh
         containers:
           app:
             image:
