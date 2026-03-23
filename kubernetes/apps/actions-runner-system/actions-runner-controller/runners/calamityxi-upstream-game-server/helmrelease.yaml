@@ -16,7 +16,14 @@ spec:
     maxRunners: 2
 
     containerMode:
-      type: dind
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: openebs-hostpath
 
     controllerServiceAccount:
       name: actions-runner-controller
@@ -24,19 +31,38 @@ spec:
 
     template:
       spec:
-        securityContext:
-          fsGroup: 123 #docker
+        initContainers:
+          - name: kube-init
+            image: ghcr.io/home-operations/actions-runner:2.333.0@sha256:35e5e1d6520009672d453ed84b3666b688423da51db732c8b4a46b14227b2628
+            command:
+              - sudo
+              - chown
+              - -R
+              - 1001:123
+              - /home/runner/_work
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+
         containers:
           - name: runner
             image: ghcr.io/home-operations/actions-runner:2.333.0@sha256:35e5e1d6520009672d453ed84b3666b688423da51db732c8b4a46b14227b2628
             command:
               - /home/runner/run.sh
             env:
-              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
-                value: "false"
+              - name: ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE
+                value: /home/runner/hook-template/content
               - name: NODE
                 valueFrom:
                   fieldRef:
                     fieldPath: spec.nodeName
+            volumeMounts:
+              - name: hook-template
+                mountPath: /home/runner/hook-template
+                readOnly: true
+        volumes:
+          - name: hook-template
+            configMap:
+              name: calamityxi-upstream-game-server-hook-template
 
         serviceAccountName: calamityxi-upstream-game-server-runners

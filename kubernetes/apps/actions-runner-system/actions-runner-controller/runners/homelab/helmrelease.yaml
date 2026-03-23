@@ -30,8 +30,6 @@ spec:
 
     template:
       spec:
-        securityContext:
-          fsGroup: 123 #docker
         containers:
           - name: runner
             image: ghcr.io/home-operations/actions-runner:2.333.0@sha256:35e5e1d6520009672d453ed84b3666b688423da51db732c8b4a46b14227b2628
