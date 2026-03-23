@@ -16,7 +16,14 @@ spec:
     maxRunners: 2
 
     containerMode:
-      type: dind
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: openebs-hostpath
 
     controllerServiceAccount:
       name: actions-runner-controller
