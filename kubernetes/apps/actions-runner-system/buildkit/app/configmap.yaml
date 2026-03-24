@@ -4,5 +4,38 @@ metadata:
   name: buildkit-config
 data:
   buildkitd.toml: |
+    debug = false
+
+    [grpc]
+      address = ["tcp://0.0.0.0:1234"]
+
     [worker.oci]
+      enabled = true
+      snapshotter = "auto"
+      gc = true
+
+      # Keep enough hot cache to matter, but stop the PVC from running away.
+      reservedSpace = "15GiB"
+      maxUsedSpace = "70GiB"
+      minFreeSpace = "10GiB"
+
+      # Biggest CPU-pressure lever.
       max-parallelism = 2
+
+      # Fine as a modest default for a single shared builder.
+      cniPoolSize = 8
+
+    [[worker.oci.gcpolicy]]
+      # Prune short-lived source and cache-mount data more aggressively.
+      reservedSpace = "5GiB"
+      maxUsedSpace = "20GiB"
+      minFreeSpace = "10GiB"
+      keepDuration = "48h"
+      filters = ["type==source.local", "type==exec.cachemount", "type==source.git.checkout"]
+
+    [[worker.oci.gcpolicy]]
+      # Keep the broader layer cache around longer.
+      reservedSpace = "15GiB"
+      maxUsedSpace = "70GiB"
+      minFreeSpace = "10GiB"
+      keepDuration = "168h"
