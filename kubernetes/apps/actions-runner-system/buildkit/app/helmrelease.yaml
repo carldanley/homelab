@@ -1,0 +1,55 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: buildkit
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      buildkit:
+        replicas: 1
+        containers:
+          app:
+            image:
+              repository: moby/buildkit
+              tag: v0.28.0
+            args:
+              - --addr
+              - tcp://0.0.0.0:1234
+              - --config
+              - /etc/buildkit/buildkitd.toml
+            securityContext:
+              privileged: true
+              allowPrivilegeEscalation: true
+              runAsUser: 0
+              runAsGroup: 0
+        pod:
+          securityContext:
+            fsGroup: 0
+
+    service:
+      buildkit:
+        ports:
+          grpc:
+            port: 1234
+
+    persistence:
+      data:
+        existingClaim: "{{ .Release.Name }}-state"
+        globalMounts:
+          - path: /var/lib/buildkit
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+      config:
+        type: configMap
+        name: buildkit-config
+        globalMounts:
+          - path: /etc/buildkit
+            readOnly: true

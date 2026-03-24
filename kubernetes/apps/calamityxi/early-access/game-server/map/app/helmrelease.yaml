@@ -20,23 +20,23 @@ spec:
           wait-for-bootstrap:
             image:
               repository: ghcr.io/calamityffxi/custom-game-server
-              tag: v0.1.8
+              tag: v0.1.10
             envFrom:
               - secretRef:
-                  name: "early-access-game-server-common-credentials-secret"
+                  name: &envSecret "early-access-game-server-common-credentials-secret"
             args:
               - /bin/bash
               - /scripts/wait-for-bootstrap.sh
           wait-for-world:
             image:
               repository: ghcr.io/calamityffxi/custom-game-server
-              tag: v0.1.8
+              tag: v0.1.10
             env:
               - name: XI_NETWORK_ZMQ_IP
                 value: &zmqIP early-access-game-server-world
             envFrom:
               - secretRef:
-                  name: "early-access-game-server-common-credentials-secret"
+                  name: *envSecret
             args:
               - /bin/sh
               - /scripts/wait-for-world.sh
@@ -44,22 +44,60 @@ spec:
           app:
             image:
               repository: ghcr.io/calamityffxi/custom-game-server
-              tag: v0.1.8
+              tag: v0.1.10
             env:
               - name: XI_NETWORK_ZMQ_IP
                 value: *zmqIP
+              - name: XI_NETWORK_MAP_PORT
+                value: &mapPort 54230
               - name: XI_NETWORK_MAP_HEARTBEAT_TARGET
-                value: "unix:///status/heartbeat.sock"
+                value: &unixSocket "unix:///status/heartbeat.sock"
             envFrom:
               - secretRef:
-                  name: "early-access-game-server-common-credentials-secret"
+                  name: *envSecret
             args:
               - /server/xi_map
             resources:
               requests:
                 cpu: 1000m
-              limits:
                 memory: 2Gi
+              limits:
+                memory: 4Gi
+          heartbeat:
+            image:
+              repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
+              tag: v0.1.0
+            env:
+              - name: XI_NETWORK_MAP_PORT
+                value: *mapPort
+              - name: XI_NETWORK_MAP_HEARTBEAT_TARGET
+                value: *unixSocket
+              - name: DOWNSTREAM_STATUS_URL
+                value: http://api-server:8080/v1/server/map-status-reports
+            envFrom:
+              - secretRef:
+                  name: *envSecret
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health/live
+                    port: &httpPort 8080
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health/ready
+                    port: *httpPort
+                  periodSeconds: 5
+                  timeoutSeconds: 2
+                  failureThreshold: 3
 
     defaultPodOptions:
       hostUsers: false
@@ -81,7 +119,7 @@ spec:
           lbipam.cilium.io/ips: 10.50.100.30
         ports:
           map:
-            port: 54230
+            port: *mapPort
             protocol: UDP
 
     persistence:

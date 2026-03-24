@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkit-config
+data:
+  buildkitd.toml: |
+    [worker.oci]
+      max-parallelism = 2
