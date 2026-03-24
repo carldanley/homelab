@@ -48,6 +48,8 @@ spec:
             env:
               - name: XI_NETWORK_ZMQ_IP
                 value: *zmqIP
+              - name: XI_NETWORK_MAP_HEARTBEAT_TARGET
+                value: "unix:///status/heartbeat.sock"
             envFrom:
               - secretRef:
                   name: "early-access-game-server-common-credentials-secret"
@@ -89,11 +91,7 @@ spec:
         globalMounts:
           - path: /scripts
             readOnly: true
-      losmeshes:
+      status:
         type: emptyDir
         globalMounts:
-          - path: /server/losmeshes
-      navmeshes:
-        type: emptyDir
-        globalMounts:
-          - path: /server/navmeshes
+          - path: /status
