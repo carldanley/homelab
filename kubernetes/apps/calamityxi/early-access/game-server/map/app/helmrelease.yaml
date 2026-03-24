@@ -55,10 +55,9 @@ spec:
               - /server/xi_map
             resources:
               requests:
-                cpu: 500m
-                memory: 4Gi
+                cpu: 1000m
               limits:
-                memory: 8Gi
+                memory: 2Gi
 
     defaultPodOptions:
       hostUsers: false
