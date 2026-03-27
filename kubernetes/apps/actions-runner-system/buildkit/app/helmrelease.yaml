@@ -17,7 +17,7 @@ spec:
           app:
             image:
               repository: moby/buildkit
-              tag: v0.28.0
+              tag: v0.28.1
             args:
               - --addr
               - tcp://0.0.0.0:1234
