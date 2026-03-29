@@ -1,0 +1,35 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: calamityxi-game-server-ghcr
+  namespace: flux-system
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: calamityxi-game-server-ghcr-secret
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ .DOCKER_CONFIG_JSON }}"
+  dataFrom:
+    - extract:
+        key: github-pat-calamityxi-private-images
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: calamityxi-game-server
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: oci://ghcr.io/calamityffxi/charts/calamityxi-game-server
+  secretRef:
+    name: calamityxi-game-server-ghcr-secret
+  ref:
+    tag: 0.1.0
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
