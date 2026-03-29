@@ -2,12 +2,12 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: early-access-game-server
+  name: game-server
   labels:
     dns.homelab/external: "false"
 spec:
   endpoints:
-  - dnsName: "ea.${DOMAIN_8}"
+  - dnsName: "login.${DOMAIN_8}"
     recordTTL: 60
     recordType: A
     targets:

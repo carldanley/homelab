@@ -2,31 +2,19 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app early-access-game-server-connect
+  name: &app valkey
   namespace: &namespace calamityxi
 spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: cert-manager-secrets
-      namespace: cert-manager
-    - name: early-access-game-server-world
-      namespace: *namespace
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *app
       namespace: *namespace
   interval: 1h
-  path: ./kubernetes/apps/calamityxi/early-access/game-server/connect/app
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false
-    substitute:
-      APP: *app
+  path: ./kubernetes/apps/calamityxi/valkey/app
   prune: true
   sourceRef:
     kind: GitRepository

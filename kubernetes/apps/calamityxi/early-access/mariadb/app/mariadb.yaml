@@ -28,19 +28,21 @@ spec:
     type: ReplicasFirstPrimaryLast
   resources:
     requests:
-      cpu: 1
-      memory: 4Gi
-    limits:
+      cpu: 2
       memory: 8Gi
+    limits:
+      memory: 12Gi
   livenessProbe:
-    periodSeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
+    failureThreshold: 6
   readinessProbe:
-    periodSeconds: 5
+    periodSeconds: 10
     timeoutSeconds: 5
+    failureThreshold: 6
   startupProbe:
-    failureThreshold: 10
-    periodSeconds: 5
+    failureThreshold: 30
+    periodSeconds: 10
     timeoutSeconds: 5
   # innodb_buffer_pool_size: 80% of memory limits.
   myCnf: |
@@ -48,9 +50,21 @@ spec:
     bind-address=*
     character-set-server=utf8mb4
     collation-server=utf8mb4_general_ci
-    innodb_buffer_pool_size=3200MB
-    max_allowed_packet=1GB
     log_bin_trust_function_creators=1
+
+    innodb_buffer_pool_size=6G
+    innodb_buffer_pool_instances=4
+
+    max_connections=1000
+    back_log=512
+    skip-name-resolve
+
+    extra_port=3307
+    extra_max_connections=10
+
+    thread_handling=pool-of-threads
+
+    max_allowed_packet=64M
   nodeSelector:
     topology.kubernetes.io/zone: controlplane
   priorityClassName: system-node-critical

@@ -11,6 +11,10 @@ spec:
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
+    - name: early-access-mariadb
+      namespace: *namespace
+    - name: valkey
+      namespace: *namespace
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
