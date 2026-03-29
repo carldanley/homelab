@@ -1,0 +1,1084 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: game-server
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: calamityxi-game-server
+    namespace: flux-system
+  values:
+    image:
+      repository: ghcr.io/calamityffxi/custom-game-server
+      tag: v0.1.19
+      pullPolicy: IfNotPresent
+
+    secrets:
+      credentialsSecretName: early-access-game-server-common-credentials-secret
+      imagePullSecretName: early-access-game-server-common-ghcr-secret
+      connectTlsSecretName: early-access-game-server-connect-tls
+
+    network:
+      serviceLoadBalancerIP: 10.50.100.30
+      loadBalancerSharingKey: calamityxi-early-access-game-server
+
+    map:
+      publicEndpoint:
+        ipv4DiscoveryURL: https://api.ipify.org
+      defaultResources:
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+        limits:
+          memory: "512Mi"
+      heartbeatSidecar:
+        downstreamStatusURL: http://api-server:8080/v1/server/map-status-reports
+
+      # For the first cutover, paste the single-map shard block from:
+      # /home/carldanley/Code/CalamityFFXI/map-sharding-topology/charts/calamityxi-game-server/examples/values-current.yaml
+      shards:
+        - name: "Phanauet Channel"
+          port: 54230
+          zoneIds:
+            - 1
+        - name: "Carpenters' Landing"
+          port: 54231
+          zoneIds:
+            - 2
+        - name: "Manaclipper"
+          port: 54232
+          zoneIds:
+            - 3
+        - name: "Bibiki Bay"
+          port: 54233
+          zoneIds:
+            - 4
+        - name: "Uleguerand Range"
+          port: 54234
+          zoneIds:
+            - 5
+        - name: "Bearclaw Pinnacle"
+          port: 54235
+          zoneIds:
+            - 6
+        - name: "Attohwa Chasm"
+          port: 54236
+          zoneIds:
+            - 7
+        - name: "Boneyard Gully"
+          port: 54237
+          zoneIds:
+            - 8
+        - name: "Pso'Xja"
+          port: 54238
+          zoneIds:
+            - 9
+        - name: "The Shrouded Maw"
+          port: 54239
+          zoneIds:
+            - 10
+        - name: "Oldton Movalpolos"
+          port: 54240
+          zoneIds:
+            - 11
+        - name: "Newton Movalpolos"
+          port: 54241
+          zoneIds:
+            - 12
+        - name: "Mine Shaft #2716"
+          port: 54242
+          zoneIds:
+            - 13
+        - name: "Hall of Transference"
+          port: 54243
+          zoneIds:
+            - 14
+        - name: "Promyvion - Holla"
+          port: 54244
+          zoneIds:
+            - 16
+        - name: "Spire of Holla"
+          port: 54245
+          zoneIds:
+            - 17
+        - name: "Promyvion -  Dem"
+          port: 54246
+          zoneIds:
+            - 18
+        - name: "Spire of Dem"
+          port: 54247
+          zoneIds:
+            - 19
+        - name: "Promyvion - Mea"
+          port: 54248
+          zoneIds:
+            - 20
+        - name: "Spire of Mea"
+          port: 54249
+          zoneIds:
+            - 21
+        - name: "Promyvion - Vahzl"
+          port: 54250
+          zoneIds:
+            - 22
+        - name: "Spire of Vahzl"
+          port: 54251
+          zoneIds:
+            - 23
+        - name: "Lufaise Meadows"
+          port: 54252
+          zoneIds:
+            - 24
+        - name: "Misareaux Coast"
+          port: 54253
+          zoneIds:
+            - 25
+        - name: "Tavnazian Safehold"
+          port: 54254
+          zoneIds:
+            - 26
+        - name: "Phomiuna Aqueducts"
+          port: 54255
+          zoneIds:
+            - 27
+        - name: "Sacrarium"
+          port: 54256
+          zoneIds:
+            - 28
+        - name: "Riverne - Site #B01"
+          port: 54257
+          zoneIds:
+            - 29
+        - name: "Riverne - Site #A01"
+          port: 54258
+          zoneIds:
+            - 30
+        - name: "Monarch Linn"
+          port: 54259
+          zoneIds:
+            - 31
+        - name: "Sealion's Den"
+          port: 54260
+          zoneIds:
+            - 32
+        - name: "Al'Taieu"
+          port: 54261
+          zoneIds:
+            - 33
+        - name: "Grand Palace of Hu'Xzoi"
+          port: 54262
+          zoneIds:
+            - 34
+        - name: "The Garden of Ru'Hmet"
+          port: 54263
+          zoneIds:
+            - 35
+        - name: "Empyreal Paradox"
+          port: 54264
+          zoneIds:
+            - 36
+        - name: "Temenos"
+          port: 54265
+          zoneIds:
+            - 37
+        - name: "Apollyon"
+          port: 54266
+          zoneIds:
+            - 38
+        - name: "Dynamis - Valkurm"
+          port: 54267
+          zoneIds:
+            - 39
+        - name: "Dynamis - Buburimu"
+          port: 54268
+          zoneIds:
+            - 40
+        - name: "Dynamis - Qufim"
+          port: 54269
+          zoneIds:
+            - 41
+        - name: "Dynamis - Tavnazia"
+          port: 54270
+          zoneIds:
+            - 42
+        - name: "Open sea route to Al Zahbi"
+          port: 54271
+          zoneIds:
+            - 46
+        - name: "Open sea route to Mhaura"
+          port: 54272
+          zoneIds:
+            - 47
+        - name: "Al Zahbi"
+          port: 54273
+          zoneIds:
+            - 48
+        - name: "Aht Urhgan Whitegate"
+          port: 54274
+          zoneIds:
+            - 50
+        - name: "Wajaom Woodlands"
+          port: 54275
+          zoneIds:
+            - 51
+        - name: "Bhaflau Thickets"
+          port: 54276
+          zoneIds:
+            - 52
+        - name: "Nashmau"
+          port: 54277
+          zoneIds:
+            - 53
+        - name: "Arrapago Reef"
+          port: 54278
+          zoneIds:
+            - 54
+        - name: "Ilrusi Atoll"
+          port: 54279
+          zoneIds:
+            - 55
+        - name: "Periqia"
+          port: 54280
+          zoneIds:
+            - 56
+        - name: "Talacca Cove"
+          port: 54281
+          zoneIds:
+            - 57
+        - name: "Silver Sea route to Nashmau"
+          port: 54282
+          zoneIds:
+            - 58
+        - name: "Silver Sea route to Al Zahbi"
+          port: 54283
+          zoneIds:
+            - 59
+        - name: "The Ashu Talif"
+          port: 54284
+          zoneIds:
+            - 60
+        - name: "Mount Zhayolm"
+          port: 54285
+          zoneIds:
+            - 61
+        - name: "Halvung"
+          port: 54286
+          zoneIds:
+            - 62
+        - name: "Lebros Cavern"
+          port: 54287
+          zoneIds:
+            - 63
+        - name: "Navukgo Execution Chamber"
+          port: 54288
+          zoneIds:
+            - 64
+        - name: "Mamook"
+          port: 54289
+          zoneIds:
+            - 65
+        - name: "Mamool Ja Training Grounds"
+          port: 54290
+          zoneIds:
+            - 66
+        - name: "Jade Sepulcher"
+          port: 54291
+          zoneIds:
+            - 67
+        - name: "Aydeewa Subterrane"
+          port: 54292
+          zoneIds:
+            - 68
+        - name: "Leujaoam Sanctum"
+          port: 54293
+          zoneIds:
+            - 69
+        - name: "Chocobo Circuit"
+          port: 54294
+          zoneIds:
+            - 70
+        - name: "The Colosseum"
+          port: 54295
+          zoneIds:
+            - 71
+        - name: "Alzadaal Undersea Ruins"
+          port: 54296
+          zoneIds:
+            - 72
+        - name: "Zhayolm Remnants"
+          port: 54297
+          zoneIds:
+            - 73
+        - name: "Arrapago Remnants"
+          port: 54298
+          zoneIds:
+            - 74
+        - name: "Bhaflau Remnants"
+          port: 54299
+          zoneIds:
+            - 75
+        - name: "Silver Sea Remnants"
+          port: 54300
+          zoneIds:
+            - 76
+        - name: "Nyzul Isle"
+          port: 54301
+          zoneIds:
+            - 77
+        - name: "Hazhalm Testing Grounds"
+          port: 54302
+          zoneIds:
+            - 78
+        - name: "Caedarva Mire"
+          port: 54303
+          zoneIds:
+            - 79
+        - name: "Southern San d'Oria [S]"
+          port: 54304
+          zoneIds:
+            - 80
+        - name: "East Ronfaure [S]"
+          port: 54305
+          zoneIds:
+            - 81
+        - name: "Jugner Forest [S]"
+          port: 54306
+          zoneIds:
+            - 82
+        - name: "Vunkerl Inlet [S]"
+          port: 54307
+          zoneIds:
+            - 83
+        - name: "Batallia Downs [S]"
+          port: 54308
+          zoneIds:
+            - 84
+        - name: "La Vaule [S]"
+          port: 54309
+          zoneIds:
+            - 85
+        - name: "Everbloom Hollow"
+          port: 54310
+          zoneIds:
+            - 86
+        - name: "Bastok Markets [S]"
+          port: 54311
+          zoneIds:
+            - 87
+        - name: "North Gustaberg [S]"
+          port: 54312
+          zoneIds:
+            - 88
+        - name: "Grauberg [S]"
+          port: 54313
+          zoneIds:
+            - 89
+        - name: "Pashhow Marshlands [S]"
+          port: 54314
+          zoneIds:
+            - 90
+        - name: "Rolanberry Fields [S]"
+          port: 54315
+          zoneIds:
+            - 91
+        - name: "Beadeaux [S]"
+          port: 54316
+          zoneIds:
+            - 92
+        - name: "Ruhotz Silvermines"
+          port: 54317
+          zoneIds:
+            - 93
+        - name: "Windurst Waters [S]"
+          port: 54318
+          zoneIds:
+            - 94
+        - name: "West Sarutabaruta [S]"
+          port: 54319
+          zoneIds:
+            - 95
+        - name: "Fort Karugo-  -Narugo [S]"
+          port: 54320
+          zoneIds:
+            - 96
+        - name: "Meriphataud Mountains [S]"
+          port: 54321
+          zoneIds:
+            - 97
+        - name: "Sauromugue Champaign [S]"
+          port: 54322
+          zoneIds:
+            - 98
+        - name: "Castle Oztroja [S]"
+          port: 54323
+          zoneIds:
+            - 99
+        - name: "West Ronfaure"
+          port: 54324
+          zoneIds:
+            - 100
+        - name: "East Ronfaure"
+          port: 54325
+          zoneIds:
+            - 101
+        - name: "La Theine Plateau"
+          port: 54326
+          zoneIds:
+            - 102
+        - name: "Valkurm Dunes"
+          port: 54327
+          zoneIds:
+            - 103
+        - name: "Jugner Forest"
+          port: 54328
+          zoneIds:
+            - 104
+        - name: "Batallia Downs"
+          port: 54329
+          zoneIds:
+            - 105
+        - name: "North Gustaberg"
+          port: 54330
+          zoneIds:
+            - 106
+        - name: "South Gustaberg"
+          port: 54331
+          zoneIds:
+            - 107
+        - name: "Konschtat Highlands"
+          port: 54332
+          zoneIds:
+            - 108
+        - name: "Pashhow Marshlands"
+          port: 54333
+          zoneIds:
+            - 109
+        - name: "Rolanberry Fields"
+          port: 54334
+          zoneIds:
+            - 110
+        - name: "Beaucedine Glacier"
+          port: 54335
+          zoneIds:
+            - 111
+        - name: "Xarcabard"
+          port: 54336
+          zoneIds:
+            - 112
+        - name: "Cape Teriggan"
+          port: 54337
+          zoneIds:
+            - 113
+        - name: "Eastern Altepa Desert"
+          port: 54338
+          zoneIds:
+            - 114
+        - name: "West Sarutabaruta"
+          port: 54339
+          zoneIds:
+            - 115
+        - name: "East Sarutabaruta"
+          port: 54340
+          zoneIds:
+            - 116
+        - name: "Tahrongi Canyon"
+          port: 54341
+          zoneIds:
+            - 117
+        - name: "Buburimu Peninsula"
+          port: 54342
+          zoneIds:
+            - 118
+        - name: "Meriphataud Mountains"
+          port: 54343
+          zoneIds:
+            - 119
+        - name: "Sauromugue Champaign"
+          port: 54344
+          zoneIds:
+            - 120
+        - name: "The Sanctuary of Zi'Tah"
+          port: 54345
+          zoneIds:
+            - 121
+        - name: "Ro'Maeve"
+          port: 54346
+          zoneIds:
+            - 122
+        - name: "Yuhtunga Jungle"
+          port: 54347
+          zoneIds:
+            - 123
+        - name: "Yhoator Jungle"
+          port: 54348
+          zoneIds:
+            - 124
+        - name: "Western Altepa Desert"
+          port: 54349
+          zoneIds:
+            - 125
+        - name: "Qufim Island"
+          port: 54350
+          zoneIds:
+            - 126
+        - name: "Behemoth's Dominion"
+          port: 54351
+          zoneIds:
+            - 127
+        - name: "Valley of Sorrows"
+          port: 54352
+          zoneIds:
+            - 128
+        - name: "Ghoyu's Reverie"
+          port: 54353
+          zoneIds:
+            - 129
+        - name: "Ru'Aun Gardens"
+          port: 54354
+          zoneIds:
+            - 130
+        - name: "Mordion Gaol"
+          port: 54355
+          zoneIds:
+            - 131
+        - name: "Dynamis - Beaucedine"
+          port: 54356
+          zoneIds:
+            - 134
+        - name: "Dynamis - Xarcabard"
+          port: 54357
+          zoneIds:
+            - 135
+        - name: "Beaucedine Glacier [S]"
+          port: 54358
+          zoneIds:
+            - 136
+        - name: "Xarcabard [S]"
+          port: 54359
+          zoneIds:
+            - 137
+        - name: "Castle Zvahl Baileys [S]"
+          port: 54360
+          zoneIds:
+            - 138
+        - name: "Horlais Peak"
+          port: 54361
+          zoneIds:
+            - 139
+        - name: "Ghelsba Outpost"
+          port: 54362
+          zoneIds:
+            - 140
+        - name: "Fort Ghelsba"
+          port: 54363
+          zoneIds:
+            - 141
+        - name: "Yughott Grotto"
+          port: 54364
+          zoneIds:
+            - 142
+        - name: "Palborough Mines"
+          port: 54365
+          zoneIds:
+            - 143
+        - name: "Waughroon Shrine"
+          port: 54366
+          zoneIds:
+            - 144
+        - name: "Giddeus"
+          port: 54367
+          zoneIds:
+            - 145
+        - name: "Balga's Dais"
+          port: 54368
+          zoneIds:
+            - 146
+        - name: "Beadeaux"
+          port: 54369
+          zoneIds:
+            - 147
+        - name: "Qulun Dome"
+          port: 54370
+          zoneIds:
+            - 148
+        - name: "Davoi"
+          port: 54371
+          zoneIds:
+            - 149
+        - name: "Monastic Cavern"
+          port: 54372
+          zoneIds:
+            - 150
+        - name: "Castle Oztroja"
+          port: 54373
+          zoneIds:
+            - 151
+        - name: "Altar Room"
+          port: 54374
+          zoneIds:
+            - 152
+        - name: "The Boyahda Tree"
+          port: 54375
+          zoneIds:
+            - 153
+        - name: "Dragon's Aery"
+          port: 54376
+          zoneIds:
+            - 154
+        - name: "Castle Zvahl Keep [S]"
+          port: 54377
+          zoneIds:
+            - 155
+        - name: "Throne Room [S]"
+          port: 54378
+          zoneIds:
+            - 156
+        - name: "Middle Delkfutt's Tower"
+          port: 54379
+          zoneIds:
+            - 157
+        - name: "Upper Delkfutt's Tower"
+          port: 54380
+          zoneIds:
+            - 158
+        - name: "Temple of Uggalepih"
+          port: 54381
+          zoneIds:
+            - 159
+        - name: "Den of Rancor"
+          port: 54382
+          zoneIds:
+            - 160
+        - name: "Castle Zvahl Baileys"
+          port: 54383
+          zoneIds:
+            - 161
+        - name: "Castle Zvahl Keep"
+          port: 54384
+          zoneIds:
+            - 162
+        - name: "Sacrificial Chamber"
+          port: 54385
+          zoneIds:
+            - 163
+        - name: "Garlaige Citadel [S]"
+          port: 54386
+          zoneIds:
+            - 164
+        - name: "Throne Room"
+          port: 54387
+          zoneIds:
+            - 165
+        - name: "Ranguemont Pass"
+          port: 54388
+          zoneIds:
+            - 166
+        - name: "Bostaunieux Oubliette"
+          port: 54389
+          zoneIds:
+            - 167
+        - name: "Chamber of Oracles"
+          port: 54390
+          zoneIds:
+            - 168
+        - name: "Toraimarai Canal"
+          port: 54391
+          zoneIds:
+            - 169
+        - name: "Full Moon Fountain"
+          port: 54392
+          zoneIds:
+            - 170
+        - name: "Crawlers' Nest [S]"
+          port: 54393
+          zoneIds:
+            - 171
+        - name: "Zeruhn Mines"
+          port: 54394
+          zoneIds:
+            - 172
+        - name: "Korroloka Tunnel"
+          port: 54395
+          zoneIds:
+            - 173
+        - name: "Kuftal Tunnel"
+          port: 54396
+          zoneIds:
+            - 174
+        - name: "The Eldieme Necropolis [S]"
+          port: 54397
+          zoneIds:
+            - 175
+        - name: "Sea Serpent Grotto"
+          port: 54398
+          zoneIds:
+            - 176
+        - name: "Ve'Lugannon Palace"
+          port: 54399
+          zoneIds:
+            - 177
+        - name: "The Shrine of Ru'Avitau"
+          port: 54400
+          zoneIds:
+            - 178
+        - name: "Stellar Fulcrum"
+          port: 54401
+          zoneIds:
+            - 179
+        - name: "La'Loff Amphitheater"
+          port: 54402
+          zoneIds:
+            - 180
+        - name: "The Celestial Nexus"
+          port: 54403
+          zoneIds:
+            - 181
+        - name: "Walk of Echoes"
+          port: 54404
+          zoneIds:
+            - 182
+        - name: "Lower Delkfutt's Tower"
+          port: 54405
+          zoneIds:
+            - 184
+        - name: "Dynamis - San d'Oria"
+          port: 54406
+          zoneIds:
+            - 185
+        - name: "Dynamis - Bastok"
+          port: 54407
+          zoneIds:
+            - 186
+        - name: "Dynamis - Windurst"
+          port: 54408
+          zoneIds:
+            - 187
+        - name: "Dynamis - Jeuno"
+          port: 54409
+          zoneIds:
+            - 188
+        - name: "King Ranperre's Tomb"
+          port: 54410
+          zoneIds:
+            - 190
+        - name: "Dangruf Wadi"
+          port: 54411
+          zoneIds:
+            - 191
+        - name: "Inner Horutoto Ruins"
+          port: 54412
+          zoneIds:
+            - 192
+        - name: "Ordelle's Caves"
+          port: 54413
+          zoneIds:
+            - 193
+        - name: "Outer Horutoto Ruins"
+          port: 54414
+          zoneIds:
+            - 194
+        - name: "The Eldieme Necropolis"
+          port: 54415
+          zoneIds:
+            - 195
+        - name: "Gusgen Mines"
+          port: 54416
+          zoneIds:
+            - 196
+        - name: "Crawlers' Nest"
+          port: 54417
+          zoneIds:
+            - 197
+        - name: "Maze of Shakhrami"
+          port: 54418
+          zoneIds:
+            - 198
+        - name: "Garlaige Citadel"
+          port: 54419
+          zoneIds:
+            - 200
+        - name: "Cloister of Gales"
+          port: 54420
+          zoneIds:
+            - 201
+        - name: "Cloister of Storms"
+          port: 54421
+          zoneIds:
+            - 202
+        - name: "Cloister of Frost"
+          port: 54422
+          zoneIds:
+            - 203
+        - name: "Fei'Yin"
+          port: 54423
+          zoneIds:
+            - 204
+        - name: "Ifrit's Cauldron"
+          port: 54424
+          zoneIds:
+            - 205
+        - name: "Qu'Bia Arena"
+          port: 54425
+          zoneIds:
+            - 206
+        - name: "Cloister of Flames"
+          port: 54426
+          zoneIds:
+            - 207
+        - name: "Quicksand Caves"
+          port: 54427
+          zoneIds:
+            - 208
+        - name: "Cloister of Tremors"
+          port: 54428
+          zoneIds:
+            - 209
+        - name: "Cloister of Tides"
+          port: 54429
+          zoneIds:
+            - 211
+        - name: "Gustav Tunnel"
+          port: 54430
+          zoneIds:
+            - 212
+        - name: "Labyrinth of Onzozo"
+          port: 54431
+          zoneIds:
+            - 213
+        - name: "Ship bound for Selbina"
+          port: 54432
+          zoneIds:
+            - 220
+        - name: "Ship bound for Mhaura"
+          port: 54433
+          zoneIds:
+            - 221
+        - name: "San d'Oria-Jeuno Airship"
+          port: 54434
+          zoneIds:
+            - 223
+        - name: "Bastok-Jeuno Airship"
+          port: 54435
+          zoneIds:
+            - 224
+        - name: "Windurst-Jeuno Airship"
+          port: 54436
+          zoneIds:
+            - 225
+        - name: "Kazham-Jeuno Airship"
+          port: 54437
+          zoneIds:
+            - 226
+        - name: "Ship bound for Selbina (with Pirates)"
+          port: 54438
+          zoneIds:
+            - 227
+        - name: "Ship bound for Mhaura (with Pirates)"
+          port: 54439
+          zoneIds:
+            - 228
+        - name: "Southern San d'Oria"
+          port: 54440
+          zoneIds:
+            - 230
+        - name: "Northern San d'Oria"
+          port: 54441
+          zoneIds:
+            - 231
+        - name: "Port San d'Oria"
+          port: 54442
+          zoneIds:
+            - 232
+        - name: "Chateau d'Oraguille"
+          port: 54443
+          zoneIds:
+            - 233
+        - name: "Bastok Mines"
+          port: 54444
+          zoneIds:
+            - 234
+        - name: "Bastok Markets"
+          port: 54445
+          zoneIds:
+            - 235
+        - name: "Port Bastok"
+          port: 54446
+          zoneIds:
+            - 236
+        - name: "Metalworks"
+          port: 54447
+          zoneIds:
+            - 237
+        - name: "Windurst Waters"
+          port: 54448
+          zoneIds:
+            - 238
+        - name: "Windurst Walls"
+          port: 54449
+          zoneIds:
+            - 239
+        - name: "Port Windurst"
+          port: 54450
+          zoneIds:
+            - 240
+        - name: "Windurst Woods"
+          port: 54451
+          zoneIds:
+            - 241
+        - name: "Heavens Tower"
+          port: 54452
+          zoneIds:
+            - 242
+        - name: "Ru'Lude Gardens"
+          port: 54453
+          zoneIds:
+            - 243
+        - name: "Upper Jeuno"
+          port: 54454
+          zoneIds:
+            - 244
+        - name: "Lower Jeuno"
+          port: 54455
+          zoneIds:
+            - 245
+        - name: "Port Jeuno"
+          port: 54456
+          zoneIds:
+            - 246
+        - name: "Rabao"
+          port: 54457
+          zoneIds:
+            - 247
+        - name: "Selbina"
+          port: 54458
+          zoneIds:
+            - 248
+        - name: "Mhaura"
+          port: 54459
+          zoneIds:
+            - 249
+        - name: "Kazham"
+          port: 54460
+          zoneIds:
+            - 250
+        - name: "Hall of the Gods"
+          port: 54461
+          zoneIds:
+            - 251
+        - name: "Norg"
+          port: 54462
+          zoneIds:
+            - 252
+        - name: "Walk of Echoes [P2]"
+          port: 54463
+          zoneIds:
+            - 279
+        - name: "Walk of Echoes [P1]"
+          port: 54464
+          zoneIds:
+            - 298
+        - name: "Admin Service"
+          port: 54465
+          zoneIds:
+            - 0
+            - 49
+            - 199
+            - 210
+            - 214
+            - 219
+        - name: "Abyssea North"
+          port: 54466
+          zoneIds:
+            - 15
+            - 45
+            - 132
+            - 215
+            - 216
+        - name: "Abyssea South"
+          port: 54467
+          zoneIds:
+            - 217
+            - 218
+            - 253
+            - 254
+            - 255
+        - name: "Legacy Event"
+          port: 54468
+          zoneIds:
+            - 43
+            - 44
+            - 183
+            - 287
+        - name: "Provenance Voidwatch"
+          port: 54469
+          zoneIds:
+            - 222
+            - 229
+            - 278
+            - 290
+            - 299
+        - name: "Adoulin City Services"
+          port: 54470
+          zoneIds:
+            - 256
+            - 257
+            - 280
+            - 281
+            - 284
+            - 285
+        - name: "Adoulin Frontier West"
+          port: 54471
+          zoneIds:
+            - 258
+            - 259
+            - 260
+            - 261
+            - 262
+        - name: "Adoulin Frontier Central"
+          port: 54472
+          zoneIds:
+            - 263
+            - 264
+            - 265
+            - 266
+            - 267
+        - name: "Adoulin Gates"
+          port: 54473
+          zoneIds:
+            - 268
+            - 269
+            - 270
+            - 271
+            - 272
+            - 273
+        - name: "RaKaznar Outer"
+          port: 54474
+          zoneIds:
+            - 133
+            - 189
+            - 274
+            - 275
+        - name: "RaKaznar Inner"
+          port: 54475
+          zoneIds:
+            - 276
+            - 277
+            - 282
+            - 283
+        - name: "Escha Reisenjima"
+          port: 54476
+          zoneIds:
+            - 288
+            - 289
+            - 291
+            - 292
+            - 293
+        - name: "Dynamis Divergence"
+          port: 54477
+          zoneIds:
+            - 294
+            - 295
+            - 296
+            - 297

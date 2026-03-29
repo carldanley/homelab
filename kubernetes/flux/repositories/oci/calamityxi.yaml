@@ -29,7 +29,7 @@ spec:
   secretRef:
     name: calamityxi-game-server-ghcr-secret
   ref:
-    tag: 0.1.0
+    tag: 0.1.2
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
