@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: early-access-game-server-connect
+  name: game-server-connect
 spec:
   commonName: calamityxi
   dnsNames:
@@ -14,6 +14,6 @@ spec:
     kind: Issuer
     group: cert-manager.io
   renewBefore: 360h
-  secretName: early-access-game-server-connect-tls
+  secretName: game-server-connect-tls
   usages:
     - server auth

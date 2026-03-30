@@ -1,0 +1,77 @@
+apiVersion: runtime.calamityxi.io/v1alpha1
+kind: CalamityXICluster
+metadata:
+  name: calamityxi
+spec:
+  image:
+    repository: ghcr.io/calamityffxi/custom-game-server
+    tag: v0.1.20
+    pullPolicy: IfNotPresent
+  heartbeatSidecarImage:
+    repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
+    tag: v0.1.0
+    pullPolicy: IfNotPresent
+  secrets:
+    credentialsSecretName: calamityxi-game-server-common-credentials-secret
+    imagePullSecretName:  calamityxi-ghcr-secret
+    connectTLSSecretName: game-server-connect-tls
+  network:
+    serviceLoadBalancerIP: 10.50.100.30
+    loadBalancerSharingKey: calamityxi-game-server
+    connectExternalTrafficPolicy: Cluster
+    searchExternalTrafficPolicy: Cluster
+    mapExternalTrafficPolicy: Cluster
+    mapPublicIPv4DiscoveryURL: https://api.ipify.org
+  world:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+  connect:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+  search:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        memory: 512Mi
+  map:
+    defaultResources:
+      requests:
+        cpu: 250m
+        memory: 2Gi
+      limits:
+        memory: 4Gi
+    heartbeatStatusURL: http://api-server:8080/v1/server/map-status-reports
+    shards:
+      - name: Starter Zones
+        port: 54232
+        zoneIds:
+          - 0
+          - 1
+          - 2
+      - name: Jeuno
+        port: 54233
+        zoneIds:
+          - 10
+          - 11
+        resources:
+          requests:
+            cpu: 500m
+            memory: 512Mi
+          limits:
+            memory: 1Gi
+  lifecycle:
+    worldReadyDelaySeconds: 10
+    restartNonce: ""
+  mapRollout:
+    maxConcurrentStarts: 1
+    batchDelaySeconds: 30

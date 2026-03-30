@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app game-server
+  name: &app operator
   namespace: &namespace calamityxi
 spec:
   commonMetadata:
@@ -15,15 +15,13 @@ spec:
       namespace: *namespace
     - name: valkey
       namespace: *namespace
-    - name: operator
-      namespace: *namespace
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *app
       namespace: *namespace
   interval: 1h
-  path: ./kubernetes/apps/calamityxi/game-server/app
+  path: ./kubernetes/apps/calamityxi/operator/app
   postBuild:
     substituteFrom:
       - kind: Secret
