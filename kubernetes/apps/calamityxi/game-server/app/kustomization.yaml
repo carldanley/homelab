@@ -6,4 +6,4 @@ resources:
   - ./externalsecret.yaml
   - ./issuer.yaml
   - ./certificate.yaml
-  - ./helmrelease.yaml
+  # - ./helmrelease.yaml
