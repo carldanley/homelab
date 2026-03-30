@@ -2,14 +2,14 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: calamityxi-game-server-ghcr
+  name: calamityxi-ghcr
   namespace: flux-system
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: onepassword
   target:
-    name: calamityxi-game-server-ghcr-secret
+    name: calamityxi-ghcr-secret
     template:
       type: kubernetes.io/dockerconfigjson
       data:
@@ -21,13 +21,13 @@ spec:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: calamityxi-game-server
+  name: calamityxi
   namespace: flux-system
 spec:
   interval: 30m
-  url: oci://ghcr.io/calamityffxi/charts/calamityxi-game-server
+  url: oci://ghcr.io/calamityffxi/charts/calamityxi-operator
   secretRef:
-    name: calamityxi-game-server-ghcr-secret
+    name: calamityxi-ghcr-secret
   ref:
     tag: 0.1.12
   layerSelector:

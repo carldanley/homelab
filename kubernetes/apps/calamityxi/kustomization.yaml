@@ -10,4 +10,5 @@ resources:
   - ./valkey/ks.yaml
   - ./early-access/mariadb/ks.yaml
   - ./api-server/ks.yaml
+  - ./operator/ks.yaml
   - ./game-server/ks.yaml
