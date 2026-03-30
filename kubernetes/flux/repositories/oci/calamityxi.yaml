@@ -29,7 +29,7 @@ spec:
   secretRef:
     name: calamityxi-ghcr-secret
   ref:
-    tag: 0.1.5
+    tag: 0.1.6
   layerSelector:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
