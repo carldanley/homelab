@@ -572,6 +572,150 @@ spec:
           - 211
           - 220
           - 221
+      - name: "Abyssea North"
+        port: 54330
+        zoneIds:
+          - 15
+          - 45
+          - 132
+          - 215
+          - 216
+      - name: "Abyssea South"
+        port: 54331
+        zoneIds:
+          - 217
+          - 218
+          - 253
+          - 254
+          - 255
+      - name: "Legacy Event"
+        port: 54332
+        zoneIds:
+          - 43
+          - 44
+          - 183
+          - 287
+      - name: "Provenance Voidwatch"
+        port: 54333
+        zoneIds:
+          - 222
+          - 229
+          - 278
+          - 290
+          - 299
+      - name: "Adoulin City Services"
+        port: 54334
+        zoneIds:
+          - 256
+          - 257
+          - 280
+          - 281
+          - 284
+          - 285
+      - name: "Adoulin Frontier West"
+        port: 54335
+        zoneIds:
+          - 258
+          - 259
+          - 260
+          - 261
+          - 262
+      - name: "Adoulin Frontier Central"
+        port: 54336
+        zoneIds:
+          - 263
+          - 264
+          - 265
+          - 266
+          - 267
+      - name: "Adoulin Gates"
+        port: 54337
+        zoneIds:
+          - 268
+          - 269
+          - 270
+          - 271
+          - 272
+          - 273
+      - name: "RaKaznar Outer"
+        port: 54338
+        zoneIds:
+          - 133
+          - 189
+          - 274
+          - 275
+      - name: "RaKaznar Inner"
+        port: 54339
+        zoneIds:
+          - 276
+          - 277
+          - 282
+          - 283
+      - name: "Escha Reisenjima"
+        port: 54340
+        zoneIds:
+          - 288
+          - 289
+          - 291
+          - 292
+          - 293
+      - name: "Dynamis Divergence"
+        port: 54341
+        zoneIds:
+          - 294
+          - 295
+          - 296
+          - 297
+      - name: "San d'Oria [S] Front"
+        port: 54342
+        zoneIds:
+          - 80
+          - 81
+          - 82
+          - 83
+          - 84
+          - 85
+          - 86
+      - name: "Bastok [S] Front"
+        port: 54343
+        zoneIds:
+          - 87
+          - 88
+          - 89
+          - 90
+          - 91
+          - 92
+          - 93
+      - name: "Windurst [S] Front"
+        port: 54344
+        zoneIds:
+          - 94
+          - 95
+          - 96
+          - 97
+          - 98
+          - 99
+          - 129
+      - name: "Northlands [S]"
+        port: 54345
+        zoneIds:
+          - 136
+          - 137
+          - 138
+          - 155
+          - 156
+      - name: "Allied Dungeons [S]"
+        port: 54346
+        zoneIds:
+          - 164
+          - 171
+          - 175
+      - name: "Walk of Echoes"
+        port: 54347
+        zoneIds:
+          - 182
+          - 279
+          - 298
   lifecycle:
     worldReadyDelaySeconds: 10
     restartNonce: ""
