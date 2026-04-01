@@ -5,7 +5,7 @@ metadata:
 spec:
   image:
     repository: ghcr.io/calamityffxi/custom-game-server
-    tag: v0.1.20
+    tag: v0.1.21
     pullPolicy: IfNotPresent
   heartbeatSidecarImage:
     repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
@@ -51,9 +51,9 @@ spec:
       limits:
         memory: 512Mi
     env:
-      - name: CALAMITY_VALKEY_ENABLED
+      - name: XI_NETWORK_CALAMITY_VALKEY_ENABLED
         value: "true"
-      - name: CALAMITY_VALKEY_HOST
+      - name: XI_NETWORK_CALAMITY_VALKEY_HOST
         value: "valkey"
     heartbeatStatusURL: http://api-server:8080/v1/server/map-status-reports
     shards:
