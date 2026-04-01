@@ -43,6 +43,11 @@ ipam:
 ipv4NativeRoutingCIDR: 172.22.0.0/16
 k8sServiceHost: 127.0.0.1
 k8sServicePort: 7445
+# L2 announcements create steady lease traffic against the API server.
+# Raise the client-go limit so lease renewals don't churn under load.
+k8sClientRateLimit:
+  qps: 50
+  burst: 100
 kubeProxyReplacement: true
 kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
 l2announcements:
