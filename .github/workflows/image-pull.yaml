@@ -52,18 +52,84 @@ jobs:
           auth=$(printf '%s' "carldanley:${GHCR_TOKEN}" | base64 -w 0)
           jq -n --arg auth "${auth}" '{auths: {"ghcr.io": {"auth": $auth}}}' > "${GITHUB_WORKSPACE}/.tmp/ghcr-docker-config.json"
 
-      - name: Gather Images
+      - name: Render Cluster
         uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
         with:
           args: >-
-            get cluster
-            --all-namespaces
-            --path /github/workspace/kubernetes/flux/cluster
-            --enable-images
-            --only-images
+            build all /github/workspace/kubernetes/flux/cluster
+            --enable-helm
             --registry-config /github/workspace/.tmp/ghcr-docker-config.json
-            --output json
-            --output-file images.json
+            --output-file cluster.yaml
+
+      - name: Ensure PyYAML
+        run: |
+          python3 - <<'PY'
+          import importlib.util
+          import subprocess
+          import sys
+
+          if importlib.util.find_spec("yaml") is None:
+              subprocess.check_call([sys.executable, "-m", "pip", "install", "PyYAML"])
+          PY
+
+      - name: Gather Images
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          import yaml
+
+          KINDS = {
+              "Pod",
+              "Deployment",
+              "StatefulSet",
+              "ReplicaSet",
+              "DaemonSet",
+              "CronJob",
+              "Job",
+              "ReplicationController",
+              "EMQX",
+              "Cluster",
+              "CephCluster",
+              "Alertmanager",
+              "Prometheus",
+              "AutoscalingRunnerSet",
+              "EnvoyProxy",
+              "Plan",
+              "Grafana",
+          }
+          IMAGE_KEY = "image"
+          KINDS_IMAGE_KEY = {"Cluster": "imageName", "Grafana": "version"}
+
+          def extract_images(kind: str, doc: dict) -> set[str]:
+              images = set()
+              image_key = KINDS_IMAGE_KEY.get(kind, IMAGE_KEY)
+
+              for key, value in doc.items():
+                  if key == image_key:
+                      if isinstance(value, dict) and "reference" in value:
+                          value = value["reference"]
+                      if isinstance(value, str):
+                          images.add(value)
+                  elif isinstance(value, dict):
+                      images.update(extract_images(kind, value))
+                  elif isinstance(value, list):
+                      for item in value:
+                          if isinstance(item, dict):
+                              images.update(extract_images(kind, item))
+
+              return images
+
+          images = set()
+          for doc in yaml.safe_load_all(Path("cluster.yaml").read_text()):
+              if not isinstance(doc, dict):
+                  continue
+              kind = doc.get("kind")
+              if kind in KINDS:
+                  images.update(extract_images(kind, doc))
+
+          Path("images.json").write_text(json.dumps(sorted(images)))
+          PY
 
       - name: Extract Images
         id: extract
