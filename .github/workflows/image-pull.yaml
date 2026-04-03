@@ -101,6 +101,23 @@ jobs:
           IMAGE_KEY = "image"
           KINDS_IMAGE_KEY = {"Cluster": "imageName", "Grafana": "version"}
 
+          class IgnoreTagsLoader(yaml.SafeLoader):
+              pass
+
+          def construct_undefined(loader, node):
+              if isinstance(node, yaml.ScalarNode):
+                  return loader.construct_scalar(node)
+              if isinstance(node, yaml.SequenceNode):
+                  return loader.construct_sequence(node)
+              if isinstance(node, yaml.MappingNode):
+                  return loader.construct_mapping(node)
+              return None
+
+          IgnoreTagsLoader.add_constructor(
+              None,
+              construct_undefined,
+          )
+
           def extract_images(kind: str, doc: dict) -> set[str]:
               images = set()
               image_key = KINDS_IMAGE_KEY.get(kind, IMAGE_KEY)
@@ -121,7 +138,7 @@ jobs:
               return images
 
           images = set()
-          for doc in yaml.safe_load_all(Path("cluster.yaml").read_text()):
+          for doc in yaml.load_all(Path("cluster.yaml").read_text(), Loader=IgnoreTagsLoader):
               if not isinstance(doc, dict):
                   continue
               kind = doc.get("kind")
