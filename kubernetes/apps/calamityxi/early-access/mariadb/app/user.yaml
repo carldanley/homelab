@@ -9,7 +9,7 @@ spec:
   passwordSecretKeyRef:
     name: early-access-mariadb-secret
     key: USER_PASSWORD
-  maxUserConnections: 1000
+  maxUserConnections: 5000
   host: "%"
   cleanupPolicy: Delete
   requeueInterval: 10h

@@ -55,9 +55,12 @@ spec:
     innodb_buffer_pool_size=6G
     innodb_buffer_pool_instances=4
 
-    max_connections=1000
+    max_connections=6000
     back_log=512
     skip-name-resolve
+
+    wait_timeout=300
+    interactive_timeout=300
 
     extra_port=3307
     extra_max_connections=10
