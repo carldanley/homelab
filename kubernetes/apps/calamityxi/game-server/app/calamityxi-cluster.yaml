@@ -5,7 +5,7 @@ metadata:
 spec:
   image:
     repository: ghcr.io/calamityffxi/custom-game-server
-    tag: v0.1.30
+    tag: v0.1.31
     pullPolicy: IfNotPresent
   heartbeatSidecarImage:
     repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
