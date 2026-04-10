@@ -2,7 +2,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: branding
+  name: website
 spec:
   interval: 1h
   chartRef:
@@ -12,25 +12,22 @@ spec:
   values:
     controllers:
 
-      branding:
+      website:
         replicas: 3
-        strategy: RollingUpdate
-        rollingUpdate:
-          maxUnavailable: 0
-          maxSurge: 1
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
           app:
             image:
-              repository: ghcr.io/calamityffxi/branding
-              tag: v0.1.11
+              repository: ghcr.io/calamityffxi/website
+              tag: v0.1.5
             resources:
               requests:
-                cpu: 10m
+                cpu: 50m
                 memory: 128Mi
               limits:
-                memory: 1Gi
+                memory: 256Mi
             probes:
               liveness:
                 enabled: true
@@ -52,24 +49,34 @@ spec:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
       imagePullSecrets:
-        - name: branding-ghcr-secret
+        - name: website-ghcr-secret
 
     service:
-      branding:
-        controller: branding
+      website:
+        controller: website
         ports:
           http:
-            port: &port 8080
+            port: &port 80
+
+    persistence:
+      cache:
+        type: emptyDir
+        globalMounts:
+          - path: /var/cache/nginx
+      run:
+        type: emptyDir
+        globalMounts:
+          - path: /run
 
     route:
       internal:
         hostnames:
-          - "branding.${DOMAIN_8}"
+          - "${DOMAIN_8}"
         parentRefs:
           - name: external
             namespace: kube-system
-            sectionName: domain-8-subdomain-https
+            sectionName: domain-8-root-https
         rules:
           - backendRefs:
-              - identifier: branding
+              - identifier: website
                 port: *port

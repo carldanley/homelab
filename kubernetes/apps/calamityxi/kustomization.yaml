@@ -6,7 +6,7 @@ namespace: calamityxi
 components:
   - ../../components/common
 resources:
-  - ./branding/ks.yaml
+  - ./website/ks.yaml
   - ./valkey/ks.yaml
   - ./early-access/mariadb/ks.yaml
   - ./api-server/ks.yaml
