@@ -1,0 +1,16 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: User
+metadata:
+  name: api-server-mariadb
+spec:
+  name: calamityxi-api-server
+  mariaDbRef:
+    name: api-server-mariadb
+  passwordSecretKeyRef:
+    name: api-server-mariadb-secret
+    key: USER_PASSWORD
+  maxUserConnections: 1000
+  host: "%"
+  cleanupPolicy: Delete
+  requeueInterval: 10h
+  retryInterval: 30s

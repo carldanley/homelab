@@ -1,0 +1,107 @@
+# HA Guide:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/high_availability.md
+#
+# Backup & Recovery:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/physical_backup.md
+#
+# Upgrade Strategy:
+# https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/updates.md
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: api-server-mariadb
+spec:
+  rootPasswordSecretKeyRef:
+    name: api-server-mariadb-secret
+    key: ROOT_PASSWORD
+  storage:
+    size: 10Gi
+  replicas: 1
+  service:
+    type: LoadBalancer
+    metadata:
+      annotations:
+        lbipam.cilium.io/ips: "10.50.100.21"
+  metrics:
+    enabled: true
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+  resources:
+    requests:
+      cpu: 2
+      memory: 4Gi
+    limits:
+      memory: 8Gi
+  livenessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+  readinessProbe:
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+  startupProbe:
+    failureThreshold: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+  # innodb_buffer_pool_size: 80% of memory limits.
+  myCnf: |
+    [mariadb]
+    bind-address=*
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_general_ci
+    log_bin_trust_function_creators=1
+
+    innodb_buffer_pool_size=6G
+    innodb_buffer_pool_instances=4
+
+    max_connections=2000
+    back_log=512
+    skip-name-resolve
+
+    wait_timeout=300
+    interactive_timeout=300
+
+    extra_port=3307
+    extra_max_connections=10
+
+    thread_handling=pool-of-threads
+
+    max_allowed_packet=64M
+  nodeSelector:
+    topology.kubernetes.io/zone: controlplane
+  priorityClassName: system-node-critical
+
+  # Recreate the MariaDB resource and bootstrap from a physical backup in S3.
+  # bootstrapFrom:
+  #   s3:
+  #     bucket: physicalbackups
+  #     prefix: mariadb
+  #     endpoint: minio.minio.svc.cluster.local:9000
+  #     accessKeyIdSecretKeyRef:
+  #       name: minio
+  #       key: access-key-id
+  #     secretAccessKeySecretKeyRef:
+  #       name: minio
+  #       key: secret-access-key
+  #     tls:
+  #       enabled: true
+  #       caSecretKeyRef:
+  #         name: minio-ca
+  #         key: ca.crt
+  #   backupContentType: Physical
+  #   targetRecoveryTime: 2023-12-19T09:00:00Z
+  #   stagingStorage:
+  #     persistentVolumeClaim:
+  #       resources:
+  #         requests:
+  #           storage: 10Gi
+  #       accessModes:
+  #         - ReadWriteOnce
+  #   restoreJob:
+  #     resources:
+  #       requests:
+  #         cpu: 100m
+  #         memory: 128Mi
+  #       limits:
+  #         memory: 1Gi

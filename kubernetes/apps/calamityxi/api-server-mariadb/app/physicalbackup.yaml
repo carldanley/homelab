@@ -1,0 +1,27 @@
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: PhysicalBackup
+metadata:
+  name: api-server-mariadb-scheduled-backup
+spec:
+  mariaDbRef:
+    name: api-server-mariadb
+    waitForIt: false
+  target: PreferReplica
+  storage:
+    s3:
+      bucket: calamityxi-mariadb-api-server
+      endpoint: d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
+      accessKeyIdSecretKeyRef:
+        name: &secretName api-server-mariadb-secret
+        key: S3_ACCESS_KEY_ID
+      secretAccessKeySecretKeyRef:
+        name: *secretName
+        key: S3_SECRET_ACCESS_KEY
+      tls:
+        enabled: true
+  schedule:
+    cron: "0 * * * *" # Every hour
+    suspend: false
+    immediate: true
+  compression: bzip2
+  maxRetention: 168h # 7 days
