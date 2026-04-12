@@ -47,7 +47,7 @@ spec:
           app:
             image:
               repository: temporalio/admin-tools
-              tag: 1.30@sha256:2c2272b008f1af295b3719963e6feeef64f838d1105d895cf6acfcf96dd31741
+              tag: 1.30@sha256:9ac15d500f4020f7cc694ecc17085dfcfc2d4b1d0d2020dbe83b6f3d49e156e0
             env:
               TEMPORAL_ADDRESS: *temporalAddress
 
