@@ -71,7 +71,7 @@ spec:
     route:
       internal:
         hostnames:
-          - "${DOMAIN_8}"
+          - "${DOMAIN_8:=domain.com}"
         parentRefs:
           - name: external
             namespace: kube-system
