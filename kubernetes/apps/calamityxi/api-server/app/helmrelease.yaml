@@ -24,11 +24,15 @@ spec:
           app:
             image:
               repository: ghcr.io/calamityffxi/api-server
-              tag: v0.1.10
+              tag: v0.1.11
             env:
               - name: APP_ENV
                 value: "production"
             envFrom:
+              - secretRef:
+                  name: "api-server-game-server-database-secret"
+              - secretRef:
+                  name: "api-server-database-secret"
               - secretRef:
                   name: "api-server-config-secret"
             resources:
