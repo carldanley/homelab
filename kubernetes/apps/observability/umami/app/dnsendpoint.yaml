@@ -1,0 +1,14 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: umami
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: "analytics.${DOMAIN_3}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "external.${DOMAIN_3}"
