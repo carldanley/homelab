@@ -5,7 +5,7 @@ metadata:
 spec:
   image:
     repository: ghcr.io/calamityffxi/custom-game-server
-    tag: v0.1.37
+    tag: v0.1.38
     pullPolicy: IfNotPresent
   heartbeatSidecarImage:
     repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
@@ -449,9 +449,12 @@ spec:
         port: 54310
         zoneIds:
           - 185
-          - 186
           - 187
           - 188
+      - name: "Dynamis Bastok"
+        port: 54500
+        zoneIds:
+          - 186
       - name: "Ghelsba Front"
         port: 54311
         zoneIds:
