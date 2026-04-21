@@ -56,6 +56,12 @@ spec:
       - name: XI_NETWORK_CALAMITY_VALKEY_HOST
         value: "valkey"
     heartbeatStatusURL: http://api-server:8080/v1/server/map-status-reports
+    maxShardPort: 55230
+    dynamicShardPools:
+      - name: dynamis-bastok
+        zoneId: 186
+        minShardCount: 2
+        releaseGraceSeconds: 60
     shards:
       - name: "Admin Service"
         port: 54230
@@ -451,10 +457,6 @@ spec:
           - 185
           - 187
           - 188
-      - name: "Dynamis Bastok"
-        port: 54500
-        zoneIds:
-          - 186
       - name: "Ghelsba Front"
         port: 54311
         zoneIds:
