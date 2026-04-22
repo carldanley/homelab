@@ -1,0 +1,12 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: valkey
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/controller: valkey
+      app.kubernetes.io/instance: valkey
+      app.kubernetes.io/name: valkey

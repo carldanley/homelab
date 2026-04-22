@@ -13,12 +13,17 @@ spec:
     controllers:
 
       valkey:
+        type: statefulset
         replicas: 1
         containers:
           app:
             image:
               repository: ghcr.io/valkey-io/valkey
               tag: 9.0.3
+            command:
+              - valkey-server
+            args:
+              - /etc/valkey/valkey.conf
             resources:
               requests:
                 cpu: 250m
@@ -26,15 +31,37 @@ spec:
               limits:
                 memory: 1Gi
             probes:
-              liveness:
+              liveness: &valkeyProbe
                 enabled: true
-              readiness:
-                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - valkey-cli
+                      - ping
+                  failureThreshold: 3
+                  periodSeconds: 10
+                  timeoutSeconds: 2
+              readiness: *valkeyProbe
               startup:
                 enabled: true
+                custom: true
                 spec:
+                  exec:
+                    command:
+                      - valkey-cli
+                      - ping
                   failureThreshold: 30
                   periodSeconds: 5
+                  timeoutSeconds: 2
+        statefulset:
+          volumeClaimTemplates:
+            - name: data
+              storageClass: ceph-block
+              size: 2Gi
+              accessMode: ReadWriteOnce
+              globalMounts:
+                - path: /data
 
     defaultPodOptions:
       hostUsers: false
@@ -56,8 +83,9 @@ spec:
             port: 6379
 
     persistence:
-      data:
-        enabled: true
-        type: emptyDir
+      config:
+        type: configMap
+        name: valkey-config
         globalMounts:
-          - path: /data
+          - path: /etc/valkey
+            readOnly: true

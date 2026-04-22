@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: valkey-config
+data:
+  valkey.conf: |
+    appendonly yes
+    appendfsync everysec
+    save ""
+    dir /data
+    maxmemory 768mb
+    maxmemory-policy noeviction
+    tcp-keepalive 60
+    protected-mode no
