@@ -1,32 +1,29 @@
 apiVersion: runtime.calamityxi.io/v1alpha1
 kind: CalamityXICluster
 metadata:
-  name: calamityxi
+  name: cxi
 spec:
-  image:
-    repository: ghcr.io/calamityffxi/custom-game-server
-    tag: v0.1.41
-    pullPolicy: IfNotPresent
-  worldServerImage:
-    repository: ghcr.io/calamityffxi/world-server
-    tag: v0.1.4
-    pullPolicy: IfNotPresent
-  heartbeatSidecarImage:
-    repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
-    tag: v0.1.0
-    pullPolicy: IfNotPresent
-  secrets:
+  shared:
+    gameServerImage:
+      repository: ghcr.io/calamityffxi/custom-game-server
+      tag: v0.1.41
     credentialsSecretName: calamityxi-game-server-common-credentials-secret
-    imagePullSecretName:  calamityxi-ghcr-secret
-    connectTLSSecretName: game-server-connect-tls
+    imagePullSecretName: calamityxi-ghcr-secret
   network:
     serviceLoadBalancerIP: 10.50.100.30
     loadBalancerSharingKey: calamityxi-game-server
-    connectExternalTrafficPolicy: Cluster
-    searchExternalTrafficPolicy: Cluster
-    mapExternalTrafficPolicy: Cluster
-    mapPublicIPv4DiscoveryURL: https://api.ipify.org
   world:
+    image:
+      repository: ghcr.io/calamityffxi/world-server
+      tag: v0.1.4
+    replicas: 2
+    readyDelaySeconds: 10
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
     env:
       - name: XI_NETWORK_CALAMITY_VALKEY_HOST
         value: "valkey"
@@ -34,13 +31,8 @@ spec:
         value: "6379"
       - name: XI_NETWORK_CALAMITY_VALKEY_PREFIX
         value: "calamityxi"
-    resources:
-      requests:
-        cpu: 250m
-        memory: 512Mi
-      limits:
-        memory: 1Gi
   connect:
+    tlsSecretName: game-server-connect-tls
     resources:
       requests:
         cpu: 250m
@@ -61,6 +53,15 @@ spec:
         memory: 256Mi
       limits:
         memory: 512Mi
+    publicIPv4DiscoveryURL: https://api.ipify.org
+    heartbeat:
+      image:
+        repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
+        tag: v0.1.0
+      statusURL: http://api-server:8080/v1/server/map-status-reports
+    rollout:
+      maxRollingShards: 10
+      recycleDelaySeconds: 15
     env:
       - name: XI_NETWORK_CALAMITY_VALKEY_ENABLED
         value: "true"
@@ -70,10 +71,6 @@ spec:
         value: "6379"
       - name: XI_NETWORK_CALAMITY_VALKEY_PREFIX
         value: "calamityxi"
-    heartbeatStatusURL: http://api-server:8080/v1/server/map-status-reports
-    privateShardPortRange:
-      min: 54348
-      max: 55230
     shards:
       - name: "Admin Service"
         port: 54230
@@ -733,9 +730,6 @@ spec:
           - 182
           - 279
           - 298
-  lifecycle:
-    worldReadyDelaySeconds: 10
-    restartNonce: ""
-  mapRollout:
-    maxConcurrentStarts: 10
-    batchDelaySeconds: 15
+    privateShardPortRange:
+      min: 54348
+      max: 55230
