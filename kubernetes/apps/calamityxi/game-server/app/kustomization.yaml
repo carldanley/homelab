@@ -5,3 +5,6 @@ resources:
   - ./calamityxi-cluster.yaml
   - ./world-server-dashboard-configmap.yaml
   - ./world-server-servicemonitor.yaml
+  - ./search-server-dashboard-configmap.yaml
+  - ./search-server-servicemonitor.yaml
+  - ./search-worker-servicemonitor.yaml

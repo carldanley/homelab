@@ -40,12 +40,26 @@ spec:
       limits:
         memory: 512Mi
   search:
+    image:
+      repository: ghcr.io/calamityffxi/search-server
+      tag: v0.1.0
+    replicas: 2
     resources:
       requests:
         cpu: 250m
         memory: 256Mi
       limits:
         memory: 512Mi
+    workers:
+      enabled: true
+      replicas: 2
+      leaseName: search-worker-ah-expiration
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          memory: 256Mi
   map:
     defaultResources:
       requests:
