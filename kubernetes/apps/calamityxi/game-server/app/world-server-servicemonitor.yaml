@@ -1,0 +1,20 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: world-server
+  namespace: calamityxi
+spec:
+  namespaceSelector:
+    matchNames:
+      - calamityxi
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: calamityxi-runtime
+      app.kubernetes.io/instance: cxi
+      app.kubernetes.io/component: world
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
