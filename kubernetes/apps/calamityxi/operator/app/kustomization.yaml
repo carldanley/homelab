@@ -7,3 +7,4 @@ resources:
   - ./issuer.yaml
   - ./certificate.yaml
   - ./helmrelease.yaml
+  - ./operator-job-rbac.yaml

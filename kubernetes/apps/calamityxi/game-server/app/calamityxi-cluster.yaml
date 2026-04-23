@@ -5,7 +5,11 @@ metadata:
 spec:
   image:
     repository: ghcr.io/calamityffxi/custom-game-server
-    tag: v0.1.40
+    tag: v0.1.41
+    pullPolicy: IfNotPresent
+  worldServerImage:
+    repository: ghcr.io/calamityffxi/world-server
+    tag: v0.1.4
     pullPolicy: IfNotPresent
   heartbeatSidecarImage:
     repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
@@ -23,6 +27,13 @@ spec:
     mapExternalTrafficPolicy: Cluster
     mapPublicIPv4DiscoveryURL: https://api.ipify.org
   world:
+    env:
+      - name: XI_NETWORK_CALAMITY_VALKEY_HOST
+        value: "valkey"
+      - name: XI_NETWORK_CALAMITY_VALKEY_PORT
+        value: "6379"
+      - name: XI_NETWORK_CALAMITY_VALKEY_PREFIX
+        value: "calamityxi"
     resources:
       requests:
         cpu: 250m
@@ -55,13 +66,14 @@ spec:
         value: "true"
       - name: XI_NETWORK_CALAMITY_VALKEY_HOST
         value: "valkey"
+      - name: XI_NETWORK_CALAMITY_VALKEY_PORT
+        value: "6379"
+      - name: XI_NETWORK_CALAMITY_VALKEY_PREFIX
+        value: "calamityxi"
     heartbeatStatusURL: http://api-server:8080/v1/server/map-status-reports
-    maxShardPort: 55230
-    dynamicShardPools:
-      - name: dynamis-bastok
-        zoneId: 186
-        minShardCount: 2
-        releaseGraceSeconds: 60
+    privateShardPortRange:
+      min: 54348
+      max: 55230
     shards:
       - name: "Admin Service"
         port: 54230

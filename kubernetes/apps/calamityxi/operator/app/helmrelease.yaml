@@ -9,10 +9,14 @@ spec:
     kind: OCIRepository
     name: calamityxi
     namespace: flux-system
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
   values:
     image:
       repository: ghcr.io/calamityffxi/operator
-      tag: v0.2.2
+      tag: v0.2.4
 
     replicaCount: 1
 
