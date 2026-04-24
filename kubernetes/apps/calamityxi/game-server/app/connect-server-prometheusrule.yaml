@@ -118,7 +118,7 @@ spec:
       rules:
         - alert: ConnectServerTCPListenerErrors
           expr: |-
-            sum(rate(connect_tcp_events_total{namespace="calamityxi",event=~"accept_error|read_error|write_error|listen_error"}[5m])) > 0
+            sum(rate(connect_tcp_events_total{namespace="calamityxi",event=~"accept_error|write_error|listen_error"}[5m])) > 0
           for: 5m
           labels:
             severity: warning
@@ -127,7 +127,7 @@ spec:
             summary: >-
               connect-server TCP listener errors
             description: >-
-              Auth, data, or view listener errors are occurring.
+              Auth, data, or view listener accept/write errors are occurring.
         - alert: ConnectServerCrossReplicaFrameErrors
           expr: |-
             sum(rate(connect_outbound_frame_operations_total{namespace="calamityxi",outcome=~"error|decode_error|drain_error|missing_socket"}[5m])) > 0
