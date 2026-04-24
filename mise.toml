@@ -4,7 +4,7 @@ kubectl = "1.35.4"
 talosctl = "1.12.6"
 
 # Flux/Helm workflow tools.
-flux2 = "2.8.5"
+flux2 = "2.8.6"
 helm = "3.20.2"
 helmfile = "1.4.4"
 "pipx:flux-local" = "8.0.1"
