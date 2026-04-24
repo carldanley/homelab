@@ -1,0 +1,61 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: operator
+  namespace: calamityxi
+spec:
+  groups:
+    - name: operator.availability
+      rules:
+        - alert: CalamityXIOperatorDeploymentMissing
+          expr: |-
+            absent(kube_deployment_spec_replicas{namespace="calamityxi",deployment="operator-calamityxi-operator"})
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+          annotations:
+            summary: >-
+              calamityxi operator deployment is missing
+            description: >-
+              kube-state-metrics cannot find the calamityxi operator deployment.
+        - alert: CalamityXIOperatorMissingReplicas
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="calamityxi",deployment="operator-calamityxi-operator"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment="operator-calamityxi-operator"}
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+          annotations:
+            summary: >-
+              calamityxi operator is missing ready replicas
+            description: >-
+              Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+              fewer available replicas than requested.
+        - alert: CalamityXIOperatorRolloutStuck
+          expr: |-
+            kube_deployment_status_condition{namespace="calamityxi",deployment="operator-calamityxi-operator",condition="Progressing",status="false"} != 0
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator
+          annotations:
+            summary: >-
+              calamityxi operator rollout is stuck
+            description: >-
+              Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+              stopped progressing.
+        - alert: CalamityXIOperatorRestarting
+          expr: |-
+            increase(kube_pod_container_status_restarts_total{namespace="calamityxi",pod=~"operator-calamityxi-operator-.*",container="manager"}[10m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator
+          annotations:
+            summary: >-
+              calamityxi operator is restarting
+            description: >-
+              Pod {{ $labels.namespace }}/{{ $labels.pod }} has restarted in
+              the last 10 minutes.

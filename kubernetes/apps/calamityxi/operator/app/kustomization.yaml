@@ -8,3 +8,4 @@ resources:
   - ./certificate.yaml
   - ./helmrelease.yaml
   - ./operator-job-rbac.yaml
+  - ./prometheusrule.yaml

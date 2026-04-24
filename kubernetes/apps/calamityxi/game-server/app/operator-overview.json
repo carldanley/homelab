@@ -1,0 +1,319 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0,
+          "thresholds": {"mode": "absolute", "steps": [{"color": "red", "value": null}, {"color": "green", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0},
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "max(calamityxi_operator_cluster_condition{namespace=\"$namespace\",cluster=\"$cluster\",condition=\"Ready\"})", "legendFormat": "ready", "refId": "A"}
+      ],
+      "title": "Cluster Ready",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {
+          "max": 1,
+          "min": 0,
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0},
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "max(calamityxi_operator_cluster_condition{namespace=\"$namespace\",cluster=\"$cluster\",condition=\"Recovering\"})", "legendFormat": "recovering", "refId": "A"}
+      ],
+      "title": "Recovering",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {"min": 0, "unit": "s"},
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0},
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "max(calamityxi_operator_cluster_requeue_after_seconds{namespace=\"$namespace\",cluster=\"$cluster\"})", "legendFormat": "requeue", "refId": "A"}
+      ],
+      "title": "Requeue Delay",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {"min": 0},
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0},
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "sum(calamityxi_operator_private_shard_desired{namespace=\"$namespace\",cluster=\"$cluster\"})", "legendFormat": "desired", "refId": "A"}
+      ],
+      "title": "Private Desired",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {"min": 0},
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0},
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "sum(calamityxi_operator_private_shard_status{namespace=\"$namespace\",cluster=\"$cluster\",ready=\"true\"})", "legendFormat": "ready", "refId": "A"}
+      ],
+      "title": "Private Ready",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "unit": "s",
+          "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "red", "value": 300}]}
+        },
+        "overrides": []
+      },
+      "gridPos": {"h": 4, "w": 4, "x": 20, "y": 0},
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false},
+        "textMode": "value"
+      },
+      "targets": [
+        {"expr": "max(calamityxi_world_server_private_shard_allocation_overdue_seconds)", "legendFormat": "overdue", "refId": "A"}
+      ],
+      "title": "Max Overdue",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4},
+      "id": 7,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "sum by (workload, shard, state) (calamityxi_operator_workload_replicas{namespace=\"$namespace\",cluster=\"$cluster\",state=~\"desired|ready|available\"})", "legendFormat": "{{workload}} {{shard}} {{state}}", "refId": "A"}
+      ],
+      "title": "Workload Replicas",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4},
+      "id": 8,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "sum by (state, allocation_type, resource_class, zone_id) (calamityxi_operator_private_shard_desired{namespace=\"$namespace\",cluster=\"$cluster\"})", "legendFormat": "desired {{state}} {{allocation_type}} {{resource_class}} z{{zone_id}}", "refId": "A"},
+        {"expr": "sum by (phase, ready, zone_id) (calamityxi_operator_private_shard_status{namespace=\"$namespace\",cluster=\"$cluster\"})", "legendFormat": "status {{phase}} ready={{ready}} z{{zone_id}}", "refId": "B"}
+      ],
+      "title": "Private Shard Desired And Status",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0, "unit": "reqps"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "id": 9,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "sum by (operation, result) (rate(calamityxi_operator_private_shard_world_server_requests_total{namespace=\"$namespace\",cluster=\"$cluster\"}[5m]))", "legendFormat": "{{operation}} {{result}}", "refId": "A"}
+      ],
+      "title": "World-Server Private Shard API",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "id": 10,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "sum by (state, allocation_type, resource_class, zone_id, expired) (calamityxi_world_server_private_shard_allocations)", "legendFormat": "{{state}} {{allocation_type}} {{resource_class}} z{{zone_id}} expired={{expired}}", "refId": "A"},
+        {"expr": "sum by (state, allocation_type, zone_id, status) (calamityxi_world_server_private_shard_occupants)", "legendFormat": "occupants {{state}} {{allocation_type}} z{{zone_id}} {{status}}", "refId": "B"}
+      ],
+      "title": "World-Server Private Shard SQL State",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0, "unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
+      "id": 11,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "max by (state, allocation_type, resource_class, zone_id) (calamityxi_world_server_private_shard_allocation_overdue_seconds)", "legendFormat": "{{state}} {{allocation_type}} {{resource_class}} z{{zone_id}}", "refId": "A"}
+      ],
+      "title": "Private Shard Overdue Seconds",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "$datasource"},
+      "fieldConfig": {"defaults": {"min": 0, "unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20},
+      "id": 12,
+      "options": {
+        "legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true},
+        "tooltip": {"mode": "multi", "sort": "none"}
+      },
+      "targets": [
+        {"expr": "min by (state, allocation_type, resource_class, zone_id) (calamityxi_world_server_private_shard_allocation_seconds_until_expiry)", "legendFormat": "{{state}} {{allocation_type}} {{resource_class}} z{{zone_id}}", "refId": "A"}
+      ],
+      "title": "Private Shard Seconds Until Expiry",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["calamityxi", "operator", "private-shards"],
+  "templating": {
+    "list": [
+      {
+        "current": {"selected": false, "text": "prometheus", "value": "prometheus"},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "datasource": {"type": "prometheus", "uid": "$datasource"},
+        "definition": "label_values(calamityxi_operator_cluster_phase, namespace)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Namespace",
+        "multi": false,
+        "name": "namespace",
+        "options": [],
+        "query": {"query": "label_values(calamityxi_operator_cluster_phase, namespace)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "datasource": {"type": "prometheus", "uid": "$datasource"},
+        "definition": "label_values(calamityxi_operator_cluster_phase{namespace=\"$namespace\"}, cluster)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster",
+        "options": [],
+        "query": {"query": "label_values(calamityxi_operator_cluster_phase{namespace=\"$namespace\"}, cluster)", "refId": "PrometheusVariableQueryEditor-VariableQuery"},
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {"from": "now-6h", "to": "now"},
+  "timepicker": {},
+  "timezone": "",
+  "title": "CalamityXI Operator",
+  "uid": "calamityxi-operator",
+  "version": 1,
+  "weekStart": ""
+}

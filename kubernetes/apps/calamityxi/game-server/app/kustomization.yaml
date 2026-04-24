@@ -5,6 +5,7 @@ resources:
   - ./calamityxi-cluster.yaml
   - ./world-server-dashboard-configmap.yaml
   - ./world-server-servicemonitor.yaml
+  - ./connect-server-dashboard-configmap.yaml
   - ./connect-server-servicemonitor.yaml
   - ./search-server-dashboard-configmap.yaml
   - ./search-server-servicemonitor.yaml
@@ -12,3 +13,18 @@ resources:
   - ./search-server-prometheusrule.yaml
   - ./world-server-prometheusrule.yaml
   - ./connect-server-prometheusrule.yaml
+  - ./operator-prometheusrule.yaml
+
+configMapGenerator:
+  - name: operator-dashboard
+    namespace: calamityxi
+    files:
+      - operator-overview.json=./operator-overview.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: calamityxi
+
+generatorOptions:
+  disableNameSuffixHash: true

@@ -1,0 +1,181 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: calamityxi-operator
+  namespace: calamityxi
+spec:
+  groups:
+    - name: calamityxi-operator.rules
+      rules:
+        - alert: CalamityXIOperatorMetricsAbsent
+          expr: |-
+            absent(calamityxi_operator_cluster_phase{namespace="calamityxi"})
+          for: 5m
+          annotations:
+            summary: >-
+              CalamityXI operator metrics are absent
+            description: >-
+              Prometheus has not scraped CalamityXI operator custom metrics for
+              five minutes. Check the operator metrics Service, ServiceMonitor,
+              target labels, and the manager pod before trusting dashboard data.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIOperatorReconcileErrors
+          expr: |-
+            sum(rate(controller_runtime_reconcile_errors_total[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              CalamityXI operator reconcile errors are non-zero
+            description: >-
+              controller-runtime is recording reconcile errors. Check operator
+              logs and the affected CalamityXICluster status before more
+              lifecycle work piles up behind the broken reconcile loop.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIClusterNotReady
+          expr: |-
+            max by (namespace, cluster) (
+              calamityxi_operator_cluster_condition{condition="Ready"}
+            ) < 1
+          for: 10m
+          annotations:
+            summary: >-
+              CalamityXI cluster is not ready
+            description: >-
+              CalamityXICluster {{ $labels.namespace }}/{{ $labels.cluster }}
+              has not reported Ready for ten minutes. Check world, connect,
+              search, map, and private shard rollout metrics.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIClusterRecoveringTooLong
+          expr: |-
+            max by (namespace, cluster) (
+              calamityxi_operator_cluster_condition{condition="Recovering"}
+            ) > 0
+          for: 15m
+          annotations:
+            summary: >-
+              CalamityXI cluster has been recovering too long
+            description: >-
+              CalamityXICluster {{ $labels.namespace }}/{{ $labels.cluster }}
+              has stayed in Recovering for fifteen minutes. A recovery that
+              sits this long is usually blocked on world/core readiness or
+              rollout cleanup.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardWorldServerAPIFailures
+          expr: |-
+            sum by (namespace, cluster, operation) (
+              rate(calamityxi_operator_private_shard_world_server_requests_total{result="error"}[5m])
+            ) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              operator private shard API calls to world-server are failing
+            description: >-
+              The operator is failing {{ $labels.operation }} calls for private
+              shards in {{ $labels.namespace }}/{{ $labels.cluster }}. Check the
+              active world-server leader, HTTP readiness, and operator API logs.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardPendingTooLong
+          expr: |-
+            sum by (namespace, cluster, zone_id) (
+              calamityxi_operator_private_shard_status{phase="pending"}
+            ) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              private shards are pending too long
+            description: >-
+              One or more private shards in {{ $labels.namespace }}/{{
+              $labels.cluster }} zone {{ $labels.zone_id }} have stayed Pending
+              for ten minutes. Check private map Deployments, Services, and map
+              heartbeat readiness.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardFailed
+          expr: |-
+            sum by (namespace, cluster, zone_id) (
+              calamityxi_operator_private_shard_status{phase="failed"}
+            ) > 0
+          for: 2m
+          annotations:
+            summary: >-
+              private shard validation failed
+            description: >-
+              The operator reported Failed private shard status in {{
+              $labels.namespace }}/{{ $labels.cluster }} zone {{
+              $labels.zone_id }}. This is commonly an invalid world-server
+              desired shard, such as a bad port or a static map port collision.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardDesiredReadyMismatch
+          expr: |-
+            (
+              sum by (namespace, cluster) (
+                calamityxi_operator_private_shard_desired
+              )
+              -
+              (
+                sum by (namespace, cluster) (
+                  calamityxi_operator_private_shard_status{ready="true"}
+                )
+                or on (namespace, cluster)
+                0 * sum by (namespace, cluster) (
+                  calamityxi_operator_private_shard_desired
+                )
+              )
+            ) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              desired private shards are not all ready
+            description: >-
+              world-server still wants more private shards than the operator is
+              reporting ready for {{ $labels.namespace }}/{{ $labels.cluster }}.
+              Check map rollout state before players get routed into missing
+              private capacity.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardOverdue
+          expr: |-
+            max by (state, allocation_type, resource_class, zone_id) (
+              calamityxi_world_server_private_shard_allocation_overdue_seconds
+            ) > 300
+          for: 5m
+          annotations:
+            summary: >-
+              private shard is past its allowed lifetime
+            description: >-
+              A {{ $labels.state }} {{ $labels.allocation_type }} private shard
+              in zone {{ $labels.zone_id }} is more than five minutes past its
+              broker-owned expiry. Cleanup or occupant ejection is stuck, and
+              this shard is staying up longer than it is supposed to.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-operator
+        - alert: CalamityXIPrivateShardMetricsRefreshFailing
+          expr: |-
+            sum(rate(calamityxi_world_server_private_shard_metrics_refresh_total{result="error"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              world-server private shard metrics refresh is failing
+            description: >-
+              world-server cannot refresh SQL-backed private shard metrics.
+              Overdue shard alerts may be stale until the SQL query path
+              recovers.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-operator

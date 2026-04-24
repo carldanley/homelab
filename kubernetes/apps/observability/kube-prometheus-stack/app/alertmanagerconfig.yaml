@@ -34,6 +34,11 @@ spec:
           - name: discord_channel
             value: calamityxi-connect-server
             matchType: =
+      - receiver: discord-calamityxi-operator
+        matchers:
+          - name: discord_channel
+            value: calamityxi-operator
+            matchType: =
   inhibitRules:
     - equal:
         - alertname
@@ -65,4 +70,10 @@ spec:
         - apiURL:
             name: alertmanager-discord-webhooks
             key: calamityxi-connect-server
+          sendResolved: true
+    - name: discord-calamityxi-operator
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhooks
+            key: calamityxi-operator
           sendResolved: true
