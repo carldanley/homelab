@@ -1,0 +1,142 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: connect-server
+  namespace: calamityxi
+spec:
+  groups:
+    - name: connect-server.availability
+      rules:
+        - alert: ConnectServerScrapeDown
+          expr: |-
+            up{namespace="calamityxi",service=~".*-connect-admin"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server metrics scrape is down
+            description: >-
+              Prometheus cannot scrape {{ $labels.namespace }}/{{ $labels.service }}.
+        - alert: ConnectServerMissingReplicas
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="calamityxi",deployment=~".*-connect"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment=~".*-connect"}
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server is missing ready replicas
+            description: >-
+              Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+              fewer available replicas than requested.
+    - name: connect-server.auth
+      rules:
+        - alert: ConnectServerElevatedAuthFailures
+          expr: |-
+            (
+              sum(rate(connect_auth_attempts_total{namespace="calamityxi",result!="success"}[5m]))
+              /
+              clamp_min(sum(rate(connect_auth_attempts_total{namespace="calamityxi"}[5m])), 1)
+            ) > 0.25
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server auth failures are elevated
+            description: >-
+              More than 25 percent of auth attempts have failed for 10 minutes.
+        - alert: ConnectServerPendingLoginMissRateHigh
+          expr: |-
+            sum(rate(connect_pending_session_operations_total{namespace="calamityxi",operation=~"get|update",outcome=~"miss|not_found|expired"}[5m])) > 1
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server pending-login misses are high
+            description: >-
+              Pending-login lookups are missing or expiring frequently.
+    - name: connect-server.dependencies
+      rules:
+        - alert: ConnectServerValkeyErrors
+          expr: |-
+            sum(rate(connect_valkey_operations_total{namespace="calamityxi",outcome!="ok"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server Valkey operations are failing
+            description: >-
+              Valkey errors are occurring in pending-login or cross-replica frame state.
+        - alert: ConnectServerMariaDBErrors
+          expr: |-
+            sum(rate(connect_sql_operations_total{namespace="calamityxi",outcome=~"error|failed"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server MariaDB operations are failing
+            description: >-
+              SQL operation failures are being reported by connect-server.
+        - alert: ConnectServerAdvisoryLockTimeouts
+          expr: |-
+            sum(rate(connect_mariadb_advisory_locks_total{namespace="calamityxi",event="acquire",outcome="timeout"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server advisory lock timeouts
+            description: >-
+              MariaDB advisory locks are timing out, which can block account
+              creation, character creation, or login-limit checks.
+        - alert: ConnectServerWorldHTTPFailures
+          expr: |-
+            sum(rate(connect_world_http_calls_total{namespace="calamityxi",outcome!="ok"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server world-server API calls are failing
+            description: >-
+              Internal world-server login, route, or char-zone calls are failing.
+    - name: connect-server.tcp
+      rules:
+        - alert: ConnectServerTCPListenerErrors
+          expr: |-
+            sum(rate(connect_tcp_events_total{namespace="calamityxi",event=~"accept_error|read_error|write_error|listen_error"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server TCP listener errors
+            description: >-
+              Auth, data, or view listener errors are occurring.
+        - alert: ConnectServerCrossReplicaFrameErrors
+          expr: |-
+            sum(rate(connect_outbound_frame_operations_total{namespace="calamityxi",outcome=~"error|decode_error|drain_error|missing_socket"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server cross-replica frame delivery errors
+            description: >-
+              Valkey-backed data/view frame delivery is failing or losing target sockets.
