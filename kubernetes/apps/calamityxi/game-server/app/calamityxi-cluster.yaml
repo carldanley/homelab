@@ -39,6 +39,13 @@ spec:
     replicas: 3
     antiAffinityPolicy: Required
     tlsSecretName: game-server-connect-tls
+    env:
+      - name: CONNECT_VALKEY_HOST
+        value: "valkey"
+      - name: CONNECT_VALKEY_PORT
+        value: "6379"
+      - name: CONNECT_VALKEY_PREFIX
+        value: "calamityxi:connect"
     resources:
       requests:
         cpu: 250m
