@@ -9,20 +9,34 @@ spec:
       rules:
         - alert: UDMDownloadBandwithLow
           expr: |
-            unpoller_device_speedtest_download < 100
+            max_over_time(unpoller_device_speedtest_download[24h]) > 0
+              and
+            max_over_time(unpoller_device_speedtest_download[24h]) < 100
           for: 5m
           annotations:
             summary: >-
-              {{ $labels.name }} download bandwidth is below {{ $value }} Mbps
+              {{ $labels.name }} download speed test is below 100 Mbps
+            description: >-
+              The highest non-zero UniFi download speed test result for
+              {{ $labels.name }} {{ $labels.port }} over the last 24 hours is
+              {{ $value }} Mbps. Zero-valued speed-test gauges are ignored
+              because disabled or standby WANs report 0.
           labels:
             severity: critical
 
         - alert: UDMUploadBandwidthLow
           expr: |
-            unpoller_device_speedtest_upload < 100
+            max_over_time(unpoller_device_speedtest_upload[24h]) > 0
+              and
+            max_over_time(unpoller_device_speedtest_upload[24h]) < 100
           for: 5m
           annotations:
             summary: >-
-              {{ $labels.name }} upload bandwidth is below {{ $value }} Mbps
+              {{ $labels.name }} upload speed test is below 100 Mbps
+            description: >-
+              The highest non-zero UniFi upload speed test result for
+              {{ $labels.name }} {{ $labels.port }} over the last 24 hours is
+              {{ $value }} Mbps. Zero-valued speed-test gauges are ignored
+              because disabled or standby WANs report 0.
           labels:
             severity: critical
