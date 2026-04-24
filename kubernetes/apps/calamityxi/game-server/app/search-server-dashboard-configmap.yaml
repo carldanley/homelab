@@ -145,6 +145,74 @@ data:
           "targets": [{ "expr": "sum by (target, operation, outcome) (rate(search_cache_operations_total[5m]))", "legendFormat": "{{target}} {{operation}} {{outcome}}", "refId": "A" }],
           "title": "Cache Operations",
           "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 25 },
+          "id": 12,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "sum by (component) (search_mariadb_pool_open_connections)", "legendFormat": "{{component}} open", "refId": "A" },
+            { "expr": "sum by (component) (search_mariadb_pool_in_use_connections)", "legendFormat": "{{component}} in use", "refId": "B" },
+            { "expr": "sum by (component) (search_mariadb_pool_idle_connections)", "legendFormat": "{{component}} idle", "refId": "C" },
+            { "expr": "sum by (component) (search_mariadb_pool_max_open_connections)", "legendFormat": "{{component}} max open", "refId": "D" }
+          ],
+          "title": "MariaDB Pool Connections",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "ops", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 25 },
+          "id": 13,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "sum by (component, event) (rate(search_mariadb_connection_events_total[5m]))", "legendFormat": "{{component}} {{event}}", "refId": "A" },
+            { "expr": "sum by (component, reason) (rate(search_mariadb_pool_closed_total[5m]))", "legendFormat": "{{component}} closed {{reason}}", "refId": "B" },
+            { "expr": "sum by (component) (rate(search_mariadb_pool_wait_count_total[5m]))", "legendFormat": "{{component}} waits", "refId": "C" }
+          ],
+          "title": "MariaDB Connection Churn",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 25 },
+          "id": 14,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "sum by (component, state) (search_valkey_pool_connections)", "legendFormat": "{{component}} {{state}}", "refId": "A" },
+            { "expr": "sum by (component) (search_valkey_pool_pending_requests)", "legendFormat": "{{component}} pending", "refId": "B" }
+          ],
+          "title": "Valkey Pool Connections",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "ops", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 32 },
+          "id": 15,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "sum by (component, event) (rate(search_valkey_connection_events_total[5m]))", "legendFormat": "{{component}} {{event}}", "refId": "A" },
+            { "expr": "sum by (component, event) (rate(search_valkey_pool_events_total[5m]))", "legendFormat": "{{component}} pool {{event}}", "refId": "B" }
+          ],
+          "title": "Valkey Connection Churn",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "s", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 32 },
+          "id": 16,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "histogram_quantile(0.95, sum by (le, component, event) (rate(search_mariadb_connection_duration_seconds_bucket[5m])))", "legendFormat": "mysql {{component}} {{event}} p95", "refId": "A" },
+            { "expr": "histogram_quantile(0.95, sum by (le, component, event) (rate(search_valkey_connection_duration_seconds_bucket[5m])))", "legendFormat": "valkey {{component}} {{event}} p95", "refId": "B" }
+          ],
+          "title": "Connection Dial Latency P95",
+          "type": "timeseries"
         }
       ],
       "refresh": "30s",
