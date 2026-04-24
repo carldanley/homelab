@@ -6,3 +6,6 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./dnsendpoint.yaml
+  - ./servicemonitor.yaml
+  - ./prometheusrule.yaml
+  - ./dashboard-configmap.yaml

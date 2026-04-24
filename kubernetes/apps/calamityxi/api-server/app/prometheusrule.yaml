@@ -1,0 +1,171 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: api-server
+  namespace: calamityxi
+spec:
+  groups:
+    - name: api-server.availability
+      rules:
+        - alert: APIServerMetricsAbsent
+          expr: |-
+            absent(calamityxi_api_server_build_info{namespace="calamityxi"})
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server metrics are absent
+            description: >-
+              Prometheus has not scraped api-server metrics in calamityxi for
+              five minutes. Check the ServiceMonitor, Service, pod readiness,
+              and /metrics handler before trusting the dashboard.
+        - alert: APIServerScrapeDown
+          expr: |-
+            up{namespace="calamityxi",service="api-server"} == 0
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server metrics scrape is down
+            description: >-
+              Prometheus cannot scrape {{ $labels.namespace }}/{{ $labels.service }}.
+        - alert: APIServerMissingReplicas
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="calamityxi",deployment="api-server"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment="api-server"}
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server is missing ready replicas
+            description: >-
+              Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+              fewer available replicas than requested.
+    - name: api-server.http
+      rules:
+        - alert: APIServerHTTP5xxRateHigh
+          expr: |-
+            (
+              sum(rate(calamityxi_api_server_http_requests_total{namespace="calamityxi",route!="/metrics",status_class="5xx"}[5m]))
+              /
+              clamp_min(sum(rate(calamityxi_api_server_http_requests_total{namespace="calamityxi",route!="/metrics"}[5m])), 1)
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server HTTP 5xx rate is elevated
+            description: >-
+              More than 5 percent of non-metrics API requests are returning 5xx
+              responses for ten minutes.
+        - alert: APIServerHTTPLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (le) (
+                rate(calamityxi_api_server_http_request_duration_seconds_bucket{namespace="calamityxi",route!~"/metrics|/v1/server/events/.*"}[5m])
+              )
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server HTTP latency p95 is high
+            description: >-
+              API p95 latency is above 500ms for ten minutes, excluding metrics
+              scrapes and long-lived SSE routes.
+        - alert: APIServerMapHeartbeatTrafficHigh
+          expr: |-
+            sum(rate(calamityxi_api_server_http_requests_total{namespace="calamityxi",route="/v1/server/map-status-reports"}[5m])) > 10
+          for: 15m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server map heartbeat traffic is high
+            description: >-
+              Map heartbeat ingestion is above 10 RPS for fifteen minutes. The
+              change-plus-lease sidecar should normally keep this near 4 RPS in
+              the current homelab shard count, so this probably means the noisy
+              old sidecar behavior is still deployed or some damn retry loop is
+              misbehaving.
+    - name: api-server.status
+      rules:
+        - alert: APIServerStatusOffline
+          expr: |-
+            max(calamityxi_api_server_status_online{namespace="calamityxi"}) < 1
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              public server status is offline
+            description: >-
+              The API status snapshot reports serverOnline=false for five
+              minutes.
+        - alert: APIServerStatusDegraded
+          expr: |-
+            max(calamityxi_api_server_status_degraded{namespace="calamityxi"}) > 0
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              public server status is degraded
+            description: >-
+              The API status snapshot reports degraded=true for ten minutes.
+        - alert: APIServerPublicShardsUnhealthy
+          expr: |-
+            max(calamityxi_api_server_public_shards{namespace="calamityxi",health=~"degraded|offline"}) > 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              one or more public shards are unhealthy
+            description: >-
+              The API status snapshot reports degraded or offline public shards.
+              Check map heartbeat age, map pods, and route-state before players
+              trip over this crap.
+        - alert: APIServerStatusCacheStale
+          expr: |-
+            max(calamityxi_api_server_status_cache_stale{namespace="calamityxi"}) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server rich status cache is stale
+            description: >-
+              The API is serving stale rich status data because refresh
+              dependencies are failing or lagging.
+    - name: api-server.launcher-telemetry
+      rules:
+        - alert: APIServerLauncherErrorEventsHigh
+          expr: |-
+            sum(rate(calamityxi_launcher_error_events_total{namespace="calamityxi"}[10m])) > 0.1
+          for: 15m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              launcher error telemetry is elevated
+            description: >-
+              Launcher clients are reporting more than 0.1 bounded error events
+              per second for fifteen minutes.

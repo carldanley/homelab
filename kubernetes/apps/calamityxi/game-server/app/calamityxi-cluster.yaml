@@ -84,7 +84,7 @@ spec:
     heartbeat:
       image:
         repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
-        tag: v0.1.0
+        tag: v0.1.1
       statusURL: http://api-server:8080/v1/server/map-status-reports
     rollout:
       maxRollingShards: 10
