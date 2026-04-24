@@ -8,3 +8,5 @@ resources:
   - ./search-server-dashboard-configmap.yaml
   - ./search-server-servicemonitor.yaml
   - ./search-worker-servicemonitor.yaml
+  - ./search-server-prometheusrule.yaml
+  - ./world-server-prometheusrule.yaml

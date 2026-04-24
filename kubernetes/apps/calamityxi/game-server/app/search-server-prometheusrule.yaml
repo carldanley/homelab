@@ -1,0 +1,233 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: search-server
+  namespace: calamityxi
+spec:
+  groups:
+    - name: search-server.rules
+      rules:
+        - alert: SearchServerMetricsAbsent
+          expr: |-
+            absent(search_server_info{namespace="calamityxi"})
+          for: 5m
+          annotations:
+            summary: >-
+              search-server metrics are absent
+            description: >-
+              Prometheus has not scraped any search-server metrics in calamityxi
+              for five minutes. Check the search admin Services, ServiceMonitors,
+              and serving/worker pods before trusting dashboard panels.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchServerPodNotReady
+          expr: |-
+            min by (namespace, pod) (search_server_ready{namespace="calamityxi"}) < 1
+          for: 5m
+          annotations:
+            summary: >-
+              search-server pod {{ $labels.namespace }}/{{ $labels.pod }} is not ready
+            description: >-
+              The pod is serving /metrics but reporting readiness failure. This
+              usually means SQL readiness is failing, so client search behavior
+              may degrade even if the process is still alive.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchWorkerLeaseInactive
+          expr: |-
+            sum(search_server_worker_active{namespace="calamityxi"}) < 1
+          for: 5m
+          annotations:
+            summary: >-
+              no active search maintenance worker
+            description: >-
+              No search-worker pod currently reports ownership of the Kubernetes
+              Lease. AH expiration will not run until one worker becomes active.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchWorkerLeaseSplitBrain
+          expr: |-
+            sum(search_server_worker_active{namespace="calamityxi"}) > 1
+          for: 2m
+          annotations:
+            summary: >-
+              multiple active search maintenance workers
+            description: >-
+              More than one search-worker pod reports active Lease ownership.
+              This is split-brain territory; stop the workers before AH mutation
+              state gets weird as hell.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchRequestErrors
+          expr: |-
+            sum(rate(search_requests_total{namespace="calamityxi",outcome!="ok"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              search-server request errors are non-zero
+            description: >-
+              Legacy search requests are returning errors. Check packet family,
+              SQL errors, and recent deploys.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchPacketFailureSpike
+          expr: |-
+            sum(rate(search_packet_failures_total{namespace="calamityxi"}[5m])) > 0.1
+          for: 10m
+          annotations:
+            summary: >-
+              search-server packet failures are elevated
+            description: >-
+              Packet validation, crypto, or dispatch failures are above the
+              example threshold. A small amount during testing is fine; sustained
+              traffic here usually means bad clients or protocol drift.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchRequestLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(search_request_duration_seconds_bucket{namespace="calamityxi"}[5m]))
+            ) > 1
+          for: 10m
+          annotations:
+            summary: >-
+              search-server request latency p95 is high
+            description: >-
+              Search request p95 latency is above one second for ten minutes.
+              Look at SQL latency, MariaDB pool waits, and TCP pressure.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchSQLQueryErrors
+          expr: |-
+            sum(rate(search_sql_queries_total{namespace="calamityxi",outcome!="ok"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              search-server SQL query errors are non-zero
+            description: >-
+              SQL queries are failing. MariaDB remains authoritative for search,
+              so this is more important than any cache-related noise.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchSQLLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(search_sql_query_duration_seconds_bucket{namespace="calamityxi"}[5m]))
+            ) > 0.5
+          for: 10m
+          annotations:
+            summary: >-
+              search-server SQL latency p95 is high
+            description: >-
+              SQL query p95 latency is above 500ms for ten minutes. Check MariaDB
+              health, query mix, and pool pressure before blaming the TCP edge.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchMariaDBDialErrors
+          expr: |-
+            sum(rate(search_mariadb_connection_events_total{namespace="calamityxi",event="dial_error"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              search-server MariaDB dial errors are non-zero
+            description: >-
+              search-server is failing to open physical MariaDB connections.
+              Existing pooled connections may hide this briefly, but new work can
+              start failing when the pool needs another connection.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchMariaDBConnectionChurnHigh
+          expr: |-
+            sum(rate(search_mariadb_connection_events_total{namespace="calamityxi",event="dial_success"}[5m])) > 0.2
+          for: 10m
+          annotations:
+            summary: >-
+              search-server MariaDB connection churn is high
+            description: >-
+              Physical MariaDB connection dials are above the example churn
+              threshold. Some churn is normal from connection lifetime rotation;
+              sustained spikes suggest reconnect loops, pool pressure, or flaky
+              networking.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchMariaDBPoolWaiting
+          expr: |-
+            sum(rate(search_mariadb_pool_wait_count_total{namespace="calamityxi"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              search-server MariaDB pool is waiting for connections
+            description: >-
+              Requests are waiting on the MariaDB connection pool. Increase pool
+              sizing only after checking query latency and database capacity,
+              because blindly cranking this knob can make shit worse.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchAHExpirationErrors
+          expr: |-
+            sum(rate(search_ah_expiration_runs_total{namespace="calamityxi",outcome!="ok"}[15m])) > 0
+          for: 15m
+          annotations:
+            summary: >-
+              search-worker AH expiration errors are non-zero
+            description: >-
+              The maintenance worker is failing AH expiration runs. Check worker
+              logs, Lease state, and MariaDB write behavior.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-search-server
+        - alert: SearchValkeyDialErrors
+          expr: |-
+            sum(rate(search_valkey_connection_events_total{namespace="calamityxi",event=~"dial_error|open_error"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              search-server Valkey dial/open errors are non-zero
+            description: >-
+              Valkey is optional cache-only, so correctness should continue via
+              SQL fallback. This alert is for cache health, not search readiness.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchValkeyFallbacks
+          expr: |-
+            sum(rate(search_cache_operations_total{namespace="calamityxi",outcome=~"fallback|stale|error"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              search-server Valkey cache fallbacks are non-zero
+            description: >-
+              Cache operations are falling back to SQL or rejecting stale/error
+              data. Search should still work, but cache value is reduced.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server
+        - alert: SearchValkeyPoolTimeouts
+          expr: |-
+            sum(rate(search_valkey_pool_events_total{namespace="calamityxi",event="timeout"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              search-server Valkey pool timeouts are non-zero
+            description: >-
+              The Valkey client pool is timing out while waiting for connections.
+              This is cache-only, but it can still waste latency before SQL
+              fallback handles the request.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-search-server

@@ -19,6 +19,16 @@ spec:
           - name: alertname
             value: InfoInhibitor
             matchType: =
+      - receiver: discord-calamityxi-search-server
+        matchers:
+          - name: discord_channel
+            value: calamityxi-search-server
+            matchType: =
+      - receiver: discord-calamityxi-world-server
+        matchers:
+          - name: discord_channel
+            value: calamityxi-world-server
+            matchType: =
   inhibitRules:
     - equal:
         - alertname
@@ -33,3 +43,15 @@ spec:
           matchType: =
   receivers:
     - name: "null"
+    - name: discord-calamityxi-search-server
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhooks
+            key: calamityxi-search-server
+          sendResolved: true
+    - name: discord-calamityxi-world-server
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhooks
+            key: calamityxi-world-server
+          sendResolved: true

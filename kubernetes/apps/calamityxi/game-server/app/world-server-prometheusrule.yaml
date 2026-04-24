@@ -1,0 +1,283 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: world-server
+  namespace: calamityxi
+spec:
+  groups:
+    - name: world-server.rules
+      rules:
+        - alert: WorldServerMetricsAbsent
+          expr: |-
+            absent(calamityxi_world_server_info{namespace="calamityxi"})
+          for: 5m
+          annotations:
+            summary: >-
+              world-server metrics are absent
+            description: >-
+              Prometheus has not scraped world-server metrics in calamityxi for
+              five minutes. Check the world Service, ServiceMonitor, endpoints,
+              and active broker pod before trusting dashboard panels.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerReadyLeaderMissing
+          expr: |-
+            max(calamityxi_world_server_ready{namespace="calamityxi"}) < 1
+          for: 5m
+          annotations:
+            summary: >-
+              no ready world-server leader is being scraped
+            description: >-
+              No scraped world-server replica is reporting readiness. In
+              route-v1 this usually means SQL route-state reloads are failing,
+              so xi_connect and xi_map traffic may not route correctly.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerLeaderMissing
+          expr: |-
+            max(calamityxi_world_server_leader{namespace="calamityxi"}) < 1
+          for: 5m
+          annotations:
+            summary: >-
+              no active world-server leader is being scraped
+            description: >-
+              No world-server replica reports active broker leadership. The
+              operator can keep standby pods around, but one leader must own
+              broker routing or connected game traffic has nowhere useful to go.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerLeaderSplitBrain
+          expr: |-
+            sum(calamityxi_world_server_leader{namespace="calamityxi"}) > 1
+          for: 2m
+          annotations:
+            summary: >-
+              multiple world-server leaders are being scraped
+            description: >-
+              More than one world-server replica reports broker leadership.
+              Active/passive is the current validated contract; split-brain here
+              can duplicate or misroute IPC, which is exactly the kind of shit
+              that ruins a rollout.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerRouteStateEmpty
+          expr: |-
+            max(calamityxi_world_server_route_state_all_map_endpoints{namespace="calamityxi"}) < 1
+          for: 10m
+          annotations:
+            summary: >-
+              world-server route state has no map endpoints
+            description: >-
+              The active route-v1 broker has no public or private map endpoints
+              loaded from SQL. Check route-state tables, MariaDB readiness, and
+              whether map shards have registered the expected zone endpoints.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerIPCRouteFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_ipc_messages_total{namespace="calamityxi",result="failed"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              world-server IPC failures are non-zero
+            description: >-
+              IPC decode, route, or send failures are being recorded. Check the
+              failed message labels, recent route changes, and upstream
+              xi_connect/xi_map compatibility before assuming this is harmless.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerIPCHandlerLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(calamityxi_world_server_ipc_handle_duration_seconds_bucket{namespace="calamityxi"}[5m]))
+            ) > 0.25
+          for: 10m
+          annotations:
+            summary: >-
+              world-server IPC handler latency p95 is high
+            description: >-
+              IPC handler p95 latency is above 250ms for ten minutes. Check SQL
+              route lookups, ZeroMQ send behavior, and noisy control-plane work
+              before it backs up connected game traffic.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerSocialRouteFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_social_messages_total{namespace="calamityxi",result="failed"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              world-server social route failures are non-zero
+            description: >-
+              Social message routing is failing for at least one channel. Check
+              party, linkshell, unity, yell, assist, and tell route labels plus
+              the related SQL lookup errors in world-server logs.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerSocialGroupLookupFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_social_group_lookup_failures_total{namespace="calamityxi"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              world-server social group lookups are failing
+            description: >-
+              Party, alliance, linkshell, or unity endpoint lookups are failing.
+              These SQL-backed lookups are part of route parity with xi_world, so
+              sustained failures deserve attention.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerZMQReceiveErrors
+          expr: |-
+            sum(rate(calamityxi_world_server_zmq_receive_errors_total{namespace="calamityxi"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server ZeroMQ receive errors are non-zero
+            description: >-
+              The ROUTER socket is reporting receive failures. Check broker pod
+              logs, ZeroMQ socket health, and whether map/connect peers are
+              reconnecting cleanly through the world Service.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerProbeEchoFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_zmq_peer_events_total{namespace="calamityxi",event="probe_echo_failed"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server peer probe echoes are failing
+            description: >-
+              world-server failed to echo one or more DEALER liveness probes.
+              Probe echoes are part of the active/passive failover contract with
+              patched xi_connect and xi_map clients.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerPeerReconnectsHigh
+          expr: |-
+            sum(rate(calamityxi_world_server_zmq_peer_events_total{namespace="calamityxi",event="probe_resumed"}[15m])) > 0.1
+          for: 15m
+          annotations:
+            summary: >-
+              world-server peer reconnect probes are elevated
+            description: >-
+              Map or connect peers are resuming probes after quiet periods at an
+              elevated rate. Some reconnects are expected during rollouts; a
+              sustained rate points at broker restarts, stale TCP, or Service
+              routing churn.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerHTTPErrors
+          expr: |-
+            sum(rate(calamityxi_world_server_http_requests_total{namespace="calamityxi",status=~"5.."}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server HTTP 5xx responses are non-zero
+            description: >-
+              world-server probes, debug routes, operator APIs, or control
+              endpoints are returning server errors. Inspect route and status
+              labels to identify the failing surface.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerControlCommandFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_control_command_results_total{namespace="calamityxi",status!="processed"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server control commands are failing
+            description: >-
+              Durable private-shard control commands are completing with a
+              non-processed status. Check command kind, retryability, result
+              stream entries, and the operator-facing queue endpoints.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerControlQueueLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (le) (rate(calamityxi_world_server_control_command_queue_latency_seconds_bucket{namespace="calamityxi"}[5m]))
+            ) > 2
+          for: 10m
+          annotations:
+            summary: >-
+              world-server control queue latency p95 is high
+            description: >-
+              Durable control commands are waiting in Valkey for more than two
+              seconds at p95. Check the active broker consumer, Valkey stream
+              health, and whether command processing is jammed.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerMariaDBConnectFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_mariadb_connection_events_total{namespace="calamityxi",event="connect_failed"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server MariaDB connection failures are non-zero
+            description: >-
+              world-server is failing MariaDB connection attempts. Route state,
+              leader locks, and private-shard durable state depend on SQL, so
+              this is a direct broker health problem.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerMariaDBPoolWaiting
+          expr: |-
+            sum(rate(calamityxi_world_server_mariadb_pool_wait_count_total{namespace="calamityxi"}[5m])) > 0
+          for: 10m
+          annotations:
+            summary: >-
+              world-server MariaDB pool is waiting for connections
+            description: >-
+              world-server is waiting on the sql.DB pool. Check query latency,
+              pool sizing, MariaDB capacity, and whether route-state refreshes
+              or control commands are piling up.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerValkeyConnectFailures
+          expr: |-
+            sum(rate(calamityxi_world_server_valkey_connection_events_total{namespace="calamityxi",event="connect_failed"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server Valkey connection failures are non-zero
+            description: >-
+              world-server cannot reliably connect to Valkey. Fast game routing
+              stays on ZeroMQ and SQL, but durable private-shard commands depend
+              on Valkey Streams.
+          labels:
+            severity: critical
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerValkeyPoolTimeouts
+          expr: |-
+            sum(rate(calamityxi_world_server_valkey_pool_timeouts_total{namespace="calamityxi"}[5m])) > 0
+          for: 5m
+          annotations:
+            summary: >-
+              world-server Valkey pool timeouts are non-zero
+            description: >-
+              The Valkey client pool is timing out. Durable command enqueue,
+              consume, and result-stream work can stall until the pool recovers.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
