@@ -72,15 +72,15 @@ tasks:
       MACHINE_TYPE:
         sh: basename $(dirname $(find '{{ .TALOS_DIR }}' -name '{{ .NODE }}.yaml.j2'))
       COMMON_TEMPLATE_FILE:
-        sh: mktemp -t common
+        sh: mktemp "${TMPDIR:-/tmp}/homelab-common.XXXXXXXXXX"
       ROLE_TEMPLATE_FILE:
-        sh: mktemp -t role
+        sh: mktemp "${TMPDIR:-/tmp}/homelab-role.XXXXXXXXXX"
       NODE_TEMPLATE_FILE:
-        sh: mktemp -t node
+        sh: mktemp "${TMPDIR:-/tmp}/homelab-node.XXXXXXXXXX"
       REGISTRY_PATCH_FILE:
-        sh: mktemp -t registry-patch
+        sh: mktemp "${TMPDIR:-/tmp}/homelab-registry-patch.XXXXXXXXXX"
       COMPILED_TEMPLATE_FILE:
-        sh: mktemp -t compiled
+        sh: mktemp "${TMPDIR:-/tmp}/homelab-compiled.XXXXXXXXXX"
       DEBUG: '{{ .DEBUG | default "false" }}'
       INSECURE: '{{ .INSECURE | default "false" }}'
     deps:
@@ -141,11 +141,7 @@ tasks:
           {{ if not (deepEqual (.FILE | default "" | trim) "") }}
           echo "{{ .FILE }}"
           {{ else }}
-          if [ -n "$TALOSCONFIG" ]; then
-            echo "$TALOSCONFIG"
-          else
-            echo "{{ .TALOS_DIR }}/talosconfig"
-          fi
+          echo "{{ .TALOS_DIR }}/talosconfig"
           {{ end }}
       ENDPOINTS:
         sh: |-
@@ -174,8 +170,8 @@ tasks:
     preconditions:
       - which op yq
 
-      # make sure the TALOSCONFIG environment variable is set
-      - printenv | grep -q TALOSCONFIG
+      # make sure the output path resolved
+      - test -n "{{ .TALOSCONFIG_PATH }}"
 
       # make sure we're logged into onepassword
       - op whoami --format=json &>/dev/null
@@ -185,6 +181,6 @@ tasks:
     cmd: talosctl kubeconfig --nodes {{ .RANDOM_CONTROLLER }} --force {{ .KUBERNETES_DIR }}
     vars:
       RANDOM_CONTROLLER:
-        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | awk 'BEGIN { srand() } { endpoints[NR] = $0 } END { if (NR > 0) print endpoints[int(rand() * NR) + 1] }'
     preconditions:
-      - which talosctl jq shuf
+      - which talosctl jq awk

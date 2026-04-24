@@ -24,3 +24,63 @@ spec:
               Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
           labels:
             severity: critical
+
+        - alert: KubeDeploymentReplicasMismatch
+          expr: |-
+            (
+              (
+                kube_deployment_spec_replicas{job="kube-state-metrics", namespace!="calamityxi"}
+                or
+                kube_deployment_spec_replicas{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+              )
+                >
+              (
+                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace!="calamityxi"}
+                or
+                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+              )
+            ) and (
+              (
+                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace!="calamityxi"}[10m])
+                ==
+                0
+              )
+              or
+              (
+                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}[10m])
+                ==
+                0
+              )
+            )
+          for: 15m
+          annotations:
+            description: >-
+              Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has
+              not matched the expected number of replicas for longer than 15
+              minutes on cluster {{ $labels.cluster }}.
+            runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedeploymentreplicasmismatch
+            summary: Deployment has not matched the expected number of replicas.
+          labels:
+            severity: warning
+
+        - alert: KubeDeploymentRolloutStuck
+          expr: |-
+            (
+              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace!="calamityxi"}
+              != 0
+            )
+            or
+            (
+              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+              != 0
+            )
+          for: 15m
+          annotations:
+            description: >-
+              Rollout of deployment {{ $labels.namespace }}/{{ $labels.deployment }}
+              is not progressing for longer than 15 minutes on cluster
+              {{ $labels.cluster }}.
+            runbook_url: https://runbooks.prometheus-operator.dev/runbooks/kubernetes/kubedeploymentrolloutstuck
+            summary: Deployment rollout is not progressing.
+          labels:
+            severity: warning

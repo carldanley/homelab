@@ -8,9 +8,9 @@ tasks:
     cmd: talosctl kubeconfig --nodes {{ .RANDOM_CONTROLLER }} --force {{ .KUBERNETES_DIR }}
     vars:
       RANDOM_CONTROLLER:
-        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | awk 'BEGIN { srand() } { endpoints[NR] = $0 } END { if (NR > 0) print endpoints[int(rand() * NR) + 1] }'
     preconditions:
-      - which talosctl jq shuf
+      - which talosctl jq awk
 
   talos:
     desc: Bootstrap Talos
@@ -25,7 +25,7 @@ tasks:
       vars:
         - NODE
     preconditions:
-      - which talosctl shuf jq
+      - which talosctl
 
       # make sure we can get the machineconfig for the randomly selected controller
       - talosctl --nodes {{ .NODE }} get machineconfig
@@ -40,13 +40,13 @@ tasks:
       - helmfile --file {{ .BOOTSTRAP_DIR }}/post-cni/helmfile.yaml sync --hide-notes
     vars:
       RANDOM_CONTROLLER:
-        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | shuf -n 1
+        sh: talosctl config info --output json | jq --raw-output '.endpoints[]' | awk 'BEGIN { srand() } { endpoints[NR] = $0 } END { if (NR > 0) print endpoints[int(rand() * NR) + 1] }'
     deps:
       - task: write-kubeconfig
     env:
       KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
     preconditions:
-      - which kubectl talosctl jq shuf helmfile op
+      - which kubectl talosctl jq awk helmfile op
 
       # make sure we can get the machineconfig for the randomly selected controller
       - talosctl --nodes {{ .RANDOM_CONTROLLER }} get machineconfig

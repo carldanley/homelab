@@ -24,6 +24,13 @@ spec:
   values:
     cleanPrometheusOperatorObjectNames: true
 
+    defaultRules:
+      disabled:
+        # cxi-world is active/passive: standby replicas intentionally fail
+        # /readyz while they are healthy but not the elected world leader.
+        KubeDeploymentReplicasMismatch: true
+        KubeDeploymentRolloutStuck: true
+
     alertmanager:
       route:
         main:
