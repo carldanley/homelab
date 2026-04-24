@@ -183,15 +183,16 @@ spec:
             discord_channel: calamityxi-world-server
         - alert: WorldServerHTTPErrors
           expr: |-
-            sum(rate(calamityxi_world_server_http_requests_total{namespace="calamityxi",status=~"5.."}[5m])) > 0
+            sum(rate(calamityxi_world_server_http_requests_total{namespace="calamityxi",route!="/readyz",status=~"5.."}[5m])) > 0
           for: 5m
           annotations:
             summary: >-
               world-server HTTP 5xx responses are non-zero
             description: >-
-              world-server probes, debug routes, operator APIs, or control
-              endpoints are returning server errors. Inspect route and status
-              labels to identify the failing surface.
+              world-server debug routes, operator APIs, or control endpoints
+              are returning server errors. Readiness has separate alerts because
+              passive active/passive standby replicas intentionally return 503
+              from /readyz while they do not hold the broker leader lock.
           labels:
             severity: warning
             discord_channel: calamityxi-world-server
