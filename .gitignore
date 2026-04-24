@@ -1,5 +1,6 @@
 /.private/
 /.task/
+/.tmp/
 *.crt
 *.key
 .decrypted~*

@@ -1,0 +1,23 @@
+[tools]
+# Keep kubectl and talosctl aligned with the versions declared for cluster upgrades.
+kubectl = "1.35.4"
+talosctl = "1.12.6"
+
+# Flux/Helm workflow tools.
+flux2 = "2.8.5"
+helm = "3.20.2"
+helmfile = "1.4.4"
+"pipx:flux-local" = "8.0.1"
+
+# Repository automation and operator tools.
+"1password-cli" = "2.33.1"
+jq = "1.8.1"
+k9s = "0.50.18"
+task = "3.50.0"
+uv = "0.11.7"
+yq = "4.53.2"
+
+# Used by the Talos templates. This goes through Cargo because minijinja-cli's
+# prebuilt installer is not managed by mise's aqua registry consistently.
+rust = "1.95.0"
+"cargo:minijinja-cli" = "2.19.0"

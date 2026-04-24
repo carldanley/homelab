@@ -17,12 +17,19 @@ env:
 includes:
   bootstrap: .taskfiles/bootstrap
   talos: .taskfiles/talos
+  tools: .taskfiles/tools
+  validate: .taskfiles/validate
   volsync: .taskfiles/volsync
 
 tasks:
   default:
     cmd: task --list
     silent: true
+
+  validate:
+    desc: Run local validation checks
+    cmds:
+      - task: validate:all
 
   k9s:
     desc: Run k9s

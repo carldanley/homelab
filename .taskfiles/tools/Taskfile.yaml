@@ -1,0 +1,28 @@
+---
+version: "3"
+
+tasks:
+  install:
+    desc: Install pinned local tools with mise
+    cmds:
+      - mise trust {{ .ROOT_DIR }}/mise.toml
+      - mise install
+    preconditions:
+      - which mise
+      - test -f {{ .ROOT_DIR }}/mise.toml
+
+  doctor:
+    desc: Show local toolchain status
+    cmds:
+      - mise doctor
+      - mise ls --current
+    preconditions:
+      - which mise
+      - test -f {{ .ROOT_DIR }}/mise.toml
+
+  env:
+    desc: Print shell activation command for pinned tools
+    cmd: mise activate
+    preconditions:
+      - which mise
+      - test -f {{ .ROOT_DIR }}/mise.toml

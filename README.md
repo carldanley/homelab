@@ -38,6 +38,16 @@ Flux will recursively search the [kubernetes/apps](./kubernetes/apps) folder unt
 
 [Renovate](https://github.com/renovatebot/renovate) monitors my **entire** repository for dependency updates, automatically creating a PR when updates are found. When a PR is merged Flux will automatically apply the changes to my cluster.
 
+### Local Validation
+
+Local CLI tooling is pinned with [mise](https://mise.jdx.dev/) in [`mise.toml`](./mise.toml). See [Local Tooling](./docs/local-tooling.md) for setup.
+
+Before pushing Kubernetes changes, run:
+
+```sh
+task validate
+```
+
 ### Directories
 
 This Git repository contains the following directories under [kubernetes](./kubernetes).

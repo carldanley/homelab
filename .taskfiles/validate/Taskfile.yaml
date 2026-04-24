@@ -1,0 +1,69 @@
+---
+version: "3"
+
+vars:
+  FLUX_LOCAL_PATH: "{{ .KUBERNETES_DIR }}/flux/cluster"
+  GHCR_REGISTRY_CONFIG: "{{ .ROOT_DIR }}/.tmp/ghcr-docker-config.json"
+
+tasks:
+  all:
+    desc: Run all local validation checks
+    cmds:
+      - task: validate:kustomize
+      - task: validate:flux-local
+
+  kustomize:
+    desc: Render Kubernetes kustomization roots
+    cmd: |
+      find "{{ .KUBERNETES_DIR }}/apps" "{{ .KUBERNETES_DIR }}/flux/repositories" \
+        -name kustomization.yaml \
+        -print \
+        | sort \
+        | while read -r kustomization; do
+            dir="$(dirname "${kustomization}")"
+            echo "Rendering ${dir#{{ .ROOT_DIR }}/}"
+            kubectl kustomize "${dir}" >/dev/null || exit 1
+          done
+    preconditions:
+      - which find sort dirname kubectl
+      - test -d {{ .KUBERNETES_DIR }}/apps
+      - test -d {{ .KUBERNETES_DIR }}/flux/repositories
+
+  flux-local:
+    desc: Run flux-local test using the same path and flags as CI
+    cmds:
+      - |
+        token="${RENOVATE_GHCR_TOKEN:-${GITHUB_TOKEN:-}}"
+
+        if [ -n "${token}" ]; then
+          mkdir -p "$(dirname "{{ .GHCR_REGISTRY_CONFIG }}")"
+          auth="$(printf '%s' "carldanley:${token}" | base64 | tr -d '\n')"
+          jq -n --arg auth "${auth}" '{auths: {"ghcr.io": {"auth": $auth}}}' > "{{ .GHCR_REGISTRY_CONFIG }}"
+
+          flux-local test \
+            --all-namespaces \
+            --enable-helm \
+            --registry-config "{{ .GHCR_REGISTRY_CONFIG }}" \
+            --path {{ .FLUX_LOCAL_PATH }} \
+            --verbose
+        else
+          echo "RENOVATE_GHCR_TOKEN/GITHUB_TOKEN is not set; running flux-local without GHCR auth."
+
+          flux-local test \
+            --all-namespaces \
+            --enable-helm \
+            --path {{ .FLUX_LOCAL_PATH }} \
+            --verbose
+        fi
+    preconditions:
+      - which flux-local jq
+      - test -d {{ .FLUX_LOCAL_PATH }}
+
+  tools:
+    desc: Check validation tool availability
+    cmds:
+      - kubectl version --client=true
+      - flux-local --version
+      - jq --version
+    preconditions:
+      - which kubectl flux-local jq

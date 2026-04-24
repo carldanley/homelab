@@ -18,7 +18,7 @@
     ":semanticCommits",
     ":timezone(America/New_York)",
   ],
-  dependencyDashboardTitle: "Renovate Dashboard �",
+  dependencyDashboardTitle: "Renovate Dashboard",
   suppressNotifications: ["prEditedNotification", "prIgnoreNotification"],
   ignorePaths: ["**/resources/**"],
   flux: {
