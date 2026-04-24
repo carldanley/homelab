@@ -60,13 +60,13 @@ spec:
                 - --extensions-dir
                 - /config/.code-server
                 - --port
-                - &codeServerPort "12321"
+                - "12321"
                 - /config
               env:
                 HASS_SERVER: http://localhost:8123
               ports:
                 - name: codeserver
-                  containerPort: 12321
+                  containerPort: &codeServerPort 12321
               resources:
                 requests:
                   cpu: 10m
@@ -131,7 +131,7 @@ spec:
         rules:
           - backendRefs:
               - identifier: codeserver
-                port: http
+                port: *codeServerPort
 
     service:
       app:
@@ -142,10 +142,10 @@ spec:
           lbipam.cilium.io/ips: *serviceIP
         ports:
           http:
-            port: http
+            port: *httpPort
           sonos:
-            port: sonos
+            port: *sonosPort
       codeserver:
         ports:
           http:
-            port: codeserver
+            port: *codeServerPort
