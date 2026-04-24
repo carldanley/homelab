@@ -73,6 +73,10 @@ spec:
 
     route:
       internal:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            url: https://api.${DOMAIN_8}/v1/server/status
+            conditions: ["[STATUS] == 200"]
         hostnames:
           - "api.${DOMAIN_8}"
         parentRefs:

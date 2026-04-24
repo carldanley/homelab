@@ -7,15 +7,20 @@ connectivity:
 endpoints:
   - name: Cloudflare
     group: connectivity
-    url: icmp://1.1.1.1
+    url: tcp://1.1.1.1:53
     interval: 1m
+    ui: &hideEndpointTargets
+      hide-hostname: true
+      hide-port: true
+      hide-url: true
     conditions:
       - "[CONNECTED] == true"
 
   - name: Google
     group: connectivity
-    url: icmp://8.8.8.8
+    url: tcp://8.8.8.8:53
     interval: 1m
+    ui: *hideEndpointTargets
     conditions:
       - "[CONNECTED] == true"
 

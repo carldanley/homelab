@@ -5,6 +5,11 @@ metadata:
   name: internal
   annotations:
     external-dns.alpha.kubernetes.io/target: &hostname "internal.${DOMAIN_1},internal.${DOMAIN_2},internal.${DOMAIN_3},internal.${DOMAIN_4},internal.${DOMAIN_5},internal.${DOMAIN_6},internal.${DOMAIN_7},internal.${DOMAIN_8}"
+    gatus.home-operations.com/endpoint: &gatusPrivacy |-
+      ui:
+        hide-hostname: true
+        hide-port: true
+        hide-url: true
 spec:
   gatewayClassName: cilium
   addresses:
