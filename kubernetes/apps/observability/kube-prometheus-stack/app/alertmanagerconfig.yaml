@@ -18,32 +18,32 @@ spec:
         matchers:
           - name: alertname
             value: InfoInhibitor
-            matchType: =
+            matchType: "="
       - receiver: discord-calamityxi-search-server
         matchers:
           - name: discord_channel
             value: calamityxi-search-server
-            matchType: =
+            matchType: "="
       - receiver: discord-calamityxi-world-server
         matchers:
           - name: discord_channel
             value: calamityxi-world-server
-            matchType: =
+            matchType: "="
       - receiver: discord-calamityxi-connect-server
         matchers:
           - name: discord_channel
             value: calamityxi-connect-server
-            matchType: =
+            matchType: "="
       - receiver: discord-calamityxi-operator
         matchers:
           - name: discord_channel
             value: calamityxi-operator
-            matchType: =
+            matchType: "="
       - receiver: discord-calamity-api-server
         matchers:
           - name: discord_channel
             value: calamity-api-server
-            matchType: =
+            matchType: "="
   inhibitRules:
     - equal:
         - alertname
@@ -51,11 +51,11 @@ spec:
       sourceMatch:
         - name: severity
           value: critical
-          matchType: =
+          matchType: "="
       targetMatch:
         - name: severity
           value: warning
-          matchType: =
+          matchType: "="
   receivers:
     - name: "null"
     - name: discord-calamityxi-search-server

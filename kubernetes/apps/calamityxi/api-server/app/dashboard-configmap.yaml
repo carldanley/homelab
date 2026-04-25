@@ -33,12 +33,12 @@ data:
       "panels": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "fieldConfig": { "defaults": { "min": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] } }, "overrides": [] },
+          "fieldConfig": { "defaults": { "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 1 }] } }, "overrides": [] },
           "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
           "id": 1,
           "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [{ "expr": "max(calamityxi_api_server_status_online{namespace=\"calamityxi\"}) or vector(0)", "legendFormat": "online", "refId": "A" }],
-          "title": "Server Online",
+          "targets": [{ "expr": "min(calamityxi_api_server_component_ready{namespace=\"calamityxi\",component=~\"api|world|connect|search\"}) or vector(0)", "legendFormat": "ready", "refId": "A" }],
+          "title": "Core Components Ready",
           "type": "stat"
         },
         {
@@ -77,8 +77,8 @@ data:
           "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
           "id": 5,
           "options": { "colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
-          "targets": [{ "expr": "max(calamityxi_launcher_active_instances{namespace=\"calamityxi\"}) or vector(0)", "legendFormat": "launchers", "refId": "A" }],
-          "title": "Active Launchers",
+          "targets": [{ "expr": "max(calamityxi_api_server_private_shard_counts{namespace=\"calamityxi\",state=\"ready\"}) or vector(0)", "legendFormat": "ready", "refId": "A" }],
+          "title": "Ready Private Shards",
           "type": "stat"
         },
         {
@@ -130,8 +130,8 @@ data:
           "gridPos": { "h": 7, "w": 8, "x": 8, "y": 12 },
           "id": 10,
           "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
-          "targets": [{ "expr": "max by (map_port) (calamityxi_api_server_public_shard_heartbeat_age_seconds{namespace=\"calamityxi\"})", "legendFormat": "{{map_port}}", "refId": "A" }],
-          "title": "Map Heartbeat Age",
+          "targets": [{ "expr": "max(calamityxi_api_server_public_shard_heartbeat_age_seconds{namespace=\"calamityxi\"}) or vector(0)", "legendFormat": "oldest", "refId": "A" }],
+          "title": "Oldest Public Shard Heartbeat Age",
           "type": "timeseries"
         },
         {
@@ -140,7 +140,7 @@ data:
           "gridPos": { "h": 7, "w": 8, "x": 16, "y": 12 },
           "id": 11,
           "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
-          "targets": [{ "expr": "max by (component) (calamityxi_api_server_component_ready{namespace=\"calamityxi\"})", "legendFormat": "{{component}}", "refId": "A" }],
+          "targets": [{ "expr": "min by (component) (calamityxi_api_server_component_ready{namespace=\"calamityxi\",component=~\"api|world|connect|search\"})", "legendFormat": "{{component}}", "refId": "A" }],
           "title": "Component Readiness",
           "type": "timeseries"
         },
@@ -165,10 +165,90 @@ data:
           "id": 13,
           "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
           "targets": [
-            { "expr": "max(calamityxi_api_server_status_cache_age_seconds{namespace=\"calamityxi\"})", "legendFormat": "cache age", "refId": "A" },
-            { "expr": "max(calamityxi_api_server_status_snapshot_age_seconds{namespace=\"calamityxi\"})", "legendFormat": "snapshot age", "refId": "B" }
+            { "expr": "max(calamityxi_api_server_status_snapshot_age_seconds{namespace=\"calamityxi\"}) or vector(0)", "legendFormat": "snapshot age", "refId": "A" }
           ],
-          "title": "Status Freshness",
+          "title": "Status Snapshot Age",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 },
+          "id": 14,
+          "panels": [],
+          "title": "SSE Streams",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "min": 0, "unit": "short", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 400 }, { "color": "red", "value": 475 }] } }, "overrides": [] },
+          "gridPos": { "h": 4, "w": 8, "x": 0, "y": 27 },
+          "id": 15,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [{ "expr": "sum by (stream) (calamityxi_api_server_sse_connections{namespace=\"calamityxi\"})", "legendFormat": "{{stream}}", "refId": "A" }],
+          "title": "SSE Active Connections",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "min": 0, "max": 100, "unit": "percent", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 80 }, { "color": "red", "value": 95 }] } }, "overrides": [] },
+          "gridPos": { "h": 4, "w": 8, "x": 8, "y": 27 },
+          "id": 16,
+          "options": { "colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [{ "expr": "100 * max(sum by (instance) (calamityxi_api_server_sse_connections{namespace=\"calamityxi\"}) / clamp_min(max by (instance) (calamityxi_api_server_sse_connection_limit{namespace=\"calamityxi\"}), 1))", "legendFormat": "highest pod", "refId": "A" }],
+          "title": "SSE Shared Limit Used",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "min": 0, "unit": "Bps", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 524288 }, { "color": "red", "value": 1048576 }] } }, "overrides": [] },
+          "gridPos": { "h": 4, "w": 8, "x": 16, "y": 27 },
+          "id": 17,
+          "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+          "targets": [{ "expr": "sum(rate(calamityxi_api_server_sse_bytes_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "bytes/sec", "refId": "A" }],
+          "title": "SSE Outbound Bytes/sec",
+          "type": "stat"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "ops", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 31 },
+          "id": 18,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [{ "expr": "sum by (stream, result) (rate(calamityxi_api_server_sse_connections_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "{{stream}} {{result}}", "refId": "A" }],
+          "title": "SSE Connection Rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "ops", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 31 },
+          "id": 19,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [{ "expr": "sum by (stream, event) (rate(calamityxi_api_server_sse_events_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "{{stream}} {{event}}", "refId": "A" }],
+          "title": "SSE Event Rate",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "Bps", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 524288 }, { "color": "red", "value": 1048576 }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 0, "y": 38 },
+          "id": 20,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [{ "expr": "sum by (stream, event) (rate(calamityxi_api_server_sse_bytes_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "{{stream}} {{event}}", "refId": "A" }],
+          "title": "SSE Outbound Bytes by Event",
+          "type": "timeseries"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "fieldConfig": { "defaults": { "custom": { "drawStyle": "line", "lineInterpolation": "linear", "barAlignment": 0, "lineWidth": 1, "fillOpacity": 10, "gradientMode": "none", "spanNulls": false, "insertNulls": false, "showPoints": "never", "pointSize": 5, "stacking": { "mode": "none", "group": "A" }, "axisPlacement": "auto", "axisLabel": "", "axisColorMode": "text", "scaleDistribution": { "type": "linear" }, "hideFrom": { "tooltip": false, "viz": false, "legend": false }, "thresholdsStyle": { "mode": "off" } }, "mappings": [], "unit": "ops", "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.001 }, { "color": "red", "value": 0.01 }] } }, "overrides": [] },
+          "gridPos": { "h": 7, "w": 12, "x": 12, "y": 38 },
+          "id": 21,
+          "options": { "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "single", "sort": "none" } },
+          "targets": [
+            { "expr": "sum by (stream, event) (rate(calamityxi_api_server_sse_write_failures_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "write {{stream}} {{event}}", "refId": "A" },
+            { "expr": "sum by (stream) (rate(calamityxi_api_server_sse_dropped_updates_total{namespace=\"calamityxi\"}[5m]))", "legendFormat": "dropped {{stream}}", "refId": "B" }
+          ],
+          "title": "SSE Write Failures and Dropped Updates",
           "type": "timeseries"
         }
       ],

@@ -100,36 +100,134 @@ spec:
               the current homelab shard count, so this probably means the noisy
               old sidecar behavior is still deployed or some damn retry loop is
               misbehaving.
-    - name: api-server.status
+    - name: api-server.sse
       rules:
-        - alert: APIServerStatusOffline
+        - alert: APIServerSSEConnectionsNearLimit
           expr: |-
-            max(calamityxi_api_server_status_online{namespace="calamityxi"}) < 1
-          for: 5m
-          labels:
-            severity: critical
-            discord_channel: calamity-api-server
-          annotations:
-            summary: >-
-              public server status is offline
-            description: >-
-              The API status snapshot reports serverOnline=false for five
-              minutes.
-        - alert: APIServerStatusDegraded
-          expr: |-
-            max(calamityxi_api_server_status_degraded{namespace="calamityxi"}) > 0
+            max(
+              sum by (namespace, instance) (calamityxi_api_server_sse_connections{namespace="calamityxi"})
+              /
+              clamp_min(max by (namespace, instance) (calamityxi_api_server_sse_connection_limit{namespace="calamityxi"}), 1)
+            ) > 0.80
           for: 10m
           labels:
             severity: warning
             discord_channel: calamity-api-server
           annotations:
             summary: >-
-              public server status is degraded
+              api-server SSE connections are near the per-pod cap
             description: >-
-              The API status snapshot reports degraded=true for ten minutes.
+              One api-server pod has had active SSE connections above 80% of
+              its configured shared SSE connection limit for ten minutes.
+        - alert: APIServerSSEConnectionsAtLimit
+          expr: |-
+            max(
+              sum by (namespace, instance) (calamityxi_api_server_sse_connections{namespace="calamityxi"})
+              /
+              clamp_min(max by (namespace, instance) (calamityxi_api_server_sse_connection_limit{namespace="calamityxi"}), 1)
+            ) > 0.95
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server SSE connections are at the per-pod cap
+            description: >-
+              One api-server pod has had active SSE connections above 95% of
+              its configured shared SSE connection limit for five minutes.
+        - alert: APIServerSSEConnectionsRejected
+          expr: |-
+            sum(rate(calamityxi_api_server_sse_connections_total{namespace="calamityxi",result="rejected"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server is rejecting SSE connections
+            description: >-
+              The API has returned SSE capacity 503s for five minutes. Clients
+              will retry, but the stream cap is full and needs attention before
+              this turns into reconnect churn.
+        - alert: APIServerSSEWriteFailures
+          expr: |-
+            sum(rate(calamityxi_api_server_sse_write_failures_total{namespace="calamityxi"}[5m])) > 0
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server SSE writes are failing
+            description: >-
+              SSE writes or flushes have failed for ten minutes. This usually
+              means slow clients, closed connections, or a proxy path doing
+              something unhelpful.
+        - alert: APIServerSSEDroppedStatusUpdates
+          expr: |-
+            sum(rate(calamityxi_api_server_sse_dropped_updates_total{namespace="calamityxi",stream="status"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server status SSE subscribers are falling behind
+            description: >-
+              Status SSE subscriber queues are dropping compact updates and
+              needing full snapshot repair for five minutes. That is exactly the
+              guardrail doing its job, but it still means clients or network
+              paths are too damn slow.
+        - alert: APIServerSSEOutboundBandwidthHigh
+          expr: |-
+            sum(rate(calamityxi_api_server_sse_bytes_total{namespace="calamityxi"}[5m])) > 1048576
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server SSE outbound bandwidth is unusually high
+            description: >-
+              SSE outbound traffic has stayed above 1 MiB/s for ten minutes.
+              Check connection counts and event rates before this becomes an
+              avoidable bandwidth problem.
+    - name: api-server.status
+      rules:
+        - alert: APIServerComponentUnavailable
+          expr: |-
+            max by (component, status) (
+              calamityxi_api_server_component_status{namespace="calamityxi",component=~"api|world|connect|search",status=~"offline|unknown"}
+            ) > 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server core component is unavailable
+            description: >-
+              The compact status snapshot has reported {{ $labels.component }}
+              as {{ $labels.status }} for five minutes.
+        - alert: APIServerComponentDegraded
+          expr: |-
+            max by (component) (
+              calamityxi_api_server_component_status{namespace="calamityxi",component=~"api|world|connect|search",status="degraded"}
+            ) > 0
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server core component is degraded
+            description: >-
+              The compact status snapshot has reported {{ $labels.component }}
+              as degraded for ten minutes.
         - alert: APIServerPublicShardsUnhealthy
           expr: |-
-            max(calamityxi_api_server_public_shards{namespace="calamityxi",health=~"degraded|offline"}) > 0
+            sum(calamityxi_api_server_public_shards{namespace="calamityxi",health=~"degraded|offline"}) > 0
           for: 5m
           labels:
             severity: critical
@@ -141,19 +239,45 @@ spec:
               The API status snapshot reports degraded or offline public shards.
               Check map heartbeat age, map pods, and route-state before players
               trip over this crap.
-        - alert: APIServerStatusCacheStale
+        - alert: APIServerPrivateShardsUnhealthy
           expr: |-
-            max(calamityxi_api_server_status_cache_stale{namespace="calamityxi"}) > 0
+            sum(calamityxi_api_server_private_shards{namespace="calamityxi",health=~"degraded|offline"}) > 0
           for: 5m
           labels:
             severity: warning
             discord_channel: calamity-api-server
           annotations:
             summary: >-
-              api-server rich status cache is stale
+              one or more private shards are unhealthy
             description: >-
-              The API is serving stale rich status data because refresh
-              dependencies are failing or lagging.
+              The API status snapshot reports degraded or offline private
+              shards for five minutes.
+        - alert: APIServerStatusSnapshotStale
+          expr: |-
+            max(calamityxi_api_server_status_snapshot_age_seconds{namespace="calamityxi"}) > 60
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server status snapshot is stale
+            description: >-
+              The compact status snapshot has been older than 60 seconds for
+              five minutes. The status refresh path is lagging or busted.
+        - alert: APIServerPlayerCountStale
+          expr: |-
+            max(calamityxi_api_server_player_count_stale{namespace="calamityxi"}) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamity-api-server
+          annotations:
+            summary: >-
+              api-server player count is stale
+            description: >-
+              The status hydration player count has been stale for five
+              minutes.
     - name: api-server.launcher-telemetry
       rules:
         - alert: APIServerLauncherErrorEventsHigh
