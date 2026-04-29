@@ -15,7 +15,7 @@ spec:
   world:
     image:
       repository: ghcr.io/calamityffxi/world-server
-      tag: v0.1.7
+      tag: v0.1.8
     replicas: 2
     readyDelaySeconds: 10
     resources:
