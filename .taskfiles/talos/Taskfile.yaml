@@ -2,11 +2,12 @@
 version: "3"
 
 vars:
-  SYSTEM_UPGRADE_KS: "{{ .KUBERNETES_DIR }}/apps/system-upgrade/system-upgrade-controller/ks.yaml"
+  KUBERNETES_UPGRADE_FILE: "{{ .KUBERNETES_DIR }}/apps/system-upgrade/tuppr/upgrades/kubernetes.yaml"
+  TALOS_UPGRADE_FILE: "{{ .KUBERNETES_DIR }}/apps/system-upgrade/tuppr/upgrades/talos.yaml"
   KUBERNETES_VERSION:
-    sh: yq '.spec.postBuild.substitute.KUBERNETES_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
+    sh: yq '.spec.kubernetes.version | select(.)' {{ .KUBERNETES_UPGRADE_FILE }}
   TALOS_VERSION:
-    sh: yq '.spec.postBuild.substitute.TALOS_VERSION | select(.)' {{ .SYSTEM_UPGRADE_KS }}
+    sh: yq '.spec.talos.version | select(.)' {{ .TALOS_UPGRADE_FILE }}
   TALOS_SCHEMATIC_AMD:
     sh: |-
       curl --silent -X POST --data-binary @{{.TALOS_DIR}}/schematic.amd.yaml https://factory.talos.dev/schematics \
@@ -123,7 +124,7 @@ tasks:
       - test -f {{ .TALOS_DIR }}/registry-auth-config.yaml.j2
 
       # make sure we're logged into onepassword
-      - op whoami --format=json &>/dev/null
+      - op vault list &>/dev/null
 
   write-talconfig:
     desc: Write the Talos config to disk [FILE=optional]
@@ -174,7 +175,7 @@ tasks:
       - test -n "{{ .TALOSCONFIG_PATH }}"
 
       # make sure we're logged into onepassword
-      - op whoami --format=json &>/dev/null
+      - op vault list &>/dev/null
 
   write-kubeconfig:
     desc: Write kubeconfig

@@ -59,4 +59,4 @@ tasks:
       - test -f {{ .BOOTSTRAP_DIR }}/post-cni/helmfile.yaml
 
       # make sure we're logged into onepassword
-      - op whoami --format=json &>/dev/null
+      - op vault list &>/dev/null
