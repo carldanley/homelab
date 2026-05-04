@@ -10,6 +10,9 @@ spec:
     name: app-template
     namespace: flux-system
   values:
+    global:
+      createDefaultServiceAccount: false
+
     controllers:
       gatus:
         annotations:
@@ -66,6 +69,7 @@ spec:
           name: gatus
 
     defaultPodOptions:
+      automountServiceAccountToken: true
       hostUsers: false
       securityContext:
         runAsNonRoot: true
