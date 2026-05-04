@@ -10,6 +10,9 @@ spec:
     name: app-template
     namespace: flux-system
   values:
+    global:
+      createDefaultServiceAccount: false
+
     controllers:
       barman-cloud:
         containers:
@@ -64,6 +67,7 @@ spec:
           name: *app
 
     defaultPodOptions:
+      automountServiceAccountToken: true
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
