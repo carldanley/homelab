@@ -84,7 +84,10 @@ spec:
         memory: 256Mi
       limits:
         memory: 512Mi
-    publicIPv4DiscoveryURL: https://api.ipify.org
+    publicIPv4From:
+      secretKeyRef:
+        name: calamityxi-game-server-common-credentials-secret
+        key: VPS_ENDPOINT_HOST
     heartbeat:
       image:
         repository: ghcr.io/calamityffxi/map-heartbeat-sidecar
