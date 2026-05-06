@@ -21,7 +21,7 @@ spec:
           app:
             image:
               repository: ghcr.io/calamityffxi/website
-              tag: v0.1.13
+              tag: v0.1.14
             resources:
               requests:
                 cpu: 50m
