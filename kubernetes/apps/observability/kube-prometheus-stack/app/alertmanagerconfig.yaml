@@ -44,6 +44,11 @@ spec:
           - name: discord_channel
             value: calamity-api-server
             matchType: "="
+      - receiver: discord-homelab-alerts
+        matchers:
+          - name: discord_channel
+            value: homelab-alerts
+            matchType: "="
   inhibitRules:
     - equal:
         - alertname
@@ -87,4 +92,10 @@ spec:
         - apiURL:
             name: alertmanager-discord-webhooks
             key: calamity-api-server
+          sendResolved: true
+    - name: discord-homelab-alerts
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhooks
+            key: homelab-alerts
           sendResolved: true

@@ -16,3 +16,18 @@ spec:
               The host {{ $labels.instance }} is down
           labels:
             severity: critical
+
+        - alert: PlexUnavailableOnTrueNAS
+          expr: |
+            probe_success{instance="http://nas.batcave:32400/identity"} == 0
+          for: 5m
+          annotations:
+            summary: >-
+              Plex on TrueNAS is unavailable
+            description: >-
+              The Kubernetes blackbox probe cannot get a healthy response from Plex at
+              http://nas.batcave:32400/identity. TrueNAS may be reachable while its
+              Apps/Docker service or Plex container is down.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
