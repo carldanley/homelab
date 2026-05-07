@@ -26,6 +26,12 @@ spec:
     controller:
       logLevel: info
     monitoring:
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
       serviceMonitor:
         enabled: true
       prometheusRule:

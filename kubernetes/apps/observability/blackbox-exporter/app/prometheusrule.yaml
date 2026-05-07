@@ -30,4 +30,3 @@ spec:
               Apps/Docker service or Plex container is down.
           labels:
             severity: critical
-            discord_channel: homelab-alerts
