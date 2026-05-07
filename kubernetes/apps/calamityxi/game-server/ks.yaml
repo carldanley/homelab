@@ -18,10 +18,15 @@ spec:
     - name: operator
       namespace: *namespace
   healthChecks:
-    - apiVersion: helm.toolkit.fluxcd.io/v2
-      kind: HelmRelease
-      name: *app
+    - apiVersion: runtime.calamityxi.io/v1alpha1
+      kind: CalamityXICluster
+      name: cxi
       namespace: *namespace
+  healthCheckExprs:
+    - apiVersion: runtime.calamityxi.io/v1alpha1
+      kind: CalamityXICluster
+      failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/calamityxi/game-server/app
   postBuild:
