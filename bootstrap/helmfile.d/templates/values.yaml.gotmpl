@@ -1,0 +1,1 @@
+{{ readFile (printf "../../../kubernetes/apps/%s/%s/app/helm/values.yaml" .Release.Namespace .Release.Name) }}
