@@ -12,6 +12,7 @@ resources:
   - ./metrics-server/ks.yaml
   - ./reflector/ks.yaml
   - ./reloader/ks.yaml
+  - ./irqbalance/ks.yaml
   - ./descheduler/ks.yaml
   - ./amd-device-plugin/ks.yaml
   - ./intel-device-plugin/ks.yaml
