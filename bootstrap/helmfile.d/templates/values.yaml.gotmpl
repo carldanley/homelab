@@ -1,1 +1,17 @@
-{{ readFile (printf "../../../kubernetes/apps/%s/%s/app/helm/values.yaml" .Release.Namespace .Release.Name) }}
+{{- $helmReleasePath := printf "../../../kubernetes/apps/%s/%s/app/helmrelease.yaml" .Release.Namespace .Release.Name -}}
+{{- $values := dict -}}
+{{- $found := false -}}
+{{- range $document := splitList "\n---" (readFile $helmReleasePath) -}}
+  {{- $resource := fromYaml $document -}}
+  {{- if and $resource (eq (index $resource "kind") "HelmRelease") -}}
+    {{- $spec := index $resource "spec" -}}
+    {{- if and $spec (hasKey $spec "values") -}}
+      {{- $values = index $spec "values" -}}
+      {{- $found = true -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if not $found -}}
+{{- fail (printf "missing inline HelmRelease spec.values for %s/%s" .Release.Namespace .Release.Name) -}}
+{{- end -}}
+{{ toYaml $values }}
