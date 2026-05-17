@@ -16,9 +16,9 @@ machine:
             # Permanently unplugged for now; uncomment when a second switch port is available.
             # - hardwareAddr: "58:47:ca:7a:8c:cb"
             #   driver: i40e
-          mode: 802.3ad
-          xmitHashPolicy: layer3+4
-          lacpRate: fast
+          mode: active-backup
+          # xmitHashPolicy: layer3+4
+          # lacpRate: fast
           miimon: 1000
         dhcp: true
         mtu: 1500
