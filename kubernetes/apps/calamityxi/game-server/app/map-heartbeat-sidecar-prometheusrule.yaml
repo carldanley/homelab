@@ -1,0 +1,64 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: map-heartbeat-sidecar
+  namespace: calamityxi
+  labels:
+    app.kubernetes.io/name: map-heartbeat-sidecar
+spec:
+  groups:
+    - name: map-heartbeat-sidecar.rules
+      rules:
+        - alert: MapHeartbeatSidecarContainerNotReady
+          expr: |
+            max by (namespace, pod) (
+              kube_pod_container_status_ready{namespace="calamityxi",container="heartbeat",pod=~"cxi-map-.*"}
+            ) == 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map heartbeat sidecar container is not ready
+            description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} has been unready for five minutes. Kubernetes will remove this pod from map Service endpoints, so the shard may not receive client traffic.
+
+        - alert: MapHeartbeatSidecarMetricsAbsent
+          expr: absent(map_heartbeat_sidecar_ready{namespace="calamityxi"})
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map heartbeat sidecar metrics are absent
+            description: Prometheus has not scraped any map heartbeat sidecar metrics in calamityxi for five minutes. Check the PodMonitor, pod labels, and heartbeat sidecar HTTP port.
+
+        - alert: MapHeartbeatSidecarPodNotReady
+          expr: map_heartbeat_sidecar_ready{namespace="calamityxi"} == 0
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map heartbeat sidecar pod is not ready
+            description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} has reported not-ready for five minutes. Kubernetes will remove this pod from map Service endpoints, so the shard may not receive client traffic.
+
+        - alert: MapHeartbeatSidecarHeartbeatStale
+          expr: map_heartbeat_sidecar_heartbeat_age_seconds{namespace="calamityxi"} > 30
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map heartbeat is stale
+            description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} has not accepted a fresh xi_map heartbeat for more than 30 seconds.
+
+        - alert: MapHeartbeatSidecarDroppedHeartbeats
+          expr: sum by (namespace, pod) (increase(map_heartbeat_sidecar_heartbeats_total{namespace="calamityxi",result="dropped"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map heartbeat sidecar is dropping heartbeats
+            description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} has dropped stale or duplicate heartbeat datagrams for five minutes. Check xi_map restarts, sequence resets, and sidecar logs.

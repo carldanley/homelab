@@ -14,6 +14,8 @@ resources:
   - ./world-server-prometheusrule.yaml
   - ./connect-server-prometheusrule.yaml
   - ./operator-prometheusrule.yaml
+  - ./map-heartbeat-sidecar-podmonitor.yaml
+  - ./map-heartbeat-sidecar-prometheusrule.yaml
 
 configMapGenerator:
   - name: operator-dashboard

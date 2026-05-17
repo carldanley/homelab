@@ -14,7 +14,7 @@ spec:
           for: 5m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server metrics are absent
@@ -28,7 +28,7 @@ spec:
           for: 2m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server metrics scrape is down
@@ -40,7 +40,7 @@ spec:
           for: 5m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server is missing ready replicas
@@ -59,7 +59,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server HTTP 5xx rate is elevated
@@ -77,7 +77,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server HTTP latency p95 is high
@@ -90,7 +90,7 @@ spec:
           for: 15m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server map heartbeat traffic is high
@@ -112,7 +112,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server SSE connections are near the per-pod cap
@@ -129,7 +129,7 @@ spec:
           for: 5m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server SSE connections are at the per-pod cap
@@ -142,7 +142,7 @@ spec:
           for: 5m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server is rejecting SSE connections
@@ -156,7 +156,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server SSE writes are failing
@@ -170,7 +170,7 @@ spec:
           for: 5m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server status SSE subscribers are falling behind
@@ -185,7 +185,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server SSE outbound bandwidth is unusually high
@@ -203,7 +203,7 @@ spec:
           for: 5m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server core component is unavailable
@@ -218,7 +218,7 @@ spec:
           for: 10m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server core component is degraded
@@ -231,7 +231,7 @@ spec:
           for: 5m
           labels:
             severity: critical
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               one or more public shards are unhealthy
@@ -245,7 +245,7 @@ spec:
           for: 5m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               one or more private shards are unhealthy
@@ -258,7 +258,7 @@ spec:
           for: 5m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server status snapshot is stale
@@ -271,7 +271,7 @@ spec:
           for: 5m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               api-server player count is stale
@@ -286,7 +286,7 @@ spec:
           for: 15m
           labels:
             severity: warning
-            discord_channel: calamity-api-server
+            discord_channel: calamityxi-api-server
           annotations:
             summary: >-
               launcher error telemetry is elevated

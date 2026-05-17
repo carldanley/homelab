@@ -39,10 +39,15 @@ spec:
           - name: discord_channel
             value: calamityxi-operator
             matchType: "="
-      - receiver: discord-calamity-api-server
+      - receiver: discord-calamityxi-api-server
         matchers:
           - name: discord_channel
-            value: calamity-api-server
+            value: calamityxi-api-server
+            matchType: "="
+      - receiver: discord-calamityxi-map-servers
+        matchers:
+          - name: discord_channel
+            value: calamityxi-map-servers
             matchType: "="
       - receiver: discord-homelab-alerts
         matchers:
@@ -87,11 +92,17 @@ spec:
             name: alertmanager-discord-webhooks
             key: calamityxi-operator
           sendResolved: true
-    - name: discord-calamity-api-server
+    - name: discord-calamityxi-api-server
       discordConfigs:
         - apiURL:
             name: alertmanager-discord-webhooks
-            key: calamity-api-server
+            key: calamityxi-api-server
+          sendResolved: true
+    - name: discord-calamityxi-map-servers
+      discordConfigs:
+        - apiURL:
+            name: alertmanager-discord-webhooks
+            key: calamityxi-map-servers
           sendResolved: true
     - name: discord-homelab-alerts
       discordConfigs:
