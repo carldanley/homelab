@@ -11,7 +11,5 @@ spec:
   values:
     dashboard:
       enabled: true
-      labels:
-        app.kubernetes.io/managed-by: grafana-operator
     serviceMonitor:
       enabled: true

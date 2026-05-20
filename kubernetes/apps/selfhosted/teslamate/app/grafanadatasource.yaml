@@ -9,13 +9,13 @@ spec:
     - targetPath: user
       valueFrom:
         secretKeyRef:
-          name: grafana-secret
-          key: TESLAMATE_DATABASE_USER
+          name: teslamate-secret
+          key: DATABASE_USER
     - targetPath: secureJsonData.password
       valueFrom:
         secretKeyRef:
-          name: grafana-secret
-          key: TESLAMATE_DATABASE_PASSWORD
+          name: teslamate-secret
+          key: DATABASE_PASS
   instanceSelector:
     matchLabels:
       dashboards: grafana
@@ -26,9 +26,9 @@ spec:
     access: proxy
     url: postgres-ro.databases.svc.cluster.local:5432
     database: teslamate
-    user: "${TESLAMATE_DATABASE_USER}"
+    user: teslamate
     secureJsonData:
-      password: "${TESLAMATE_DATABASE_PASSWORD}"
+      password: placeholder
     jsonData:
       postgresVersion: 1500
       sslmode: disable

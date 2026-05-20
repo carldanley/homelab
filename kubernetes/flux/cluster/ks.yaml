@@ -65,6 +65,8 @@ spec:
                     cleanupOnFail: true
                     recreate: true
                   timeout: 10m
+                  driftDetection:
+                    mode: enabled
                   upgrade:
                     cleanupOnFail: true
                     crds: CreateReplace
