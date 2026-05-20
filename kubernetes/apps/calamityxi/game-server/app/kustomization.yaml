@@ -3,11 +3,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./calamityxi-cluster.yaml
-  - ./world-server-dashboard-configmap.yaml
+  - ./grafanadashboard.yaml
   - ./world-server-servicemonitor.yaml
-  - ./connect-server-dashboard-configmap.yaml
   - ./connect-server-servicemonitor.yaml
-  - ./search-server-dashboard-configmap.yaml
   - ./search-server-servicemonitor.yaml
   - ./search-worker-servicemonitor.yaml
   - ./search-server-prometheusrule.yaml
@@ -18,15 +16,17 @@ resources:
   - ./map-heartbeat-sidecar-prometheusrule.yaml
 
 configMapGenerator:
-  - name: operator-dashboard
-    namespace: calamityxi
+  - name: grafana-dashboard-calamityxi-connect-server-overview
     files:
-      - operator-overview.json=./operator-overview.json
-    options:
-      labels:
-        grafana_dashboard: "1"
-      annotations:
-        grafana_folder: calamityxi
+      - connect-server-overview.json=./resources/connect-server-overview.json
+  - name: grafana-dashboard-calamityxi-search-server-overview
+    files:
+      - search-server-overview.json=./resources/search-server-overview.json
+  - name: grafana-dashboard-calamityxi-world-server-overview
+    files:
+      - world-server-overview.json=./resources/world-server-overview.json
 
 generatorOptions:
   disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/managed-by: grafana-operator

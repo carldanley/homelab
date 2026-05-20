@@ -5,6 +5,8 @@ kind: Kustomization
 resources:
   - ./alertmanagerconfig.yaml
   - ./externalsecret.yaml
+  - ./grafanadashboard.yaml
+  - ./grafanadatasource.yaml
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
   - ./dnsendpoint.yaml

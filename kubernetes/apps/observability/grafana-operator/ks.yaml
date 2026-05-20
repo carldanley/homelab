@@ -40,8 +40,15 @@ spec:
       namespace: *namespace
     - name: grafana-operator
       namespace: *namespace
+    - name: rook-ceph-cluster
+      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/observability/grafana-operator/instance
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository
