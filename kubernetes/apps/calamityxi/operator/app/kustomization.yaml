@@ -9,6 +9,7 @@ resources:
   - ./helmrelease.yaml
   - ./operator-job-rbac.yaml
   - ./prometheusrule.yaml
+  - ./servicemonitor.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-calamityxi-operator-overview
