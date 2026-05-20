@@ -16,3 +16,4 @@ resources:
   - ./fluent-bit/ks.yaml
   - ./victoria-logs/ks.yaml
   - ./grafana/ks.yaml
+  - ./grafana-operator/ks.yaml

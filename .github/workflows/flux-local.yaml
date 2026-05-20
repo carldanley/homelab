@@ -42,7 +42,7 @@ jobs:
           jq -n --arg auth "${auth}" '{auths: {"ghcr.io": {"auth": $auth}}}' > "${GITHUB_WORKSPACE}/.tmp/ghcr-docker-config.json"
 
       - name: Run flux-local test
-        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
+        uses: docker://ghcr.io/allenporter/flux-local:v8.2.0
         with:
           args: >-
             test
@@ -88,7 +88,7 @@ jobs:
 
       - name: Run flux-local diff (HelmRelease)
         if: ${{ matrix.resource == 'helmrelease' }}
-        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
+        uses: docker://ghcr.io/allenporter/flux-local:v8.2.0
         with:
           args: >-
             diff helmrelease
@@ -104,7 +104,7 @@ jobs:
 
       - name: Run flux-local diff (Kustomization)
         if: ${{ matrix.resource == 'kustomization' }}
-        uses: docker://ghcr.io/allenporter/flux-local:v8.0.1
+        uses: docker://ghcr.io/allenporter/flux-local:v8.2.0
         with:
           args: >-
             diff kustomization

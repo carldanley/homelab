@@ -11,6 +11,7 @@
     "github>carldanley/homelab//.renovate/groups.json5",
     "github>carldanley/homelab//.renovate/labels.json5",
     "github>carldanley/homelab//.renovate/semanticCommits.json5",
+    "github>carldanley/homelab//.renovate/talosFactory.json5",
     ":automergeBranch",
     ":dependencyDashboard",
     ":disableRateLimiting",
