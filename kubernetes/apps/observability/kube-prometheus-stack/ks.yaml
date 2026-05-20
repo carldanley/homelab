@@ -21,6 +21,14 @@ spec:
       name: *app
       namespace: *namespace
   healthCheckExprs:
+    - apiVersion: monitoring.coreos.com/v1
+      kind: Alertmanager
+      failed: status.conditions.filter(e, e.type == 'Available').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Available').all(e, e.status == 'True')
+    - apiVersion: monitoring.coreos.com/v1
+      kind: Prometheus
+      failed: status.conditions.filter(e, e.type == 'Available').all(e, e.status == 'False')
+      current: status.conditions.filter(e, e.type == 'Available').all(e, e.status == 'True')
     - apiVersion: external-secrets.io/v1
       kind: ExternalSecret
       failed: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'False')

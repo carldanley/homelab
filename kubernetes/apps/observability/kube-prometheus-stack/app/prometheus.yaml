@@ -1,0 +1,89 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: kube-prometheus-stack
+  labels:
+    app: kube-prometheus-stack-prometheus
+    app.kubernetes.io/instance: kube-prometheus-stack
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: kube-prometheus-stack
+    helm.toolkit.fluxcd.io/name: kube-prometheus-stack
+    helm.toolkit.fluxcd.io/namespace: observability
+    heritage: Helm
+    release: kube-prometheus-stack
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - prometheus
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                    - kube-prometheus-stack
+            topologyKey: kubernetes.io/hostname
+          weight: 100
+  alerting:
+    alertmanagers:
+      - apiVersion: v2
+        name: kube-prometheus-stack-alertmanager
+        namespace: observability
+        pathPrefix: /
+        port: http-web
+  automountServiceAccountToken: true
+  enableAdminAPI: false
+  enableOTLPReceiver: false
+  externalUrl: "https://prometheus.${DOMAIN_5}"
+  hostNetwork: false
+  image: docker.io/prompp/prompp:0.7.11
+  imagePullPolicy: IfNotPresent
+  listenLocal: false
+  logFormat: logfmt
+  logLevel: info
+  paused: false
+  podMonitorNamespaceSelector: {}
+  podMonitorSelector: {}
+  portName: http-web
+  probeNamespaceSelector: {}
+  probeSelector: {}
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+    limits:
+      memory: 4Gi
+  retention: 14d
+  retentionSize: 50GB
+  routePrefix: /
+  ruleNamespaceSelector: {}
+  ruleSelector: {}
+  scrapeConfigNamespaceSelector: {}
+  scrapeConfigSelector: {}
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 64535
+    runAsGroup: 64535
+    fsGroup: 64535
+    seccompProfile:
+      type: RuntimeDefault
+  serviceAccountName: kube-prometheus-stack-prometheus
+  serviceMonitorNamespaceSelector: {}
+  serviceMonitorSelector: {}
+  shards: 1
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: ceph-block
+        resources:
+          requests:
+            storage: 50Gi
+  tsdb:
+    outOfOrderTimeWindow: 0s
+  version: v2.55.1
+  walCompression: true

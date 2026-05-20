@@ -3,10 +3,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - ./alertmanager.yaml
   - ./alertmanagerconfig.yaml
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
   - ./grafanadatasource.yaml
   - ./helmrelease.yaml
+  - ./prometheus.yaml
   - ./prometheusrule.yaml
   - ./dnsendpoint.yaml
