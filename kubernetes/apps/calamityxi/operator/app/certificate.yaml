@@ -4,14 +4,14 @@ kind: Certificate
 metadata:
   name: game-server-connect
 spec:
-  commonName: calamityxi
+  commonName: "login.${DOMAIN_8}"
   dnsNames:
     - "login.${DOMAIN_8}"
   duration: 2160h
   isCA: false
   issuerRef:
-    name: calamityxi
-    kind: Issuer
+    name: letsencrypt-production
+    kind: ClusterIssuer
     group: cert-manager.io
   renewBefore: 360h
   secretName: game-server-connect-tls
