@@ -38,7 +38,7 @@ spec:
   connect:
     image:
       repository: ghcr.io/calamityffxi/connect-server
-      tag: v0.1.3
+      tag: v0.1.4
       pullPolicy: IfNotPresent
     replicas: 3
     antiAffinityPolicy: Required
@@ -50,6 +50,13 @@ spec:
         value: "6379"
       - name: CONNECT_VALKEY_PREFIX
         value: "calamityxi:connect"
+      - name: CONNECT_ENV
+        value: "production"
+      - name: &hmacSecretKey CONNECT_DEVICE_HMAC_SECRET
+        valueFrom:
+          secretKeyRef:
+            name: calamityxi-connect-server-secret
+            key: *hmacSecretKey
     resources:
       requests:
         cpu: 250m
