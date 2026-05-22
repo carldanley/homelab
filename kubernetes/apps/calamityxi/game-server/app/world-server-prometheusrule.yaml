@@ -227,6 +227,66 @@ spec:
           labels:
             severity: warning
             discord_channel: calamityxi-world-server
+        - alert: WorldServerCalamityEventForcedTimeouts
+          expr: |-
+            sum(rate(calamityxi_world_server_calamity_event_finishes_total{namespace="calamityxi",forced="true"}[15m])) > 0
+          for: 1m
+          annotations:
+            summary: >-
+              calamity event timeout occurred
+            description: >-
+              world-server recorded at least one calamity event timeout, either
+              from graceful event cleanup after its deadline or after the
+              coordinator timeout grace window. Check event logs, cleanup
+              handlers, and the Calamity Events dashboard before enabling the
+              event again.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerCalamityCatalogMissingAtThreshold
+          expr: |-
+            max(calamityxi_world_server_calamity_threshold_zones{namespace="calamityxi"}) > 0
+            and
+            max(calamityxi_world_server_calamity_catalog_fresh_entries{namespace="calamityxi"}) < 1
+          for: 10m
+          annotations:
+            summary: >-
+              zone chaos is thresholded but no calamity events are registered
+            description: >-
+              At least one zone is ready for calamity selection, but
+              world-server has no fresh event manifests. Check map module load,
+              catalog publishing, and recent event unregistration.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerCalamityEventFailuresHigh
+          expr: |-
+            sum(rate(calamityxi_world_server_calamity_event_finishes_total{namespace="calamityxi",outcome=~"failure|timed_out|start_timeout"}[30m])) > 0.05
+          for: 15m
+          annotations:
+            summary: >-
+              calamity event failure rate is elevated
+            description: >-
+              Calamity events are finishing with failure or timeout outcomes
+              more often than expected. Inspect the active event, chain
+              handoffs, and event-owned cleanup paths.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
+        - alert: WorldServerCalamityEventUnregisterSpike
+          expr: |-
+            sum(rate(calamityxi_world_server_calamity_event_unregistrations_total{namespace="calamityxi",result="unregistered"}[15m])) > 0.1
+          for: 5m
+          annotations:
+            summary: >-
+              calamity event unregister activity spiked
+            description: >-
+              Operators or event runners are unregistering calamity events at
+              an unusual rate. Check whether a broken event is repeatedly being
+              removed and republished.
+          labels:
+            severity: warning
+            discord_channel: calamityxi-world-server
         - alert: WorldServerMariaDBConnectFailures
           expr: |-
             sum(rate(calamityxi_world_server_mariadb_connection_events_total{namespace="calamityxi",event="connect_failed"}[5m])) > 0

@@ -1,0 +1,262 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "max(calamityxi_world_server_calamity_catalog_fresh_entries)",
+          "legendFormat": "fresh events",
+          "refId": "A"
+        }
+      ],
+      "title": "Fresh Event Catalog",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "max(calamityxi_world_server_calamity_threshold_zones)",
+          "legendFormat": "threshold zones",
+          "refId": "A"
+        },
+        {
+          "expr": "max(calamityxi_world_server_calamity_runnable_zones)",
+          "legendFormat": "runnable zones",
+          "refId": "B"
+        }
+      ],
+      "title": "Zone Readiness",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (status) (calamityxi_world_server_calamity_runtime_state)",
+          "legendFormat": "{{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Coordinator State",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (event_id, outcome) (rate(calamityxi_world_server_calamity_event_finishes_total[15m]))",
+          "legendFormat": "{{event_id}} {{outcome}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_starts_total[15m]))",
+          "legendFormat": "{{event_id}} start {{result}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Event Starts And Finishes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 12
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_registrations_total[15m]))",
+          "legendFormat": "register {{event_id}} {{result}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_unregistrations_total[15m]))",
+          "legendFormat": "unregister {{event_id}} {{result}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Catalog Churn",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
+      },
+      "id": 6,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, event_id) (rate(calamityxi_world_server_calamity_event_duration_seconds_bucket[30m])))",
+          "legendFormat": "{{event_id}} p95",
+          "refId": "A"
+        }
+      ],
+      "title": "Event Duration",
+      "type": "timeseries"
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": [
+    "calamityxi",
+    "calamities",
+    "world-server"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Calamity Events",
+  "uid": "calamity-events",
+  "version": 1,
+  "weekStart": ""
+}
