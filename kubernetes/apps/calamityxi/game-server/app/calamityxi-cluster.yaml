@@ -6,7 +6,7 @@ spec:
   shared:
     gameServerImage:
       repository: ghcr.io/calamityffxi/custom-game-server
-      tag: v0.1.50
+      tag: v0.1.51
     credentialsSecretName: calamityxi-game-server-common-credentials-secret
     imagePullSecretName: calamityxi-ghcr-secret
   network:
@@ -15,7 +15,7 @@ spec:
   world:
     image:
       repository: ghcr.io/calamityffxi/world-server
-      tag: v0.1.9
+      tag: v0.1.10
     replicas: 2
     readyDelaySeconds: 10
     resources:
