@@ -156,12 +156,12 @@
       },
       "targets": [
         {
-          "expr": "sum by (event_id, outcome) (rate(calamityxi_world_server_calamity_event_finishes_total[15m]))",
-          "legendFormat": "{{event_id}} {{outcome}}",
+          "expr": "sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_finishes_total[$__range]) unless (calamityxi_world_server_calamity_event_finishes_total unless calamityxi_world_server_calamity_event_finishes_total offset $__range)) or (calamityxi_world_server_calamity_event_finishes_total unless calamityxi_world_server_calamity_event_finishes_total offset $__range)) > 0",
+          "legendFormat": "{{event_id}} finish {{outcome}}",
           "refId": "A"
         },
         {
-          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_starts_total[15m]))",
+          "expr": "sum by (event_id, result) ((increase(calamityxi_world_server_calamity_event_starts_total[$__range]) unless (calamityxi_world_server_calamity_event_starts_total unless calamityxi_world_server_calamity_event_starts_total offset $__range)) or (calamityxi_world_server_calamity_event_starts_total unless calamityxi_world_server_calamity_event_starts_total offset $__range)) > 0",
           "legendFormat": "{{event_id}} start {{result}}",
           "refId": "B"
         }
@@ -194,12 +194,12 @@
       },
       "targets": [
         {
-          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_registrations_total[15m]))",
+          "expr": "sum by (event_id, result) ((increase(calamityxi_world_server_calamity_event_registrations_total[$__range]) unless (calamityxi_world_server_calamity_event_registrations_total unless calamityxi_world_server_calamity_event_registrations_total offset $__range)) or (calamityxi_world_server_calamity_event_registrations_total unless calamityxi_world_server_calamity_event_registrations_total offset $__range)) > 0",
           "legendFormat": "register {{event_id}} {{result}}",
           "refId": "A"
         },
         {
-          "expr": "sum by (event_id, result) (rate(calamityxi_world_server_calamity_event_unregistrations_total[15m]))",
+          "expr": "sum by (event_id, result) ((increase(calamityxi_world_server_calamity_event_unregistrations_total[$__range]) unless (calamityxi_world_server_calamity_event_unregistrations_total unless calamityxi_world_server_calamity_event_unregistrations_total offset $__range)) or (calamityxi_world_server_calamity_event_unregistrations_total unless calamityxi_world_server_calamity_event_unregistrations_total offset $__range)) > 0",
           "legendFormat": "unregister {{event_id}} {{result}}",
           "refId": "B"
         }
@@ -232,9 +232,14 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le, event_id) (rate(calamityxi_world_server_calamity_event_duration_seconds_bucket[30m])))",
-          "legendFormat": "{{event_id}} p95",
+          "expr": "histogram_quantile(0.95, sum by (le, event_id, outcome) ((increase(calamityxi_world_server_calamity_event_duration_seconds_bucket[$__range]) unless (calamityxi_world_server_calamity_event_duration_seconds_bucket unless calamityxi_world_server_calamity_event_duration_seconds_bucket offset $__range)) or (calamityxi_world_server_calamity_event_duration_seconds_bucket unless calamityxi_world_server_calamity_event_duration_seconds_bucket offset $__range))) and on (event_id, outcome) (sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_duration_seconds_count[$__range]) unless (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range)) or (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range)) > 0)",
+          "legendFormat": "{{event_id}} {{outcome}} p95",
           "refId": "A"
+        },
+        {
+          "expr": "(sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_duration_seconds_sum[$__range]) unless (calamityxi_world_server_calamity_event_duration_seconds_sum unless calamityxi_world_server_calamity_event_duration_seconds_sum offset $__range)) or (calamityxi_world_server_calamity_event_duration_seconds_sum unless calamityxi_world_server_calamity_event_duration_seconds_sum offset $__range)) / sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_duration_seconds_count[$__range]) unless (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range)) or (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range))) and on (event_id, outcome) (sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_duration_seconds_count[$__range]) unless (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range)) or (calamityxi_world_server_calamity_event_duration_seconds_count unless calamityxi_world_server_calamity_event_duration_seconds_count offset $__range)) > 0)",
+          "legendFormat": "{{event_id}} {{outcome}} avg",
+          "refId": "B"
         }
       ],
       "title": "Event Duration",
@@ -265,14 +270,19 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, sum by (le, event_id, outcome) (rate(calamityxi_world_server_calamity_event_participants_bucket[30m])))",
-          "legendFormat": "{{event_id}} {{outcome}} p95",
+          "expr": "(sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_participants_sum[$__range]) unless (calamityxi_world_server_calamity_event_participants_sum unless calamityxi_world_server_calamity_event_participants_sum offset $__range)) or (calamityxi_world_server_calamity_event_participants_sum unless calamityxi_world_server_calamity_event_participants_sum offset $__range)) / sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_participants_count[$__range]) unless (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range)) or (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range))) and on (event_id, outcome) (sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_participants_count[$__range]) unless (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range)) or (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range)) > 0)",
+          "legendFormat": "{{event_id}} {{outcome}} avg participants",
           "refId": "A"
         },
         {
-          "expr": "sum by (event_id, outcome) (rate(calamityxi_world_server_calamity_event_participants_sum[30m])) / sum by (event_id, outcome) (rate(calamityxi_world_server_calamity_event_participants_count[30m]))",
-          "legendFormat": "{{event_id}} {{outcome}} avg",
+          "expr": "sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_participants_sum[$__range]) unless (calamityxi_world_server_calamity_event_participants_sum unless calamityxi_world_server_calamity_event_participants_sum offset $__range)) or (calamityxi_world_server_calamity_event_participants_sum unless calamityxi_world_server_calamity_event_participants_sum offset $__range)) > 0",
+          "legendFormat": "{{event_id}} {{outcome}} total participants",
           "refId": "B"
+        },
+        {
+          "expr": "sum by (event_id, outcome) ((increase(calamityxi_world_server_calamity_event_participants_count[$__range]) unless (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range)) or (calamityxi_world_server_calamity_event_participants_count unless calamityxi_world_server_calamity_event_participants_count offset $__range)) > 0",
+          "legendFormat": "{{event_id}} {{outcome}} finished events",
+          "refId": "C"
         }
       ],
       "title": "Event Participants",
