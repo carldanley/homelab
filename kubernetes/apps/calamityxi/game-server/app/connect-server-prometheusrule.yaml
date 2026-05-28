@@ -140,3 +140,81 @@ spec:
               connect-server cross-replica frame delivery errors
             description: >-
               Valkey-backed data/view frame delivery is failing or losing target sockets.
+    - name: connect-server.latency
+      rules:
+        - alert: ConnectServerAuthLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (namespace, le, command) (
+                rate(connect_auth_duration_seconds_bucket{namespace="calamityxi",result="success"}[5m])
+              )
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server auth latency p95 is high
+            description: >-
+              Successful {{ $labels.command }} auth p95 latency is above 500ms
+              for ten minutes. Check TCP connect pressure, SQL, Valkey, and
+              world-server handoff latency.
+        - alert: ConnectServerValkeyLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (namespace, le, operation) (
+                rate(connect_valkey_operation_duration_seconds_bucket{namespace="calamityxi",outcome="ok"}[5m])
+              )
+            ) > 0.25
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server Valkey latency p95 is high
+            description: >-
+              Valkey {{ $labels.operation }} p95 latency is above 250ms for ten
+              minutes. Pending login and cross-replica frame delivery can start
+              feeling laggy before outright errors appear.
+        - alert: ConnectServerSQLLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (namespace, le, operation) (
+                rate(connect_sql_operation_duration_seconds_bucket{namespace="calamityxi",outcome!~"error|failed"}[5m])
+              )
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server SQL latency p95 is high
+            description: >-
+              SQL {{ $labels.operation }} p95 latency is above 500ms for ten
+              minutes. Check MariaDB pressure and connection pool waits before
+              tuning login or auth paths.
+        - alert: ConnectServerWorldHTTPLatencyHigh
+          expr: |-
+            histogram_quantile(
+              0.95,
+              sum by (namespace, le, endpoint) (
+                rate(connect_world_http_call_duration_seconds_bucket{namespace="calamityxi",outcome="ok"}[5m])
+              )
+            ) > 0.5
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-connect-server
+          annotations:
+            summary: >-
+              connect-server world-server HTTP p95 is high
+            description: >-
+              world-server {{ $labels.endpoint }} calls from connect-server are
+              above 500ms at p95 for ten minutes. Login and map handoff can
+              degrade even when both services are technically healthy.

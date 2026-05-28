@@ -15,6 +15,9 @@ resources:
   - ./operator-prometheusrule.yaml
   - ./map-heartbeat-sidecar-podmonitor.yaml
   - ./map-heartbeat-sidecar-prometheusrule.yaml
+  - ./traffic-probe.yaml
+  - ./traffic-probe-servicemonitor.yaml
+  - ./traffic-probe-prometheusrule.yaml
 
 configMapGenerator:
   - name: grafana-dashboard-calamityxi-connect-server-overview
@@ -26,6 +29,12 @@ configMapGenerator:
   - name: grafana-dashboard-calamityxi-world-server-overview
     files:
       - world-server-overview.json=./resources/world-server-overview.json
+  - name: grafana-dashboard-calamityxi-map-server-overview
+    files:
+      - map-server-overview.json=./resources/map-server-overview.json
+  - name: grafana-dashboard-calamityxi-edge-traffic-probe
+    files:
+      - edge-traffic-probe.json=./resources/edge-traffic-probe.json
   - name: grafana-dashboard-calamityxi-calamities
     files:
       - calamities.json=./resources/calamities.json

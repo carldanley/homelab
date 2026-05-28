@@ -1,0 +1,317 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: calamityxi-traffic-probe-script
+  namespace: calamityxi
+data:
+  traffic_probe.py: |
+    import os
+    import socket
+    import threading
+    import time
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    service = "calamityxi-traffic-probe"
+    target = os.environ.get("CALAMITYXI_TRAFFIC_PROBE_TARGET", "").strip()
+    interval_seconds = float(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_INTERVAL_SECONDS", "30"))
+    tcp_timeout_seconds = float(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_TCP_TIMEOUT_SECONDS", "2"))
+    tcp_repeat = int(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_TCP_REPEAT", "1"))
+    udp_repeat = int(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_UDP_REPEAT", "3"))
+    udp_payload_bytes = int(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_UDP_PAYLOAD_BYTES", "32"))
+    metrics_addr = os.environ.get("CALAMITYXI_TRAFFIC_PROBE_METRICS_ADDR", "0.0.0.0")
+    metrics_port = int(os.environ.get("CALAMITYXI_TRAFFIC_PROBE_METRICS_PORT", "8080"))
+
+    def parse_ports(name):
+      raw = os.environ.get(name, "")
+      ports = []
+      for item in raw.split(","):
+        item = item.strip()
+        if not item:
+          continue
+        port = int(item)
+        if port < 1 or port > 65535:
+          raise ValueError(f"{name} contains invalid port {port}")
+        ports.append(port)
+      return ports
+
+    tcp_ports = parse_ports("CALAMITYXI_TRAFFIC_PROBE_TCP_PORTS")
+    udp_ports = parse_ports("CALAMITYXI_TRAFFIC_PROBE_UDP_PORTS")
+    payload = (b"calamityxi synthetic udp probe " + (b"." * udp_payload_bytes))[:udp_payload_bytes]
+
+    lock = threading.Lock()
+    started_at = time.time()
+    attempts = {}
+    packets = {}
+    last_success = {}
+    last_duration = {}
+    last_success_timestamp = {}
+
+    def labels(target_value, protocol, port, extra=None):
+      values = {
+        "target": target_value,
+        "protocol": protocol,
+        "port": str(port),
+      }
+      if extra:
+        values.update(extra)
+      return values
+
+    def escape(value):
+      return str(value).replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
+
+    def format_labels(values):
+      return "{" + ",".join(f'{key}="{escape(value)}"' for key, value in sorted(values.items())) + "}"
+
+    def inc(counter, key, amount=1):
+      counter[key] = counter.get(key, 0) + amount
+
+    def record(protocol, port, result, duration, success):
+      key = (target, protocol, str(port))
+      result_key = (target, protocol, str(port), result)
+      now = time.time()
+      with lock:
+        inc(attempts, result_key)
+        if protocol == "udp":
+          inc(packets, result_key)
+        last_success[key] = 1 if success else 0
+        last_duration[key] = duration
+        if success:
+          last_success_timestamp[key] = now
+
+    def probe_tcp(port):
+      started = time.monotonic()
+      result = "success"
+      success = True
+      sock = None
+      try:
+        sock = socket.create_connection((target, port), timeout=tcp_timeout_seconds)
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+      except socket.timeout:
+        result = "timeout"
+        success = False
+      except OSError:
+        result = "error"
+        success = False
+      finally:
+        if sock is not None:
+          try:
+            sock.close()
+          except OSError:
+            pass
+      record("tcp", port, result, time.monotonic() - started, success)
+
+    def probe_udp(port):
+      started = time.monotonic()
+      result = "sent"
+      success = True
+      sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+      try:
+        sock.sendto(payload, (target, port))
+      except OSError:
+        result = "send_error"
+        success = False
+      finally:
+        sock.close()
+      record("udp", port, result, time.monotonic() - started, success)
+
+    def probe_loop():
+      while True:
+        for port in tcp_ports:
+          for _ in range(max(tcp_repeat, 0)):
+            probe_tcp(port)
+        for port in udp_ports:
+          for _ in range(max(udp_repeat, 0)):
+            probe_udp(port)
+        time.sleep(interval_seconds)
+
+    def render_metrics():
+      now = time.time()
+      with lock:
+        lines = [
+          "# HELP calamityxi_synthetic_probe_info Synthetic CalamityXI traffic probe metadata.",
+          "# TYPE calamityxi_synthetic_probe_info gauge",
+          f'calamityxi_synthetic_probe_info{{service="{service}",version="v1"}} 1',
+          "# HELP calamityxi_synthetic_probe_uptime_seconds Probe process uptime in seconds.",
+          "# TYPE calamityxi_synthetic_probe_uptime_seconds gauge",
+          f"calamityxi_synthetic_probe_uptime_seconds {now - started_at:.3f}",
+          "# HELP calamityxi_synthetic_probe_success Whether the latest probe attempt succeeded.",
+          "# TYPE calamityxi_synthetic_probe_success gauge",
+        ]
+        for key, value in sorted(last_success.items()):
+          lines.append(f"calamityxi_synthetic_probe_success{format_labels(labels(key[0], key[1], key[2]))} {value}")
+        lines.extend([
+          "# HELP calamityxi_synthetic_probe_last_duration_seconds Latest probe attempt duration in seconds.",
+          "# TYPE calamityxi_synthetic_probe_last_duration_seconds gauge",
+        ])
+        for key, value in sorted(last_duration.items()):
+          lines.append(f"calamityxi_synthetic_probe_last_duration_seconds{format_labels(labels(key[0], key[1], key[2]))} {value:.6f}")
+        lines.extend([
+          "# HELP calamityxi_synthetic_probe_last_success_timestamp_seconds Unix timestamp of the latest successful probe.",
+          "# TYPE calamityxi_synthetic_probe_last_success_timestamp_seconds gauge",
+        ])
+        for key, value in sorted(last_success_timestamp.items()):
+          lines.append(f"calamityxi_synthetic_probe_last_success_timestamp_seconds{format_labels(labels(key[0], key[1], key[2]))} {value:.0f}")
+        lines.extend([
+          "# HELP calamityxi_synthetic_probe_attempts_total Probe attempts by protocol, port, and result.",
+          "# TYPE calamityxi_synthetic_probe_attempts_total counter",
+        ])
+        for key, value in sorted(attempts.items()):
+          lines.append(f"calamityxi_synthetic_probe_attempts_total{format_labels(labels(key[0], key[1], key[2], {'result': key[3]}))} {value}")
+        lines.extend([
+          "# HELP calamityxi_synthetic_probe_packets_total UDP packets generated by the probe.",
+          "# TYPE calamityxi_synthetic_probe_packets_total counter",
+        ])
+        for key, value in sorted(packets.items()):
+          lines.append(f"calamityxi_synthetic_probe_packets_total{format_labels(labels(key[0], key[1], key[2], {'result': key[3]}))} {value}")
+        return "\n".join(lines) + "\n"
+
+    class Handler(BaseHTTPRequestHandler):
+      def do_GET(self):
+        if self.path == "/healthz":
+          self.send_response(200)
+          self.end_headers()
+          self.wfile.write(b"ok\n")
+          return
+        if self.path != "/metrics":
+          self.send_response(404)
+          self.end_headers()
+          return
+        body = render_metrics().encode()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain; version=0.0.4")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+      def log_message(self, *_):
+        return
+
+    if not target:
+      raise SystemExit("CALAMITYXI_TRAFFIC_PROBE_TARGET is required")
+
+    thread = threading.Thread(target=probe_loop, daemon=True)
+    thread.start()
+    ThreadingHTTPServer((metrics_addr, metrics_port), Handler).serve_forever()
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calamityxi-traffic-probe
+  namespace: calamityxi
+  labels:
+    app.kubernetes.io/name: calamityxi-traffic-probe
+    app.kubernetes.io/instance: cxi
+    app.kubernetes.io/component: traffic-probe
+    app.kubernetes.io/part-of: calamityxi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: calamityxi-traffic-probe
+      app.kubernetes.io/instance: cxi
+      app.kubernetes.io/component: traffic-probe
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: calamityxi-traffic-probe
+        app.kubernetes.io/instance: cxi
+        app.kubernetes.io/component: traffic-probe
+        app.kubernetes.io/part-of: calamityxi
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: probe
+          image: python:3.13-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - python
+            - /app/traffic_probe.py
+          env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: CALAMITYXI_TRAFFIC_PROBE_TARGET
+              valueFrom:
+                secretKeyRef:
+                  name: calamityxi-game-server-common-credentials-secret
+                  key: VPS_ENDPOINT_HOST
+            - name: CALAMITYXI_TRAFFIC_PROBE_TCP_PORTS
+              value: "54001,54002,54230,54231"
+            - name: CALAMITYXI_TRAFFIC_PROBE_UDP_PORTS
+              value: "54231,54232,54253,54257,54347,54348"
+            - name: CALAMITYXI_TRAFFIC_PROBE_INTERVAL_SECONDS
+              value: "30"
+            - name: CALAMITYXI_TRAFFIC_PROBE_TCP_TIMEOUT_SECONDS
+              value: "2"
+            - name: CALAMITYXI_TRAFFIC_PROBE_TCP_REPEAT
+              value: "1"
+            - name: CALAMITYXI_TRAFFIC_PROBE_UDP_REPEAT
+              value: "3"
+            - name: CALAMITYXI_TRAFFIC_PROBE_UDP_PAYLOAD_BYTES
+              value: "32"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: probe-script
+              mountPath: /app
+              readOnly: true
+      volumes:
+        - name: probe-script
+          configMap:
+            name: calamityxi-traffic-probe-script
+            defaultMode: 0444
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: calamityxi-traffic-probe
+  namespace: calamityxi
+  labels:
+    app.kubernetes.io/name: calamityxi-traffic-probe
+    app.kubernetes.io/instance: cxi
+    app.kubernetes.io/component: traffic-probe
+    app.kubernetes.io/part-of: calamityxi
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: calamityxi-traffic-probe
+    app.kubernetes.io/instance: cxi
+    app.kubernetes.io/component: traffic-probe
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
