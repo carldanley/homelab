@@ -13,7 +13,7 @@ spec:
     uid: powerwall-influxdb
     type: influxdb
     access: proxy
-    url: http://powerwall-dashboard-influxdb.home-automation.svc.cluster.local:8086
+    url: http://powerwall-dashboard-influxdb.selfhosted.svc.cluster.local:8086
     database: powerwall
     jsonData:
       httpMode: GET

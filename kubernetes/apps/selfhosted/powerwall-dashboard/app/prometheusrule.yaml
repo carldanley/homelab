@@ -9,7 +9,7 @@ spec:
       rules:
         - alert: PowerwallDashboardTelemetryMissing
           expr: |
-            absent(pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"}) == 1
+            absent(pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"}) == 1
           for: 30m
           annotations:
             summary: Powerwall telemetry is missing
@@ -23,7 +23,7 @@ spec:
 
         - alert: PowerwallDashboardCollectorDown
           expr: |
-            up{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            up{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
           for: 5m
           annotations:
             summary: Powerwall dashboard collector is down
@@ -35,9 +35,9 @@ spec:
 
         - alert: PyPowerwallCloudDegraded
           expr: |
-            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 1
+            pypowerwall_is_degraded{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 1
               or
-            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} > 900
+            pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} > 900
           for: 10m
           annotations:
             summary: pyPowerwall cloud telemetry is degraded
@@ -50,7 +50,7 @@ spec:
 
         - alert: PowerwallReportedAlerts
           expr: |
-            {namespace="home-automation", service="powerwall-dashboard-telegraf", __name__=~"powerwall_alerts_.+"} > 0
+            {namespace="selfhosted", service="powerwall-dashboard-telegraf", __name__=~"powerwall_alerts_.+"} > 0
           for: 5m
           annotations:
             summary: Powerwall is reporting active alerts
@@ -64,13 +64,13 @@ spec:
 
         - alert: PowerwallGridDown
           expr: |
-            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+            pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and
-            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_is_degraded{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_consecutive_failures{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
           for: 2m
           annotations:
             summary: Utility grid is down and the home is on backup power
@@ -83,15 +83,15 @@ spec:
 
         - alert: PowerwallGeneratorPrepNeeded
           expr: |
-            powerwall_state_of_energy_percent{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 25
+            powerwall_state_of_energy_percent{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 25
               and
-            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+            pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and
-            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_is_degraded{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_consecutive_failures{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
           for: 5m
           annotations:
             summary: Powerwall is below 25 percent during an outage
@@ -105,15 +105,15 @@ spec:
 
         - alert: PowerwallBatteryCriticalDuringOutage
           expr: |
-            powerwall_state_of_energy_percent{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 15
+            powerwall_state_of_energy_percent{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 15
               and
-            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+            pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and
-            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_is_degraded{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
-            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+            pypowerwall_consecutive_failures{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
           for: 2m
           annotations:
             summary: Powerwall is critically low during an outage

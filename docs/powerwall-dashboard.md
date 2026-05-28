@@ -15,7 +15,7 @@ PW_EMAIL=<tesla-account-email>
 After Flux creates the deployment and PVC, complete the one-time Tesla browser authentication from the pyPowerwall pod:
 
 ```sh
-kubectl -n home-automation exec -it deploy/powerwall-dashboard-pypowerwall -- \
+kubectl -n selfhosted exec -it deploy/powerwall-dashboard-pypowerwall -- \
   python3 -m pypowerwall setup -headless -authpath /app/.auth
 ```
 

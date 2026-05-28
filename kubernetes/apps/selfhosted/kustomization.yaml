@@ -12,3 +12,4 @@ resources:
   - ./tandoor/ks.yaml
   - ./paperless/ks.yaml
   - ./teslamate/ks.yaml
+  - ./powerwall-dashboard/ks.yaml
