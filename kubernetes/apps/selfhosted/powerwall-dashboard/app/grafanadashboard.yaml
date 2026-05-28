@@ -11,8 +11,213 @@ spec:
       dashboards: grafana
   folder: powerwall
   datasources:
-    - datasourceName: Powerwall InfluxDB
-      inputName: DS_INFLUXDB
-    - datasourceName: Sun and Moon
-      inputName: DS_SUN_AND MOON
-  url: https://raw.githubusercontent.com/jasonacox/Powerwall-Dashboard/main/dashboards/dashboard-no-animation.json
+    - datasourceName: Prometheus
+      inputName: DS_PROMETHEUS
+  json: |
+    {
+      "uid": "powerwall-prometheus",
+      "title": "Powerwall",
+      "tags": ["powerwall", "prometheus"],
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "templating": {
+        "list": [
+          {
+            "name": "namespace",
+            "type": "constant",
+            "query": "selfhosted",
+            "current": {"text": "selfhosted", "value": "selfhosted"}
+          },
+          {
+            "name": "service",
+            "type": "constant",
+            "query": "powerwall-dashboard-telegraf",
+            "current": {"text": "powerwall-dashboard-telegraf", "value": "powerwall-dashboard-telegraf"}
+          }
+        ]
+      },
+      "panels": [
+        {
+          "id": 1,
+          "type": "stat",
+          "title": "Battery",
+          "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "min": 0,
+              "max": 100,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "yellow", "value": 25},
+                  {"color": "green", "value": 50}
+                ]
+              }
+            }
+          },
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "http_percentage{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Battery",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "type": "stat",
+          "title": "Grid Status",
+          "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {"type": "value", "options": {"0": {"text": "Down", "color": "red"}}},
+                {"type": "value", "options": {"1": {"text": "Up", "color": "green"}}}
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "green", "value": 1}
+                ]
+              }
+            }
+          },
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "http_grid_status{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Grid",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "pyPowerwall Health",
+          "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {"type": "value", "options": {"0": {"text": "Healthy", "color": "green"}}},
+                {"type": "value", "options": {"1": {"text": "Degraded", "color": "red"}}}
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "red", "value": 1}
+                ]
+              }
+            }
+          },
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "pypowerwall_is_degraded{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Health",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Last Successful Read",
+          "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {"defaults": {"unit": "s"}},
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "pypowerwall_last_success_age_seconds{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Age",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "timeseries",
+          "title": "Power Flow",
+          "gridPos": {"h": 9, "w": 24, "x": 0, "y": 5},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {"defaults": {"unit": "watt"}},
+          "targets": [
+            {
+              "expr": "http_load_instant_power{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Home",
+              "refId": "A"
+            },
+            {
+              "expr": "http_solar_instant_power{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Solar",
+              "refId": "B"
+            },
+            {
+              "expr": "http_battery_instant_power{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Battery",
+              "refId": "C"
+            },
+            {
+              "expr": "http_site_instant_power{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Grid",
+              "refId": "D"
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "type": "timeseries",
+          "title": "Collector Health",
+          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "targets": [
+            {
+              "expr": "pypowerwall_consecutive_failures{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Consecutive failures",
+              "refId": "A"
+            },
+            {
+              "expr": "pypowerwall_proxy_total_timeouts{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Proxy timeouts",
+              "refId": "B"
+            },
+            {
+              "expr": "pypowerwall_proxy_total_errors{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Proxy errors",
+              "refId": "C"
+            }
+          ]
+        },
+        {
+          "id": 7,
+          "type": "timeseries",
+          "title": "Battery State of Energy",
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}},
+          "targets": [
+            {
+              "expr": "http_percentage{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Battery",
+              "refId": "A"
+            },
+            {
+              "expr": "http_backup_reserve_percent{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Backup reserve",
+              "refId": "B"
+            }
+          ]
+        }
+      ]
+    }

@@ -9,12 +9,12 @@ spec:
       rules:
         - alert: PowerwallDashboardTelemetryMissing
           expr: |
-            absent(pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"}) == 1
+            absent(http_percentage{namespace="selfhosted", service="powerwall-dashboard-telegraf"}) == 1
           for: 30m
           annotations:
             summary: Powerwall telemetry is missing
             description: >-
-              Telegraf is not exporting pyPowerwall health metrics. Check the
+              Telegraf is not exporting Powerwall telemetry metrics. Check the
               powerwall-dashboard pypowerwall and telegraf pods, and confirm
               Tesla cloud authentication has been completed.
           labels:
@@ -64,7 +64,7 @@ spec:
 
         - alert: PowerwallGridDown
           expr: |
-            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
+            http_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
             pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and
@@ -83,9 +83,9 @@ spec:
 
         - alert: PowerwallGeneratorPrepNeeded
           expr: |
-            powerwall_state_of_energy_percent{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 25
+            http_percentage{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 25
               and
-            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
+            http_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
             pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and
@@ -105,9 +105,9 @@ spec:
 
         - alert: PowerwallBatteryCriticalDuringOutage
           expr: |
-            powerwall_state_of_energy_percent{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 15
+            http_percentage{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 15
               and
-            powerwall_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
+            http_grid_status{namespace="selfhosted", service="powerwall-dashboard-telegraf"} == 0
               and
             pypowerwall_last_success_age_seconds{namespace="selfhosted", service="powerwall-dashboard-telegraf"} < 300
               and

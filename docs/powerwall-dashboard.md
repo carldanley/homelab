@@ -1,6 +1,6 @@
 # Powerwall Dashboard
 
-Powerwall-Dashboard runs in cloud mode for Tesla Powerwall 3 monitoring. The deployment uses pyPowerwall for Tesla cloud reads, Telegraf for collection, InfluxDB for the upstream Grafana dashboard schema, and Prometheus metrics for Alertmanager notifications.
+Powerwall Dashboard runs in cloud mode for Tesla Powerwall 3 monitoring. The deployment uses pyPowerwall for Tesla cloud reads, Telegraf for collection, and the in-cluster Prometheus/Grafana stack for dashboards and Alertmanager notifications.
 
 ## Secrets
 

@@ -6,7 +6,6 @@ resources:
   - ./configmap.yaml
   - ./externalsecret.yaml
   - ./grafanadashboard.yaml
-  - ./grafanadatasource.yaml
   - ./helmrelease.yaml
   - ./prometheusrule.yaml
   - ./pvc.yaml

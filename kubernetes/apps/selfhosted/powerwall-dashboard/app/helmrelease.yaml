@@ -29,33 +29,6 @@ spec:
               limits:
                 memory: 512Mi
 
-      influxdb:
-        strategy: Recreate
-        containers:
-          app:
-            image:
-              repository: docker.io/library/influxdb
-              tag: "1.8"
-            probes:
-              liveness: &influxdbProbe
-                enabled: true
-                custom: true
-                spec:
-                  httpGet:
-                    path: /health
-                    port: &influxdbPort 8086
-                  initialDelaySeconds: 30
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 3
-              readiness: *influxdbProbe
-            resources:
-              requests:
-                cpu: 25m
-                memory: 256Mi
-              limits:
-                memory: 1Gi
-
       telegraf:
         annotations:
           configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-configmap"
@@ -89,22 +62,11 @@ spec:
         type: configMap
         name: "{{ .Release.Name }}-configmap"
         advancedMounts:
-          influxdb:
-            app:
-              - path: /docker-entrypoint-initdb.d/influxdb.iql
-                subPath: influxdb.iql
-                readOnly: true
           telegraf:
             app:
               - path: /etc/telegraf/telegraf.conf
                 subPath: telegraf.conf
                 readOnly: true
-      influxdb:
-        existingClaim: "{{ .Release.Name }}-influxdb"
-        advancedMounts:
-          influxdb:
-            app:
-              - path: /var/lib/influxdb
 
     service:
       pypowerwall:
@@ -112,11 +74,6 @@ spec:
         ports:
           http:
             port: 8675
-      influxdb:
-        controller: influxdb
-        ports:
-          http:
-            port: *influxdbPort
       telegraf:
         controller: telegraf
         ports:
