@@ -27,6 +27,12 @@ spec:
 
     deschedulerPolicyAPIVersion: descheduler/v1alpha2
     deschedulerPolicy:
+      maxNoOfPodsToEvictPerNode: 2
+      maxNoOfPodsToEvictTotal: 4
+      metricsProviders:
+        - source: Prometheus
+          prometheus:
+            url: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
       profiles:
         - name: Default
           pluginConfig:
@@ -64,6 +70,48 @@ spec:
                 - RemoveFailedPods
                 - RemovePodsViolatingInterPodAntiAffinity
                 - RemovePodsViolatingNodeAffinity
+        - name: SafeLowUtilization
+          pluginConfig:
+            - name: DefaultEvictor
+              args:
+                nodeFit: true
+                minPodAge: 30m
+                noEvictionPolicy: Mandatory
+                podProtections:
+                  extraEnabled:
+                    - PodsWithPVC
+                    - PodsWithoutPDB
+            - name: LowNodeUtilization
+              args:
+                metricsUtilization:
+                  source: Prometheus
+                  prometheus:
+                    query: |
+                      label_replace(
+                        max by (node) (kubelet_running_pods{job="kubelet", metrics_path="/metrics"})
+                          / max by (node) (kube_node_status_capacity{job="kube-state-metrics", resource="pods"}),
+                        "instance", "$1", "node", "(.+)"
+                      )
+                thresholds:
+                  MetricResource: 30
+                targetThresholds:
+                  MetricResource: 85
+                evictionLimits:
+                  node: 2
+                evictableNamespaces:
+                  exclude:
+                    - actions-runner-system
+                    - calamityxi
+                    - cert-manager
+                    - databases
+                    - external-secrets
+                    - kube-system
+                    - rook-ceph
+                    - system-upgrade
+          plugins:
+            balance:
+              enabled:
+                - LowNodeUtilization
 
     service:
       enabled: true
