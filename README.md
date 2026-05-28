@@ -72,6 +72,8 @@ This Git repository contains the following directories under [kubernetes](./kube
 | TESmart 8 Port KVM Switch               | 1     | -            | -                         | -    | -                 | Network KVM (for PiKVM) |
 | UniFi UDM Pro Max                       | 1     | -            | -                         | -    | UniFi OS          | Router & NVR            |
 | UniFi USW Aggregation                   | 1     | -            | -                         | -    | UniFi OS          | 10G Core Switch         |
+| Tesla Powerwall 3                       | 1     | -            | 13.5 kWh battery          | -    | Tesla firmware    | Home battery & inverter |
+| Generac Guardian 22 kW                  | 1     | -            | Natural gas               | -    | Generac firmware  | Backup generator        |
 
 ---
 
@@ -99,6 +101,13 @@ My MinisForum N5 Pro is configured with the following hardware:
 
 ---
 
+My home energy backup is configured with the following hardware:
+
+- Tesla Powerwall 3 - 13.5 kWh battery, 11.5 kW continuous power, integrated solar inverter, and instant (0 ms) failover
+- Generac Guardian 22 kW - natural gas standby generator for failover once the Powerwall is depleted
+
+---
+
 ## <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/270f_fe0f/512.gif" alt="🖍︎" width="20" height="20"> Additional Documentation
 
 For random notes I've taken the time to jot down, see the following links:
@@ -107,6 +116,7 @@ For random notes I've taken the time to jot down, see the following links:
 - [TESMART KVM Switch + PiKVM](./docs/tesmart-kvm-switch-and-pikvm.md)
 - [Using Cilium with UniFi BGP](./docs/using-cilium-with-unifi-bgp.md)
 - [Checking Synology SSD Cache](./docs/checking-synology-ssd-cache.md)
+- [Powerwall Dashboard](./docs/powerwall-dashboard.md)
 
 For fonts, see [Noto Emoji Animations](https://googlefonts.github.io/noto-emoji-animation/).
 

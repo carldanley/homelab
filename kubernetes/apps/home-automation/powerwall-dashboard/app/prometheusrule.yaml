@@ -1,0 +1,125 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: powerwall-dashboard
+spec:
+  groups:
+    - name: powerwall-dashboard.rules
+      rules:
+        - alert: PowerwallDashboardTelemetryMissing
+          expr: |
+            absent(pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"}) == 1
+          for: 30m
+          annotations:
+            summary: Powerwall telemetry is missing
+            description: >-
+              Telegraf is not exporting pyPowerwall health metrics. Check the
+              powerwall-dashboard pypowerwall and telegraf pods, and confirm
+              Tesla cloud authentication has been completed.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: PowerwallDashboardCollectorDown
+          expr: |
+            up{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+          for: 5m
+          annotations:
+            summary: Powerwall dashboard collector is down
+            description: >-
+              Prometheus cannot scrape the Powerwall Telegraf collector.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: PyPowerwallCloudDegraded
+          expr: |
+            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 1
+              or
+            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} > 900
+          for: 10m
+          annotations:
+            summary: pyPowerwall cloud telemetry is degraded
+            description: >-
+              pyPowerwall has not had a successful Tesla cloud read for more
+              than 15 minutes or has entered degraded mode.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: PowerwallReportedAlerts
+          expr: |
+            {namespace="home-automation", service="powerwall-dashboard-telegraf", __name__=~"powerwall_alerts_.+"} > 0
+          for: 5m
+          annotations:
+            summary: Powerwall is reporting active alerts
+            description: >-
+              pyPowerwall is reporting an active Powerwall alert via
+              /alerts/pw. Check the Powerwall dashboard and Tesla app for the
+              specific condition.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: PowerwallGridDown
+          expr: |
+            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+              and
+            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+          for: 2m
+          annotations:
+            summary: Utility grid is down and the home is on backup power
+            description: >-
+              pyPowerwall reports the grid is down. The Powerwall should be
+              carrying the house with instant battery failover.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: PowerwallGeneratorPrepNeeded
+          expr: |
+            powerwall_state_of_energy_percent{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 25
+              and
+            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+              and
+            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+          for: 5m
+          annotations:
+            summary: Powerwall is below 25 percent during an outage
+            description: >-
+              The Powerwall is below the generator prep threshold while the
+              grid is down. Manually turn on or prep the Generac so it is ready
+              for automatic failover before the battery is depleted.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: PowerwallBatteryCriticalDuringOutage
+          expr: |
+            powerwall_state_of_energy_percent{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 15
+              and
+            powerwall_grid_status{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_last_success_age_seconds{namespace="home-automation", service="powerwall-dashboard-telegraf"} < 300
+              and
+            pypowerwall_is_degraded{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+              and
+            pypowerwall_consecutive_failures{namespace="home-automation", service="powerwall-dashboard-telegraf"} == 0
+          for: 2m
+          annotations:
+            summary: Powerwall is critically low during an outage
+            description: >-
+              The Powerwall is below 15 percent while the grid is down. The
+              Generac should already be ready for failover.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts

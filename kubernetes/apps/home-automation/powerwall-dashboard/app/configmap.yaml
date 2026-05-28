@@ -1,0 +1,131 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: powerwall-dashboard-configmap
+data:
+  telegraf.conf: |
+    [agent]
+      interval = "30s"
+      round_interval = true
+      metric_batch_size = 1000
+      metric_buffer_limit = 10000
+      flush_interval = "15s"
+      flush_jitter = "0s"
+      omit_hostname = true
+
+    [[outputs.influxdb]]
+      urls = ["http://powerwall-dashboard-influxdb:8086"]
+      database = "powerwall"
+      skip_database_creation = false
+      retention_policy = "raw"
+
+    [[outputs.prometheus_client]]
+      listen = ":9273"
+      path = "/metrics"
+      metric_version = 2
+      expiration_interval = "2m"
+
+    [[inputs.http]]
+      urls = [
+        "http://powerwall-dashboard-pypowerwall:8675/aggregates",
+        "http://powerwall-dashboard-pypowerwall:8675/soe",
+        "http://powerwall-dashboard-pypowerwall:8675/freq",
+        "http://powerwall-dashboard-pypowerwall:8675/pod"
+      ]
+      method = "GET"
+      timeout = "10s"
+      data_format = "json"
+
+    [[inputs.http]]
+      urls = ["http://powerwall-dashboard-pypowerwall:8675/alerts/pw"]
+      name_override = "powerwall_alerts"
+      method = "GET"
+      timeout = "10s"
+      data_format = "json"
+
+    [[inputs.http]]
+      urls = ["http://powerwall-dashboard-pypowerwall:8675/json"]
+      name_override = "powerwall"
+      method = "GET"
+      timeout = "10s"
+      data_format = "json_v2"
+
+      [[inputs.http.json_v2]]
+        [[inputs.http.json_v2.field]]
+          path = "soe"
+          rename = "state_of_energy_percent"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "grid_status"
+          type = "int"
+        [[inputs.http.json_v2.field]]
+          path = "time_remaining_hours"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "reserve"
+          rename = "backup_reserve_percent"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "grid"
+          rename = "grid_watts"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "home"
+          rename = "home_watts"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "solar"
+          rename = "solar_watts"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "battery"
+          rename = "battery_watts"
+          type = "float"
+
+    [[inputs.http]]
+      urls = ["http://powerwall-dashboard-pypowerwall:8675/health"]
+      name_override = "pypowerwall"
+      method = "GET"
+      timeout = "10s"
+      data_format = "json_v2"
+
+      [[inputs.http.json_v2]]
+        [[inputs.http.json_v2.field]]
+          path = "connection_health.is_degraded"
+          rename = "is_degraded"
+          type = "bool"
+        [[inputs.http.json_v2.field]]
+          path = "connection_health.last_success_age_seconds"
+          type = "float"
+        [[inputs.http.json_v2.field]]
+          path = "connection_health.consecutive_failures"
+          type = "int"
+        [[inputs.http.json_v2.field]]
+          path = "proxy_stats.total_errors"
+          rename = "proxy_total_errors"
+          type = "int"
+        [[inputs.http.json_v2.field]]
+          path = "proxy_stats.total_timeouts"
+          rename = "proxy_total_timeouts"
+          type = "int"
+
+    [[processors.date]]
+      tag_key = "month"
+      date_format = "Jan"
+      timezone = "America/New_York"
+
+    [[processors.date]]
+      tag_key = "year"
+      date_format = "2006"
+      timezone = "America/New_York"
+
+  influxdb.iql: |
+    CREATE DATABASE powerwall
+    CREATE RETENTION POLICY raw ON powerwall duration 3d replication 1
+    ALTER RETENTION POLICY autogen ON powerwall duration 0s
+    CREATE RETENTION POLICY kwh ON powerwall duration INF replication 1
+    CREATE RETENTION POLICY grid ON powerwall duration INF replication 1
+    CREATE CONTINUOUS QUERY cq_autogen ON powerwall BEGIN SELECT mean(home) AS home, mean(solar) AS solar, mean(from_pw) AS from_pw, mean(to_pw) AS to_pw, mean(from_grid) AS from_grid, mean(to_grid) AS to_grid, last(percentage) AS percentage INTO powerwall.autogen.:MEASUREMENT FROM (SELECT load_instant_power AS home, solar_instant_power AS solar, abs((1+battery_instant_power/abs(battery_instant_power))*battery_instant_power/2) AS from_pw, abs((1-battery_instant_power/abs(battery_instant_power))*battery_instant_power/2) AS to_pw, abs((1+site_instant_power/abs(site_instant_power))*site_instant_power/2) AS from_grid, abs((1-site_instant_power/abs(site_instant_power))*site_instant_power/2) AS to_grid, percentage FROM raw.http) GROUP BY time(1m), month, year fill(linear) END
+    CREATE CONTINUOUS QUERY cq_kwh ON powerwall RESAMPLE EVERY 1m BEGIN SELECT integral(home)/1000/3600 AS home, integral(solar)/1000/3600 AS solar, integral(from_pw)/1000/3600 AS from_pw, integral(to_pw)/1000/3600 AS to_pw, integral(from_grid)/1000/3600 AS from_grid, integral(to_grid)/1000/3600 AS to_grid INTO powerwall.kwh.:MEASUREMENT FROM autogen.http GROUP BY time(1h), month, year tz('America/New_York') END
+    CREATE CONTINUOUS QUERY cq_grid ON powerwall BEGIN SELECT min(grid_status) AS grid_status INTO powerwall.grid.:MEASUREMENT FROM (SELECT grid_status FROM raw.http) GROUP BY time(1m), month, year fill(linear) END

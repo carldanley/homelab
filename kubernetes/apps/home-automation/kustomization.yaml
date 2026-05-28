@@ -12,3 +12,4 @@ resources:
   - ./wyoming-piper/ks.yaml
   - ./wyoming-whisper/ks.yaml
   - ./home-assistant/ks.yaml
+  - ./powerwall-dashboard/ks.yaml
