@@ -14,6 +14,8 @@ spec:
       echo-server:
         replicas: 2
         strategy: RollingUpdate
+        podDisruptionBudget:
+          maxUnavailable: 1
         containers:
           app:
             image:

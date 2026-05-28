@@ -24,5 +24,7 @@ spec:
   values:
     controller:
       replicaCount: 2
+      pdb:
+        maxUnavailable: 1
       serviceMonitor:
         create: true
