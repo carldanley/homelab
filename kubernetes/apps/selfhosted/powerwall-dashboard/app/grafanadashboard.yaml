@@ -20,7 +20,7 @@ spec:
       "tags": ["powerwall", "prometheus"],
       "timezone": "browser",
       "schemaVersion": 39,
-      "version": 1,
+      "version": 2,
       "refresh": "30s",
       "templating": {
         "list": [
@@ -43,7 +43,7 @@ spec:
           "id": 1,
           "type": "stat",
           "title": "Battery",
-          "gridPos": {"h": 5, "w": 6, "x": 0, "y": 0},
+          "gridPos": {"h": 5, "w": 4, "x": 0, "y": 0},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "fieldConfig": {
             "defaults": {
@@ -73,7 +73,7 @@ spec:
           "id": 2,
           "type": "stat",
           "title": "Grid Status",
-          "gridPos": {"h": 5, "w": 6, "x": 6, "y": 0},
+          "gridPos": {"h": 5, "w": 4, "x": 4, "y": 0},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "fieldConfig": {
             "defaults": {
@@ -100,10 +100,56 @@ spec:
           ]
         },
         {
+          "id": 8,
+          "type": "stat",
+          "title": "Backup Reserve",
+          "gridPos": {"h": 5, "w": 4, "x": 8, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "min": 0,
+              "max": 100,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "red", "value": null},
+                  {"color": "yellow", "value": 25},
+                  {"color": "green", "value": 50}
+                ]
+              }
+            }
+          },
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "http_backup_reserve_percent{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Reserve",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "type": "stat",
+          "title": "Runtime Remaining",
+          "gridPos": {"h": 5, "w": 4, "x": 12, "y": 0},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {"defaults": {"unit": "h"}},
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "http_time_remaining_hours{namespace=\"$namespace\", service=\"$service\"}",
+              "legendFormat": "Hours",
+              "refId": "A"
+            }
+          ]
+        },
+        {
           "id": 3,
           "type": "stat",
           "title": "pyPowerwall Health",
-          "gridPos": {"h": 5, "w": 6, "x": 12, "y": 0},
+          "gridPos": {"h": 5, "w": 4, "x": 16, "y": 0},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "fieldConfig": {
             "defaults": {
@@ -132,8 +178,8 @@ spec:
         {
           "id": 4,
           "type": "stat",
-          "title": "Last Successful Read",
-          "gridPos": {"h": 5, "w": 6, "x": 18, "y": 0},
+          "title": "Last Read",
+          "gridPos": {"h": 5, "w": 4, "x": 20, "y": 0},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "fieldConfig": {"defaults": {"unit": "s"}},
           "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
@@ -179,7 +225,7 @@ spec:
           "id": 6,
           "type": "timeseries",
           "title": "Collector Health",
-          "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
+          "gridPos": {"h": 8, "w": 8, "x": 0, "y": 14},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "targets": [
             {
@@ -203,7 +249,7 @@ spec:
           "id": 7,
           "type": "timeseries",
           "title": "Battery State of Energy",
-          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
+          "gridPos": {"h": 8, "w": 8, "x": 8, "y": 14},
           "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
           "fieldConfig": {"defaults": {"unit": "percent", "min": 0, "max": 100}},
           "targets": [
@@ -216,6 +262,35 @@ spec:
               "expr": "http_backup_reserve_percent{namespace=\"$namespace\", service=\"$service\"}",
               "legendFormat": "Backup reserve",
               "refId": "B"
+            }
+          ]
+        },
+        {
+          "id": 10,
+          "type": "stat",
+          "title": "Reported Alerts",
+          "gridPos": {"h": 8, "w": 8, "x": 16, "y": 14},
+          "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {"type": "value", "options": {"0": {"text": "None", "color": "green"}}}
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {"color": "green", "value": null},
+                  {"color": "red", "value": 1}
+                ]
+              }
+            }
+          },
+          "options": {"reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}},
+          "targets": [
+            {
+              "expr": "sum({namespace=\"$namespace\", service=\"$service\", __name__=~\"powerwall_alerts_.+\", __name__!=\"powerwall_alerts_SystemConnectedToGrid\"}) or vector(0)",
+              "legendFormat": "Alerts",
+              "refId": "A"
             }
           ]
         }
