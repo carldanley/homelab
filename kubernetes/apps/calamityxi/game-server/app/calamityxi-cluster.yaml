@@ -68,6 +68,19 @@ spec:
       repository: ghcr.io/calamityffxi/search-server
       tag: v0.1.2
     replicas: 2
+    env:
+      - name: SEARCH_CACHE_ENABLED
+        value: "true"
+      - name: SEARCH_VALKEY_HOST
+        value: "valkey"
+      - name: SEARCH_VALKEY_PORT
+        value: "6379"
+      - name: SEARCH_CACHE_PREFIX
+        value: "calamityxi:search"
+      - name: SEARCH_CACHE_AH_CATEGORY_TTL
+        value: "30s"
+      - name: SEARCH_CACHE_AH_HISTORY_TTL
+        value: "60s"
     resources:
       requests:
         cpu: 250m
