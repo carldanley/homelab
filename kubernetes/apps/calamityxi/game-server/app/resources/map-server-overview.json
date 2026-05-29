@@ -620,18 +620,19 @@
       },
       "targets": [
         {
-          "expr": "max by (pod) (map_heartbeat_sidecar_last_main_tick_age_seconds{namespace=\"$namespace\"})",
+          "expr": "max by (pod) (map_heartbeat_sidecar_last_main_tick_age_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_heartbeat_age_seconds{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} main",
           "refId": "A"
         },
         {
-          "expr": "max by (pod) (map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"})",
+          "expr": "max by (pod) (map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_heartbeat_age_seconds{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} zone",
           "refId": "B"
         }
       ],
       "title": "Tick Age By Map Pod",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Uses map-heartbeat-sidecar v0.1.4 tick-age metrics. Shows 0 per pod until the sidecar image is rolled out."
     },
     {
       "datasource": {
@@ -744,23 +745,24 @@
       },
       "targets": [
         {
-          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_connected_players{namespace=\"$namespace\"})",
+          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_connected_players{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} players",
           "refId": "A"
         },
         {
-          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_active_zones{namespace=\"$namespace\"})",
+          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_active_zones{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} active zones",
           "refId": "B"
         },
         {
-          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_loaded_zones{namespace=\"$namespace\"})",
+          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_loaded_zones{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} loaded zones",
           "refId": "C"
         }
       ],
       "title": "Map Player And Zone Workload",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Requires map-heartbeat-sidecar v0.1.4 and a game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
     },
     {
       "datasource": {
@@ -813,13 +815,14 @@
       },
       "targets": [
         {
-          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_active_mobs{namespace=\"$namespace\"})",
+          "expr": "sum by (pod) (map_heartbeat_sidecar_xi_map_active_mobs{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} mobs",
           "refId": "A"
         }
       ],
       "title": "Active Mobs By Map Pod",
-      "type": "timeseries"
+      "type": "timeseries",
+      "description": "Requires map-heartbeat-sidecar v0.1.4 and a game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
     },
     {
       "datasource": {
@@ -1055,6 +1058,6 @@
   "timezone": "browser",
   "title": "Map Server Overview",
   "uid": "calamityxi-map-server-overview",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
