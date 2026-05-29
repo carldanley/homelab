@@ -63,6 +63,29 @@ spec:
             summary: map heartbeat is lagging
             description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} has not accepted a fresh xi_map heartbeat for more than 10 seconds. This is an early warning for map tick stalls, overloaded pods, or a sidecar/socket problem before endpoint removal.
 
+        - alert: MapServerMainTickLagging
+          expr: map_heartbeat_sidecar_last_main_tick_age_seconds{namespace="calamityxi"} > 10
+          for: 2m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server main tick is lagging
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} last reported a main tick more than 10 seconds ago. This usually means xi_map is overloaded, blocked, or no longer publishing fresh heartbeat snapshots.
+
+        - alert: MapServerZoneTickLaggingWithPlayers
+          expr: |
+            map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace="calamityxi"} > 15
+            and on(namespace, pod)
+            map_heartbeat_sidecar_xi_map_connected_players{namespace="calamityxi"} > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server zone tick is lagging while players are connected
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has connected players but has not reported a zone tick for more than 15 seconds. Check hot-zone scripts, map CPU, and recent rollouts.
+
         - alert: MapHeartbeatSidecarDroppedHeartbeats
           expr: sum by (namespace, pod) (increase(map_heartbeat_sidecar_heartbeats_total{namespace="calamityxi",result="dropped"}[5m])) > 0
           for: 5m
@@ -93,6 +116,16 @@ spec:
             summary: map heartbeat sidecar reported offline transitions
             description: Map heartbeat sidecar {{ $labels.namespace }}/{{ $labels.pod }} reported one or more offline transitions in the last ten minutes. Check the matching map pod logs and rollout timing.
 
+        - alert: MapServerDynamicTargIdPressureHigh
+          expr: map_heartbeat_sidecar_xi_map_dynamic_targ_id_usage_percent{namespace="calamityxi"} > 70
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server dynamic target id usage is high
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has used more than 70 percent of active-zone dynamic target id capacity for ten minutes. Split busy zones or investigate dynamic entity churn before target id exhaustion affects players.
+
         - alert: MapServerContainerRestarted
           expr: sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total{namespace="calamityxi",pod=~"cxi-map-.*",container=~"app|heartbeat"}[10m])) > 0
           for: 1m
@@ -104,7 +137,7 @@ spec:
             description: Container {{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} restarted in the last ten minutes. Correlate this with heartbeat age, dropped packets, and operator rollout activity.
 
         - alert: MapServerMemoryPressureHigh
-          expr: |-
+          expr: |
             (
               max by (namespace, pod, container) (
                 container_memory_working_set_bytes{namespace="calamityxi",pod=~"cxi-map-.*",container=~"app|heartbeat"}
