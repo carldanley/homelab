@@ -66,7 +66,7 @@ spec:
   search:
     image:
       repository: ghcr.io/calamityffxi/search-server
-      tag: v0.1.2
+      tag: v0.1.4
     replicas: 2
     env:
       - name: SEARCH_CACHE_ENABLED
