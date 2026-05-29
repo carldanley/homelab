@@ -12,7 +12,6 @@ spec:
       - calamityxi
   selector:
     matchLabels:
-      app.kubernetes.io/name: calamityxi-traffic-probe
       app.kubernetes.io/instance: cxi
       app.kubernetes.io/component: traffic-probe
   endpoints:
