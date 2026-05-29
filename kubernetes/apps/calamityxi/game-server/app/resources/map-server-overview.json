@@ -420,13 +420,14 @@
       "pluginVersion": "12.0.0",
       "targets": [
         {
-          "expr": "max(map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"}) or vector(0)",
-          "legendFormat": "max zone tick age",
+          "expr": "max(map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"} and on(namespace,pod) (map_heartbeat_sidecar_xi_map_connected_players{namespace=\"$namespace\"} > 0)) or vector(0)",
+          "legendFormat": "max active zone tick age",
           "refId": "A"
         }
       ],
-      "title": "Max Zone Tick Age",
-      "type": "stat"
+      "title": "Max Active Zone Tick Age",
+      "type": "stat",
+      "description": "Filters to map pods with connected players so idle or sleeping zone timers do not page as player-facing latency."
     },
     {
       "datasource": {
@@ -625,14 +626,14 @@
           "refId": "A"
         },
         {
-          "expr": "max by (pod) (map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_heartbeat_age_seconds{namespace=\"$namespace\"} * 0)",
+          "expr": "(max by (pod) (map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace=\"$namespace\"} and on(namespace,pod) (map_heartbeat_sidecar_xi_map_connected_players{namespace=\"$namespace\"} > 0))) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
           "legendFormat": "{{pod}} zone",
           "refId": "B"
         }
       ],
       "title": "Tick Age By Map Pod",
       "type": "timeseries",
-      "description": "Uses map-heartbeat-sidecar v0.1.4 tick-age metrics. Shows 0 per pod until the sidecar image is rolled out."
+      "description": "Main age is a liveness/stall signal. Zone age is filtered to pods with connected players so idle or sleeping zones do not dominate the panel."
     },
     {
       "datasource": {
@@ -715,6 +716,371 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2.4
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "id": 19,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_main_tick_duration_window_max_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} window max",
+          "refId": "A"
+        },
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_main_tick_duration_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} last",
+          "refId": "B"
+        }
+      ],
+      "title": "Main Tick Duration By Map Pod",
+      "type": "timeseries",
+      "description": "Baseline wall time for the native time-server tick work. This is duration, not age; 0 means the metric is not rolled out yet or no sample was reported in the window."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.2
+              },
+              {
+                "color": "red",
+                "value": 0.4
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_zone_tick_duration_window_max_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} window max",
+          "refId": "A"
+        },
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_zone_tick_duration_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} last",
+          "refId": "B"
+        }
+      ],
+      "title": "Zone Tick Duration By Map Pod",
+      "type": "timeseries",
+      "description": "Baseline wall time for zone logic ticks. The red threshold matches the 400ms zone logic interval."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.1
+              },
+              {
+                "color": "red",
+                "value": 0.25
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_sql_query_duration_window_max_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} window max",
+          "refId": "A"
+        },
+        {
+          "expr": "max by (pod) (map_heartbeat_sidecar_xi_map_sql_query_duration_seconds{namespace=\"$namespace\"}) or max by (pod) (map_heartbeat_sidecar_ready{namespace=\"$namespace\"} * 0)",
+          "legendFormat": "{{pod}} last",
+          "refId": "B"
+        }
+      ],
+      "title": "SQL Query Duration By Map Pod",
+      "type": "timeseries",
+      "description": "Baseline duration for timed map-server SQL queries. Slow-query warning and error thresholds are 100ms and 250ms by default."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.01
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 20
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (pod, tick) (rate(map_heartbeat_sidecar_xi_map_tick_overruns_total{namespace=\"$namespace\"}[5m]))",
+          "legendFormat": "{{pod}} {{tick}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Tick Overrun Rate",
+      "type": "timeseries",
+      "description": "Main tick overruns count samples above 2.4s; zone tick overruns count samples above 400ms."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.01
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 20
+      },
+      "id": 23,
+      "options": {
+        "legend": {
+          "calcs": [
+            "lastNotNull",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (pod, severity) (rate(map_heartbeat_sidecar_xi_map_sql_slow_queries_total{namespace=\"$namespace\"}[5m]))",
+          "legendFormat": "{{pod}} {{severity}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (pod) (rate(map_heartbeat_sidecar_xi_map_sql_queries_total{namespace=\"$namespace\"}[5m]))",
+          "legendFormat": "{{pod}} all queries",
+          "refId": "B"
+        }
+      ],
+      "title": "SQL Slow Query Rate",
+      "type": "timeseries",
+      "description": "Rate of map-server SQL queries crossing the configured slow-query warning and error thresholds."
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 8,
+            "showPoints": "never"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
               }
             ]
           }
@@ -725,7 +1091,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 12
+        "y": 28
       },
       "id": 17,
       "options": {
@@ -762,7 +1128,7 @@
       ],
       "title": "Map Player And Zone Workload",
       "type": "timeseries",
-      "description": "Requires map-heartbeat-sidecar v0.1.4 and a game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
+      "description": "Requires a map-heartbeat-sidecar image and game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
     },
     {
       "datasource": {
@@ -795,7 +1161,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 12
+        "y": 28
       },
       "id": 18,
       "options": {
@@ -822,7 +1188,7 @@
       ],
       "title": "Active Mobs By Map Pod",
       "type": "timeseries",
-      "description": "Requires map-heartbeat-sidecar v0.1.4 and a game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
+      "description": "Requires a map-heartbeat-sidecar image and game-server image that emits map workload heartbeat fields. Shows 0 per pod until both images are rolled out."
     },
     {
       "datasource": {
@@ -856,7 +1222,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 20
+        "y": 36
       },
       "id": 7,
       "options": {
@@ -924,7 +1290,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 20
+        "y": 36
       },
       "id": 8,
       "options": {
@@ -983,7 +1349,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 28
+        "y": 44
       },
       "id": 9,
       "options": {

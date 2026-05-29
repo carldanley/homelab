@@ -77,7 +77,7 @@ spec:
           expr: |
             map_heartbeat_sidecar_last_zone_tick_age_seconds{namespace="calamityxi"} > 15
             and on(namespace, pod)
-            map_heartbeat_sidecar_xi_map_connected_players{namespace="calamityxi"} > 0
+            (map_heartbeat_sidecar_xi_map_connected_players{namespace="calamityxi"} > 0)
           for: 5m
           labels:
             severity: warning
@@ -85,6 +85,59 @@ spec:
           annotations:
             summary: map server zone tick is lagging while players are connected
             description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has connected players but has not reported a zone tick for more than 15 seconds. Check hot-zone scripts, map CPU, and recent rollouts.
+
+        - alert: MapServerMainTickDurationHigh
+          expr: max by (namespace, pod) (map_heartbeat_sidecar_xi_map_main_tick_duration_window_max_seconds{namespace="calamityxi"}) > 1
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server main tick duration is high
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has reported main tick duration above 1s for five minutes. The main tick interval is 2.4s, so this is baseline drift before a hard overrun.
+
+        - alert: MapServerZoneTickDurationHighWithPlayers
+          expr: |
+            max by (namespace, pod) (map_heartbeat_sidecar_xi_map_zone_tick_duration_window_max_seconds{namespace="calamityxi"}) > 0.4
+            and on(namespace, pod)
+            (map_heartbeat_sidecar_xi_map_connected_players{namespace="calamityxi"} > 0)
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server zone tick duration is high with players connected
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has connected players and zone tick duration above the 400ms zone logic interval for five minutes. Check hot-zone scripts, mob AI, pathing, and CPU throttling.
+
+        - alert: MapServerTickOverruns
+          expr: sum by (namespace, pod, tick) (increase(map_heartbeat_sidecar_xi_map_tick_overruns_total{namespace="calamityxi"}[5m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server tick overrun detected
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} reported {{ $labels.tick }} tick duration overruns in the last five minutes. Main overruns are above 2.4s and zone overruns are above 400ms.
+
+        - alert: MapServerSQLQueryDurationHigh
+          expr: max by (namespace, pod) (map_heartbeat_sidecar_xi_map_sql_query_duration_window_max_seconds{namespace="calamityxi"}) > 0.25
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server SQL query duration is high
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} has reported SQL query duration above the default 250ms slow-query error threshold for five minutes. Check database latency, locks, and recent content changes.
+
+        - alert: MapServerSQLSlowQueryErrors
+          expr: sum by (namespace, pod) (increase(map_heartbeat_sidecar_xi_map_sql_slow_queries_total{namespace="calamityxi",severity="error"}[5m])) > 0
+          for: 1m
+          labels:
+            severity: warning
+            discord_channel: calamityxi-map-servers
+          annotations:
+            summary: map server SQL slow-query error threshold crossed
+            description: Map server {{ $labels.namespace }}/{{ $labels.pod }} reported one or more SQL queries above the configured slow-query error threshold in the last five minutes. Correlate with map tick duration and MariaDB metrics.
 
         - alert: MapHeartbeatSidecarDroppedHeartbeats
           expr: sum by (namespace, pod) (increase(map_heartbeat_sidecar_heartbeats_total{namespace="calamityxi",result="dropped"}[5m])) > 0
