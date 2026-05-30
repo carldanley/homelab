@@ -20,7 +20,7 @@ spec:
       tls:
         enabled: true
   schedule:
-    cron: "0 * * * *" # Every hour
+    cron: "17 * * * *" # Every hour on minute 17
     suspend: false
     immediate: true
   compression: bzip2
