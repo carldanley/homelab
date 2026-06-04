@@ -44,6 +44,7 @@ spec:
         imageSet:
           name: rook-csi-operator-image-set-configmap
         log: {}
+        snapshotPolicy: volumeSnapshot
         nodePlugin:
           affinity:
             nodeAffinity: {}
@@ -120,6 +121,7 @@ spec:
         imageSet:
           name: rook-csi-operator-image-set-configmap
         log: {}
+        snapshotPolicy: volumeSnapshot
         nodePlugin:
           affinity:
             nodeAffinity: {}
