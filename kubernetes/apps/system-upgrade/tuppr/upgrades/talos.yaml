@@ -4,6 +4,10 @@ kind: TalosUpgrade
 metadata:
   name: talos
 spec:
+  policy:
+    # Worker nodes host singleton/PDB-protected workloads; let Talos reboot
+    # handle disruption instead of blocking on Kubernetes eviction.
+    nodrain: true
   talos:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
     version: v1.13.4
