@@ -77,10 +77,17 @@ spec:
                 nodeFit: true
                 minPodAge: 30m
                 noEvictionPolicy: Mandatory
+                labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - cloudflared-http
+                        - echo-server
+                        - snapshot-controller
                 podProtections:
                   extraEnabled:
                     - PodsWithPVC
-                    - PodsWithoutPDB
             - name: LowNodeUtilization
               args:
                 metricsUtilization:
@@ -93,7 +100,7 @@ spec:
                         "instance", "$1", "node", "(.+)"
                       )
                 thresholds:
-                  MetricResource: 30
+                  MetricResource: 60
                 targetThresholds:
                   MetricResource: 85
                 evictionLimits:
