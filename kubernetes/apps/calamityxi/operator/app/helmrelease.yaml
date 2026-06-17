@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: ghcr.io/calamityffxi/operator
-      tag: v0.2.26
+      tag: v0.2.29
 
     replicaCount: 1
 
