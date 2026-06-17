@@ -62,13 +62,13 @@ spec:
               (
                 kube_deployment_spec_replicas{job="kube-state-metrics", namespace!="calamityxi"}
                 or
-                kube_deployment_spec_replicas{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+                kube_deployment_spec_replicas{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
               )
                 >
               (
                 kube_deployment_status_replicas_available{job="kube-state-metrics", namespace!="calamityxi"}
                 or
-                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
               )
             ) and (
               (
@@ -78,7 +78,7 @@ spec:
               )
               or
               (
-                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}[10m])
+                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}[10m])
                 ==
                 0
               )
@@ -102,7 +102,7 @@ spec:
             )
             or
             (
-              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace="calamityxi", deployment!="cxi-world"}
+              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
               != 0
             )
           for: 15m
