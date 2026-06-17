@@ -1,0 +1,24 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: teslamate-fleet-key
+spec:
+  commonName: "teslamate.${DOMAIN_5}"
+  dnsNames:
+    - "teslamate.${DOMAIN_5}"
+  duration: 87600h
+  isCA: false
+  issuerRef:
+    name: teslamate-fleet-key
+    kind: Issuer
+    group: cert-manager.io
+  privateKey:
+    algorithm: ECDSA
+    encoding: PKCS8
+    rotationPolicy: Never
+    size: 256
+  renewBefore: 720h
+  secretName: teslamate-fleet-key-tls
+  usages:
+    - digital signature

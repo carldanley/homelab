@@ -15,7 +15,8 @@ spec:
       app:
         replicas: 1
         annotations:
-          secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret"
+          configmap.reloader.stakater.com/reload: "{{ .Release.Name }}-fleet-key-configmap"
+          secret.reloader.stakater.com/reload: "{{ .Release.Name }}-secret,{{ .Release.Name }}-fleet-key-tls"
         initContainers:
           init-db:
             image:
@@ -25,6 +26,19 @@ spec:
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+          fleet-key-generator:
+            image:
+              repository: docker.io/alpine/openssl
+              tag: 3.5.7
+            command:
+              - /bin/sh
+              - -ec
+            args:
+              - |
+                mkdir -p /www/.well-known/appspecific
+                openssl pkey -in /cert/tls.key -pubout \
+                  -out /www/.well-known/appspecific/com.tesla.3p.public-key.pem
+                chmod 0444 /www/.well-known/appspecific/com.tesla.3p.public-key.pem
         containers:
           app:
             image:
@@ -44,12 +58,28 @@ spec:
                 cpu: 50m
               limits:
                 memory: 500Mi
+          fleet-key:
+            image:
+              repository: ghcr.io/nginxinc/nginx-unprivileged
+              tag: 1.27.4
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 64Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                  - ALL
 
     service:
       app:
         ports:
           http:
             port: &port 4000
+          fleet-key:
+            port: &fleetKeyPort 8080
 
     defaultPodOptions:
       hostUsers: false
@@ -66,3 +96,31 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *port
+
+    persistence:
+      fleet-key:
+        type: emptyDir
+        advancedMounts:
+          app:
+            fleet-key:
+              - path: /www
+                readOnly: true
+            fleet-key-generator:
+              - path: /www
+      fleet-key-config:
+        type: configMap
+        name: "{{ .Release.Name }}-fleet-key-configmap"
+        advancedMounts:
+          app:
+            fleet-key:
+              - path: /etc/nginx/nginx.conf
+                subPath: nginx.conf
+                readOnly: true
+      fleet-key-tls:
+        type: secret
+        name: "{{ .Release.Name }}-fleet-key-tls"
+        advancedMounts:
+          app:
+            fleet-key-generator:
+              - path: /cert
+                readOnly: true
