@@ -22,7 +22,13 @@ spec:
               Prometheus cannot scrape {{ $labels.namespace }}/{{ $labels.service }}.
         - alert: ConnectServerMissingReplicas
           expr: |-
-            kube_deployment_status_replicas_available{namespace="calamityxi",deployment=~".*-connect"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment=~".*-connect"}
+            max by (namespace, deployment) (
+              kube_deployment_status_replicas_available{namespace="calamityxi",deployment=~".*-connect"}
+            )
+            <
+            max by (namespace, deployment) (
+              kube_deployment_spec_replicas{namespace="calamityxi",deployment=~".*-connect"}
+            )
           for: 5m
           labels:
             severity: critical

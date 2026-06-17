@@ -36,7 +36,13 @@ spec:
               Prometheus cannot scrape {{ $labels.namespace }}/{{ $labels.service }}.
         - alert: APIServerMissingReplicas
           expr: |-
-            kube_deployment_status_replicas_available{namespace="calamityxi",deployment="api-server"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment="api-server"}
+            max by (namespace, deployment) (
+              kube_deployment_status_replicas_available{namespace="calamityxi",deployment="api-server"}
+            )
+            <
+            max by (namespace, deployment) (
+              kube_deployment_spec_replicas{namespace="calamityxi",deployment="api-server"}
+            )
           for: 5m
           labels:
             severity: critical

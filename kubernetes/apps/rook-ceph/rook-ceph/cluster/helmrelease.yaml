@@ -26,6 +26,27 @@ spec:
     monitoring:
       enabled: true
       createPrometheusRules: true
+      prometheusRuleOverrides:
+        CephPoolGrowthWarning:
+          expr: |-
+            (
+              predict_linear(
+                (max without (pod) (ceph_pool_percent_used))[2d:],
+                3600 * 24 * 5
+              )
+              * on(cluster, pool_id, instance) group_right()
+                max without (pod) (ceph_pool_metadata)
+            ) >= 95
+        CephNodeDiskspaceWarning:
+          expr: |-
+            (
+              predict_linear(
+                (max without (pod) (node_filesystem_free_bytes{device=~"/.*"}))[2d:],
+                3600 * 24 * 5
+              )
+              * on(cluster, instance) group_left(nodename)
+                max by (cluster, instance, nodename) (node_uname_info)
+            ) < 0
 
     toolbox:
       enabled: true

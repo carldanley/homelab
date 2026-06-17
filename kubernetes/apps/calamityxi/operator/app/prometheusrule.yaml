@@ -22,7 +22,13 @@ spec:
               kube-state-metrics cannot find the calamityxi operator deployment.
         - alert: CalamityXIOperatorMissingReplicas
           expr: |-
-            kube_deployment_status_replicas_available{namespace="calamityxi",deployment="operator-calamityxi-operator"} < on(namespace, deployment) kube_deployment_spec_replicas{namespace="calamityxi",deployment="operator-calamityxi-operator"}
+            max by (namespace, deployment) (
+              kube_deployment_status_replicas_available{namespace="calamityxi",deployment="operator-calamityxi-operator"}
+            )
+            <
+            max by (namespace, deployment) (
+              kube_deployment_spec_replicas{namespace="calamityxi",deployment="operator-calamityxi-operator"}
+            )
           for: 5m
           labels:
             severity: critical

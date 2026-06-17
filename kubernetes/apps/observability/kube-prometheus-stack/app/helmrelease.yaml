@@ -30,6 +30,7 @@ spec:
         # /readyz while they are healthy but not the elected world leader.
         KubeDeploymentReplicasMismatch: true
         KubeDeploymentRolloutStuck: true
+        KubePodNotReady: true
         # The upstream rule is too noisy for small etcd DBs because it fires
         # whenever live data is below 50% of allocated space and over 100MiB.
         etcdDatabaseHighFragmentationRatio: true
