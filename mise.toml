@@ -11,7 +11,7 @@ helmfile = "1.5.5"
 
 # Repository automation and operator tools.
 "1password-cli" = "2.33.1"
-jq = "1.8.1"
+jq = "1.8.2"
 k9s = "0.51.0"
 task = "3.51.1"
 uv = "0.11.21"
