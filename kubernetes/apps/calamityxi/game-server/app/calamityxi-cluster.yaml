@@ -651,6 +651,10 @@ spec:
           - 164
           - 171
           - 175
+      - name: "Riftwood"
+        port: 54347
+        zoneIds:
+          - 281
     privateShardPortRange:
       min: 54348
       max: 55230
