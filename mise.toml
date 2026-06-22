@@ -1,7 +1,7 @@
 [tools]
 # Keep kubectl and talosctl aligned with the versions declared for cluster upgrades.
 kubectl = "1.36.2"
-talosctl = "1.13.4"
+talosctl = "1.13.5"
 
 # Flux/Helm workflow tools.
 flux2 = "2.8.8"
