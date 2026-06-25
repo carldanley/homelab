@@ -16,7 +16,7 @@ spec:
           app:
             image:
               repository: rhasspy/wyoming-whisper
-              tag: 3.2.0
+              tag: 3.3.0
             args:
               - --model=small
               - --language=en
