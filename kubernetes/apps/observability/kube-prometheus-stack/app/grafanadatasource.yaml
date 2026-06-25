@@ -13,7 +13,7 @@ spec:
     uid: prometheus
     type: prometheus
     access: proxy
-    url: http://prometheus-operated.observability.svc.cluster.local:9090
+    url: http://kube-prometheus-stack-prometheus.observability.svc.cluster.local:9090
     isDefault: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadatasource_v1beta1.json
