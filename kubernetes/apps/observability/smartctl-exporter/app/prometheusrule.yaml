@@ -53,7 +53,40 @@ spec:
           for: 5m
           annotations:
             summary: >-
-              Device {{ $labels.device }} on instance {{ $labels.instance }} is under available spare threashold
+              Device {{ $labels.device }} on instance {{ $labels.instance }} is under available spare threshold
+          labels:
+            severity: critical
+
+        - alert: SmartDeviceNvmeWearHigh
+          expr: |
+            (
+              smartctl_device_percentage_used >= 80
+              and smartctl_device_percentage_used < 100
+            )
+            * on(instance, device, namespace, service, endpoint, container)
+              group_left(model_name, serial_number)
+              smartctl_device
+          for: 1h
+          annotations:
+            summary: >-
+              NVMe drive {{ $labels.device }} on instance {{ $labels.instance }} is {{ $value }}% worn
+            description: >-
+              {{ $labels.model_name }} serial {{ $labels.serial_number }} has consumed {{ $value }}% of its vendor-estimated endurance.
+          labels:
+            severity: warning
+
+        - alert: SmartDeviceNvmeWearCritical
+          expr: |
+            (smartctl_device_percentage_used >= 100)
+            * on(instance, device, namespace, service, endpoint, container)
+              group_left(model_name, serial_number)
+              smartctl_device
+          for: 15m
+          annotations:
+            summary: >-
+              NVMe drive {{ $labels.device }} on instance {{ $labels.instance }} has exceeded its endurance estimate
+            description: >-
+              {{ $labels.model_name }} serial {{ $labels.serial_number }} reports {{ $value }}% used. Plan replacement, especially for control-plane OS disks.
           labels:
             severity: critical
 
@@ -62,7 +95,7 @@ spec:
             smartctl_device_interface_speed{speed_type="current"} != on(device, instance, namespace, pod) smartctl_device_interface_speed{speed_type="max"}
           annotations:
             summary: >-
-              Device {{ $labels.device }} on instance {{ $labels.instance }} interface is slower then it should be
+              Device {{ $labels.device }} on instance {{ $labels.instance }} interface is slower than it should be
           for: 5m
           labels:
             severity: critical
