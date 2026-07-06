@@ -84,6 +84,12 @@ spec:
           - name: "cp03"
             devices:
               - name: "/dev/disk/by-id/nvme-eui.36384c30544014030025384500000001"
+          - name: "w02"
+            devices:
+              - name: "/dev/disk/by-id/nvme-eui.36335330541215750025384500000001"
+          - name: "w03"
+            devices:
+              - name: "/dev/disk/by-id/nvme-eui.36335330581016220025384a00000001"
 
     cephBlockPools:
       - name: ceph-blockpool

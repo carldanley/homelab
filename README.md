@@ -65,7 +65,8 @@ This Git repository contains the following directories under [kubernetes](./kube
 
 | Device                                 | Count | OS Disk Size | Data Disk Size            | RAM  | Operating System  | Purpose                 |
 |-----------------------------------------|-------|--------------|---------------------------|------|-------------------|-------------------------|
-| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 3     | 500GB M.2    | 1.92 TB U.2 + 1.92 TB M.2 | 96GB | Talos             | Kubernetes              |
+| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 3     | 500GB M.2    | 1.92 TB U.2 + 1.92 TB M.2 | 96GB  | Talos             | Kubernetes Controlplane |
+| MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 2     | 1TB M.2      | 1.92 TB U.2 + 2TB M.2     | 128GB | Talos             | Kubernetes Workers      |
 | MinisForum MS-01 (Intel Core i9-13900H) | 1     | 1GB M.2      | 4GB M.2                   | 32GB | Talos             | Kubernetes (NVR)        |
 | MinisForum N5 Pro                       | 1     | 64GB         | 5x20TB HDD                | 96GB | TrueNAS Community | NAS                     |
 | PiKVM (RasPi 4)                         | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM             | KVM                     |
@@ -77,10 +78,19 @@ This Git repository contains the following directories under [kubernetes](./kube
 
 ---
 
-My MS-A2 workstations are configured with the following hardware:
+My original MS-A2 workstations are configured with the following hardware:
 
 - [Crucial 96GB Kit (48GBx2) DDR5-5600 SODIMM](https://www.crucial.com/memory/ddr5/ct2k48g56c46s5)
 - [Crucial 500GB M.2 P3 Plus Gen4 NVMe PCIe 4.0](https://www.crucial.com/products/ssd/crucial-p3-plus-ssd) (Talos OS)
+- [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
+- [Samsung 990 Pro 2TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie-4-0-nvme-ssd-2tb-mz-v9p2t0b-am.html) - (OpenEBS Local Storage)
+
+---
+
+My additional MS-A2 worker nodes are configured with the following hardware:
+
+- 128GB DDR5 SODIMM
+- [Samsung SSD 990 PRO 1TB NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie--4-0-nvme--ssd-1tb-mz-v9p1t0b-am.html) - (Talos OS)
 - [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
 - [Samsung 990 Pro 2TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie-4-0-nvme-ssd-2tb-mz-v9p2t0b-am.html) - (OpenEBS Local Storage)
 
