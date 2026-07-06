@@ -89,7 +89,7 @@ My original MS-A2 workstations are configured with the following hardware:
 
 My additional MS-A2 worker nodes are configured with the following hardware:
 
-- 128GB DDR5 SODIMM
+- [Crucial 128GB Kit (64GBx2) DDR5-5600 SODIMM](https://www.crucial.com/memory/ddr5/ct2k64g56c46s5)
 - [Samsung SSD 990 PRO 1TB NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie--4-0-nvme--ssd-1tb-mz-v9p1t0b-am.html) - (Talos OS)
 - [Samsung 1.92TB U.2 2.5-inch 7mmT PM9A3 NVMe PCIe 4.0](https://www.samsung.com/us/business/computing/memory-storage/enterprise-solid-state-drives/pm9a3-nvme-u-2-ssd-1-9tb-mz-ql21t900/) - (Ceph Storage)
 - [Samsung 990 Pro 2TB SSD NVMe PCIe 4.0](https://www.samsung.com/us/computing/memory-storage/solid-state-drives/990-pro-pcie-4-0-nvme-ssd-2tb-mz-v9p2t0b-am.html) - (OpenEBS Local Storage)
