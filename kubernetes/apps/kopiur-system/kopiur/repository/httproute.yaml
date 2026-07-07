@@ -5,7 +5,7 @@ metadata:
   name: kopia
   annotations:
     gatus.home-operations.com/endpoint: |-
-      conditions: ["[STATUS] == 401"]
+      conditions: ["[STATUS] == 200"]
 spec:
   parentRefs:
     - name: internal

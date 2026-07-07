@@ -62,8 +62,8 @@ spec:
     namespace: kopiur-system
     readOnly: true
     auth:
-      generate:
-        username: kopia
+      insecure:
+        acknowledgeInsecure: true
     service:
       type: ClusterIP
       port: 51515
