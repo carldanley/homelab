@@ -15,6 +15,9 @@ spec:
     - apiVersion: ceph.rook.io/v1
       kind: CephCluster
       expr: status.ceph.health in ['HEALTH_OK']
-    - apiVersion: volsync.backube/v1alpha1
-      kind: ReplicationSource
-      expr: status.conditions.filter(c, c.type == "Synchronizing").all(c, c.status == "False")
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: Snapshot
+      expr: status.phase in ['Succeeded', 'Failed']
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: Restore
+      expr: status.phase in ['Completed', 'Failed']

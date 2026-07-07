@@ -10,7 +10,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: snapshot-controller
-      namespace: volsync-system
+      namespace: snapshot-system
     - name: openebs
       namespace: openebs-system
     - name: kube-prometheus-stack

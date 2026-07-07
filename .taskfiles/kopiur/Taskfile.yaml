@@ -1,0 +1,46 @@
+---
+version: "3"
+
+tasks:
+  status:
+    desc: Show Kopiur backup and restore status
+    cmds:
+      - kubectl get clusterrepositories.kopiur.home-operations.com
+      - kubectl get snapshotpolicies.kopiur.home-operations.com -A
+      - kubectl get snapshotschedules.kopiur.home-operations.com -A
+      - kubectl get restores.kopiur.home-operations.com -A
+      - kubectl get snapshots.kopiur.home-operations.com -A
+    env:
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
+    preconditions:
+      - which kubectl
+
+  snapshot:
+    desc: Create a pinned manual Kopiur snapshot [NS=required] [APP=required]
+    cmds:
+      - |
+        kubectl --namespace {{.NS}} create --filename - <<'YAML'
+        apiVersion: kopiur.home-operations.com/v1alpha1
+        kind: Snapshot
+        metadata:
+          generateName: {{.APP}}-manual-
+          labels:
+            app.kubernetes.io/name: {{.APP}}
+        spec:
+          deletionPolicy: Retain
+          pin: true
+          policyRef:
+            name: {{.APP}}
+          tags:
+            app: {{.APP}}
+            reason: manual
+        YAML
+    env:
+      KUBECONFIG: "{{ .KUBERNETES_DIR }}/kubeconfig"
+    requires:
+      vars:
+        - APP
+        - NS
+    preconditions:
+      - which kubectl
+      - kubectl --namespace {{.NS}} get snapshotpolicies.kopiur.home-operations.com {{.APP}}

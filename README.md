@@ -28,7 +28,7 @@ There is a template at [onedr0p/cluster-template](https://github.com/onedr0p/clu
 - [multus](https://github.com/k8snetworkplumbingwg/multus-cni) - Multi-homed pod networking
 - [rook](https://github.com/rook/rook) - Distributed block storage for persistent storage
 - [spegel](https://github.com/spegel-org/spegel) - Stateless cluster local OCI registry mirror
-- [volsync](https://github.com/backube/volsync) - Backup and recovery of persistent volume claims
+- [kopiur](https://github.com/home-operations/kopiur) - Backup and recovery of persistent volume claims
 
 ### GitOps
 
@@ -47,6 +47,8 @@ Before pushing Kubernetes changes, run:
 ```sh
 task validate
 ```
+
+Backup and restore operations are documented in [Backup and Restore](./docs/backup-and-restore.md).
 
 ### Directories
 
@@ -127,6 +129,7 @@ For random notes I've taken the time to jot down, see the following links:
 - [Using Cilium with UniFi BGP](./docs/using-cilium-with-unifi-bgp.md)
 - [Checking Synology SSD Cache](./docs/checking-synology-ssd-cache.md)
 - [Powerwall Dashboard](./docs/powerwall-dashboard.md)
+- [Backup and Restore](./docs/backup-and-restore.md)
 
 For fonts, see [Noto Emoji Animations](https://googlefonts.github.io/noto-emoji-animation/).
 

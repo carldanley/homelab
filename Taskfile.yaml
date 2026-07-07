@@ -28,7 +28,7 @@ includes:
   talos: .taskfiles/talos
   tools: .taskfiles/tools
   validate: .taskfiles/validate
-  volsync: .taskfiles/volsync
+  kopiur: .taskfiles/kopiur
 
 tasks:
   default:

@@ -1,0 +1,70 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kopiur-homelab
+spec:
+  groups:
+    - name: kopiur-homelab.rules
+      rules:
+        - alert: KopiurMetricsAbsent
+          expr: absent(kopiur_controller_reconciliations_total)
+          for: 10m
+          annotations:
+            summary: Kopiur controller metrics are absent
+            description: >-
+              Prometheus has not scraped Kopiur controller metrics for more than
+              10 minutes. Backup freshness alerts depend on this scrape.
+          labels:
+            severity: critical
+
+        - alert: KopiurSnapshotStillRunning
+          expr: >-
+            max by (namespace, name, policy, phase)
+            (kopiur_resource_phase{kind="Snapshot", phase!~"Succeeded|Failed"}) == 1
+          for: 1h
+          annotations:
+            summary: Kopiur snapshot is still {{ $labels.phase }}
+            description: >-
+              Snapshot {{ $labels.namespace }}/{{ $labels.name }} for policy
+              {{ $labels.policy }} has not reached a terminal state for more
+              than one hour.
+          labels:
+            severity: warning
+
+        - alert: KopiurRestoreStillRunning
+          expr: >-
+            max by (namespace, name, phase)
+            (kopiur_resource_phase{kind="Restore", phase!="Completed"}) == 1
+          for: 30m
+          annotations:
+            summary: Kopiur restore is still {{ $labels.phase }}
+            description: >-
+              Restore {{ $labels.namespace }}/{{ $labels.name }} has not reached
+              Completed for more than 30 minutes.
+          labels:
+            severity: warning
+
+        - alert: KopiurBackupSizeUnexpectedlyLarge
+          expr: kopiur_policy_last_backup_size_bytes > 10 * 1024 * 1024 * 1024
+          for: 30m
+          annotations:
+            summary: Kopiur backup is larger than expected
+            description: >-
+              Latest backup for {{ $labels.namespace }}/{{ $labels.policy }} is
+              {{ $value | humanize1024 }}. This may mean a media, cache, or
+              scratch path is being backed up unintentionally.
+          labels:
+            severity: warning
+
+        - alert: KopiurMaintenanceMetricsAbsent
+          expr: absent(kopiur_maintenance_last_reclaimed_bytes{name="r2", namespace="kopiur-system"})
+          for: 24h
+          annotations:
+            summary: Kopiur repository maintenance metrics are absent
+            description: >-
+              The r2 repository maintenance metric has been absent for more than
+              24 hours. Check the Maintenance resource and Kopia repository
+              health.
+          labels:
+            severity: warning
