@@ -5,3 +5,15 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./dnsendpoint.yaml
+patches:
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: SnapshotPolicy
+      name: zwavejs2mqtt
+    patch: |-
+      - op: add
+        path: /spec/files
+        value:
+          ignoreRules:
+            - .session-secret

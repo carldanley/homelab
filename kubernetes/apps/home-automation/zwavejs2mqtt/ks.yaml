@@ -9,17 +9,34 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
-    - ../../../../components/volsync
+    - ../../../../components/kopiur
+    - ../../../../components/kopiur-restore
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
-    - name: volsync
-      namespace: volsync-system
+    - name: kopiur-repository
+      namespace: kopiur-system
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: *app
       namespace: *namespace
+  healthCheckExprs:
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: SnapshotPolicy
+      inProgress: status.observedGeneration != metadata.generation || status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
+      failed: status.conditions.exists(e, e.type == 'Ready' && e.status == 'False') || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
+      current: status.observedGeneration == metadata.generation && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: SnapshotSchedule
+      inProgress: status.observedGeneration != metadata.generation || status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
+      failed: status.conditions.exists(e, e.type == 'Ready' && e.status == 'False') || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
+      current: status.observedGeneration == metadata.generation && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: Restore
+      inProgress: status.observedGeneration != metadata.generation || status.phase != 'Completed'
+      failed: status.phase == 'Failed' || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
+      current: status.observedGeneration == metadata.generation && status.phase == 'Completed'
   interval: 1h
   path: ./kubernetes/apps/home-automation/zwavejs2mqtt/app
   postBuild:
@@ -29,8 +46,7 @@ spec:
         optional: false
     substitute:
       APP: *app
-      VOLSYNC_CAPACITY: 1Gi
-      VOLSYNC_CACHE_CAPACITY: 1Gi
+      KOPIUR_CAPACITY: 1Gi
   prune: true
   sourceRef:
     kind: GitRepository
