@@ -18,6 +18,8 @@ spec:
     features:
       credentialProjection:
         enabled: true
+      kopiaUi:
+        enabled: true
     monitoring:
       dashboards:
         enabled: true

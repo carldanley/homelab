@@ -58,3 +58,16 @@ spec:
     ttlSecondsAfterFinished: 300
   scheduleDefaults:
     timezone: America/New_York
+  server:
+    namespace: kopiur-system
+    readOnly: true
+    auth:
+      generate:
+        username: kopia
+    service:
+      type: ClusterIP
+      port: 51515
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi

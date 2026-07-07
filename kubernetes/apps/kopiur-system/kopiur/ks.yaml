@@ -86,6 +86,9 @@ spec:
       - kind: Secret
         name: kopia-storage-secret
         optional: false
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository

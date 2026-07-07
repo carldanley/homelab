@@ -9,10 +9,13 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   components:
+    - ../../../../components/kopiur
     - ../../../../components/volsync
   dependsOn:
     - name: cert-manager-secrets
       namespace: cert-manager
+    - name: kopiur-repository
+      namespace: kopiur-system
     - name: volsync
       namespace: volsync-system
   healthChecks:
@@ -20,6 +23,17 @@ spec:
       kind: HelmRelease
       name: *app
       namespace: *namespace
+  healthCheckExprs:
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: SnapshotPolicy
+      inProgress: status.observedGeneration != metadata.generation
+      failed: status.conditions.exists(e, e.status == 'False')
+      current: status.observedGeneration == metadata.generation
+    - apiVersion: kopiur.home-operations.com/v1alpha1
+      kind: SnapshotSchedule
+      inProgress: status.observedGeneration != metadata.generation
+      failed: status.conditions.exists(e, e.status == 'False')
+      current: status.observedGeneration == metadata.generation
   interval: 1h
   path: ./kubernetes/apps/media/tautulli/app
   postBuild:
