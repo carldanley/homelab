@@ -1,0 +1,11 @@
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotSchedule
+metadata:
+  name: ${APP}
+spec:
+  policyRef:
+    name: ${APP}
+  schedule:
+    cron: "${KOPIUR_SCHEDULE:=H */8 * * *}"
+    jitter: "${KOPIUR_JITTER:=30m}"

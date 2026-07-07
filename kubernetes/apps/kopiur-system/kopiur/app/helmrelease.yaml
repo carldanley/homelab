@@ -1,0 +1,45 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kopiur
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: kopiur
+  values:
+    installScope: cluster
+    replicaCount: 2
+    leaderElection:
+      enabled: true
+    podDisruptionBudget:
+      enabled: true
+    features:
+      credentialProjection:
+        enabled: true
+    monitoring:
+      dashboards:
+        enabled: true
+        grafanaOperator:
+          enabled: true
+          matchLabels:
+            dashboards: grafana
+      prometheusRule:
+        enabled: true
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+    webhook:
+      replicaCount: 2
+      podDisruptionBudget:
+        enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+      serviceMonitor:
+        enabled: true

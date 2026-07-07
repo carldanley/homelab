@@ -1,0 +1,27 @@
+---
+apiVersion: kopiur.home-operations.com/v1alpha1
+kind: SnapshotPolicy
+metadata:
+  name: ${APP}
+  annotations:
+    kopiur.home-operations.com/allow-identity-change: "true"
+spec:
+  credentialProjection:
+    enabled: true
+  repository:
+    kind: ClusterRepository
+    name: r2
+  retention:
+    keepHourly: 24
+    keepDaily: 7
+  sources:
+    - pvc:
+        name: ${APP}
+  verification:
+    quick:
+      schedule:
+        cron: H 3 * * *
+    deep:
+      schedule:
+        cron: H 5 1 * *
+  volumeSnapshotClassName: "${KOPIUR_SNAPSHOTCLASS:=csi-ceph-block}"
