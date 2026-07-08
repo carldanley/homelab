@@ -6,7 +6,6 @@ namespace: selfhosted
 components:
   - ../../components/common
 resources:
-  - ./searxng/ks.yaml
   - ./n8n/ks.yaml
   - ./docmost/ks.yaml
   - ./tandoor/ks.yaml
