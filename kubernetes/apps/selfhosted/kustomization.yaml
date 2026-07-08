@@ -10,6 +10,5 @@ resources:
   - ./n8n/ks.yaml
   - ./docmost/ks.yaml
   - ./tandoor/ks.yaml
-  - ./paperless/ks.yaml
   - ./teslamate/ks.yaml
   - ./powerwall-dashboard/ks.yaml
