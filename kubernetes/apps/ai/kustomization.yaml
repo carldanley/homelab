@@ -6,6 +6,5 @@ namespace: ai
 components:
   - ../../components/common
 resources:
-  - ./openwebui/ks.yaml
   - ./qdrant/ks.yaml
   - ./crawl4ai/ks.yaml
