@@ -1,0 +1,41 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: k8s-gpu-dra-driver
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: v0.1.0
+  url: oci://ghcr.io/buroa/helm/k8s-gpu-dra-driver
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: k8s-gpu-dra-driver
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: k8s-gpu-dra-driver
+  interval: 1h
+  values:
+    image:
+      repository: docker.io/rocm/k8s-gpu-dra-driver
+      tag: v1.0.0
+
+    cdi:
+      dynamicPath: /run/cdi
+
+    kubeletPlugin:
+      nodeSelector:
+        gpu.homelab/amd: "true"
+      containers:
+        plugin:
+          resources:
+            requests:
+              cpu: 10m
+            limits:
+              memory: 128Mi

@@ -15,4 +15,5 @@ resources:
   - ./irqbalance/ks.yaml
   - ./descheduler/ks.yaml
   - ./amd-device-plugin/ks.yaml
+  - ./k8s-gpu-dra-driver/ks.yaml
   - ./intel-device-plugin/ks.yaml
