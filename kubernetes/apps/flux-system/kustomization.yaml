@@ -6,6 +6,7 @@ namespace: flux-system
 components:
   - ../../components/common
 resources:
+  - ./downflate/ks.yaml
   - ./flux-instance/ks.yaml
   - ./flux-operator/ks.yaml
   - ./konflate/ks.yaml

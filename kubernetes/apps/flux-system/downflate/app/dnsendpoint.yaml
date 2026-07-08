@@ -1,0 +1,14 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: downflate
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: downflate.${DOMAIN_7}
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - external.${DOMAIN_7}
