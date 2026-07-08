@@ -35,9 +35,9 @@ spec:
       current: status.observedGeneration == metadata.generation && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
     - apiVersion: kopiur.home-operations.com/v1alpha1
       kind: SnapshotSchedule
-      inProgress: status.observedGeneration != metadata.generation || status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
+      inProgress: status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
       failed: status.conditions.exists(e, e.type == 'Ready' && e.status == 'False') || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
-      current: status.observedGeneration == metadata.generation && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+      current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
     - apiVersion: kopiur.home-operations.com/v1alpha1
       kind: Restore
       inProgress: status.observedGeneration != metadata.generation || status.phase != 'Completed'
