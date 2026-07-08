@@ -30,9 +30,9 @@ spec:
       current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
     - apiVersion: kopiur.home-operations.com/v1alpha1
       kind: SnapshotPolicy
-      inProgress: status.observedGeneration != metadata.generation || status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
+      inProgress: status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
       failed: status.conditions.exists(e, e.type == 'Ready' && e.status == 'False') || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
-      current: status.observedGeneration == metadata.generation && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
+      current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
     - apiVersion: kopiur.home-operations.com/v1alpha1
       kind: SnapshotSchedule
       inProgress: status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True')
@@ -40,9 +40,9 @@ spec:
       current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
     - apiVersion: kopiur.home-operations.com/v1alpha1
       kind: Restore
-      inProgress: status.observedGeneration != metadata.generation || status.phase != 'Completed'
+      inProgress: status.conditions.exists(e, e.type == 'Reconciling' && e.status == 'True') || status.phase != 'Completed'
       failed: status.phase == 'Failed' || status.conditions.exists(e, e.type == 'Stalled' && e.status == 'True')
-      current: status.observedGeneration == metadata.generation && status.phase == 'Completed'
+      current: status.phase == 'Completed' && status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/media/prowlarr/app
   postBuild:
