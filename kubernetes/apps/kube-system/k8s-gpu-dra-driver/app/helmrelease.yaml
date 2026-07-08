@@ -22,10 +22,6 @@ spec:
     name: k8s-gpu-dra-driver
   interval: 1h
   values:
-    image:
-      repository: docker.io/rocm/k8s-gpu-dra-driver
-      tag: v1.0.0
-
     cdi:
       dynamicPath: /run/cdi
 
