@@ -1,91 +1,209 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: external-dns-unifi
-spec:
-  interval: 30m
-  url: https://kubernetes-sigs.github.io/external-dns
----
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: external-dns-unifi
+  name: &app external-dns-unifi
 spec:
-  interval: 30m
-  chart:
-    spec:
-      chart: external-dns
-      version: 1.21.1
-      sourceRef:
-        kind: HelmRepository
-        name: external-dns-unifi
-      interval: 30m
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  upgrade:
+    force: true
   values:
-    fullnameOverride: &name external-dns-unifi
-    logLevel: &logLevel info
+    controllers:
+      external-dns-unifi:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: registry.k8s.io/external-dns/external-dns
+              tag: v0.21.0@sha256:f53faaf71cb270d1ca9dce6ea0c94bfebf1a18696263487f0fbc74b9bf2bd7ff
+            args:
+              - --log-level=info
+              - --log-format=text
+              - --interval=1m
+              - --events
+              - --source=crd
+              - --source=service
+              - --policy=sync
+              - --registry=txt
+              - --txt-owner-id=k8s
+              - --txt-prefix=k8s.
+              - --domain-filter=${DOMAIN_1}
+              - --domain-filter=${DOMAIN_2}
+              - --domain-filter=${DOMAIN_3}
+              - --domain-filter=${DOMAIN_4}
+              - --domain-filter=${DOMAIN_5}
+              - --domain-filter=${DOMAIN_6}
+              - --domain-filter=${DOMAIN_7}
+              - --domain-filter=${DOMAIN_8}
+              - --provider=webhook
+              - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+              - --crd-source-kind=DNSEndpoint
+              - --label-filter=dns.homelab/external!=true
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &httpPort 7979
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 2
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *httpPort
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+            resources:
+              requests:
+                cpu: 16m
+                memory: 90M
+              limits:
+                memory: 90M
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+          webhook:
+            image:
+              repository: ghcr.io/home-operations/external-dns-unifi-webhook
+              tag: 0.10.9@sha256:30ae224e23bb7c303d72901a85aea77060288872716b8bc50589216c1f9d0df0
+            env:
+              LOG_LEVEL: info
+              LOG_FORMAT: text
+              UNIFI_HOST: https://10.40.1.1
+              UNIFI_SKIP_TLS_VERIFY: "true"
+            envFrom:
+              - secretRef:
+                  name: external-dns-unifi-secrets
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &webhookPort 8080
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 2
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /readyz
+                    port: *webhookPort
+                  initialDelaySeconds: 10
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+            resources:
+              requests:
+                cpu: 10m
+              limits:
+                memory: 64Mi
+            securityContext: *securityContext
+        serviceAccount:
+          name: *app
 
-    domainFilters:
-      - "${DOMAIN_1}"
-      - "${DOMAIN_2}"
-      - "${DOMAIN_3}"
-      - "${DOMAIN_4}"
-      - "${DOMAIN_5}"
-      - "${DOMAIN_6}"
-      - "${DOMAIN_7}"
-      - "${DOMAIN_8}"
+    defaultPodOptions:
+      automountServiceAccountToken: true
+      enableServiceLinks: false
+      hostUsers: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
 
-    extraArgs:
-      - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
-      - --crd-source-kind=DNSEndpoint
-      - --label-filter=dns.homelab/external!=true
+    service:
+      app:
+        ports:
+          http:
+            port: *httpPort
+          http-webhook:
+            port: *webhookPort
 
-    podAnnotations:
-      secret.reloader.stakater.com/reload: external-dns-unifi-secrets
-    policy: sync
+    serviceAccount:
+      external-dns-unifi: {}
 
-    provider:
-      name: webhook
-      webhook:
-        image:
-          repository: ghcr.io/kashalls/external-dns-unifi-webhook
-          tag: v0.9.0
-        env:
-          - name: LOG_LEVEL
-            value: *logLevel
-          - name: UNIFI_HOST
-            value: https://10.40.1.1
-          - name: UNIFI_API_KEY
-            valueFrom:
-              secretKeyRef:
-                name: external-dns-unifi-secrets
-                key: UNIFI_API_KEY
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http-webhook
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /readyz
-            port: http-webhook
-          initialDelaySeconds: 10
-          timeoutSeconds: 5
-
-    resources:
-      requests:
-        cpu: 16m
-        memory: 90M
-      limits:
-        memory: 90M
+    rbac:
+      roles:
+        external-dns-unifi:
+          type: ClusterRole
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - services
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - discovery.k8s.io
+              resources:
+                - endpointslices
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - externaldns.k8s.io
+              resources:
+                - dnsendpoints
+              verbs:
+                - get
+                - watch
+                - list
+            - apiGroups:
+                - externaldns.k8s.io
+              resources:
+                - dnsendpoints/status
+              verbs:
+                - "*"
+      bindings:
+        external-dns-unifi-viewer:
+          type: ClusterRoleBinding
+          forceRename: external-dns-unifi-viewer
+          roleRef:
+            identifier: external-dns-unifi
+          subjects:
+            - identifier: external-dns-unifi
 
     serviceMonitor:
-      enabled: true
-
-    sources:
-      - crd
-      - service
-    triggerLoopOnEvent: true
-    txtOwnerId: k8s
-    txtPrefix: "k8s."
+      app:
+        jobLabel: app.kubernetes.io/instance
+        endpoints:
+          - port: http
+            path: /metrics
+          - port: http-webhook
+            path: /metrics
