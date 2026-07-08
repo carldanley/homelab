@@ -27,7 +27,7 @@ the latest snapshot from the app policy.
 
 Default policy behavior:
 
-- schedule: `H */8 * * *` with `30m` jitter
+- schedule: `H * * * *` with `30m` jitter
 - retention: `24` hourly snapshots and `7` daily snapshots
 - quick verification: daily around `03:00`
 - deep verification: monthly on the first day around `05:00`

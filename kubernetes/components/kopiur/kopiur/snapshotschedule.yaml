@@ -7,5 +7,5 @@ spec:
   policyRef:
     name: ${APP}
   schedule:
-    cron: "${KOPIUR_SCHEDULE:=H */8 * * *}"
+    cron: "${KOPIUR_SCHEDULE:=H * * * *}"
     jitter: "${KOPIUR_JITTER:=30m}"
