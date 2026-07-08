@@ -31,6 +31,8 @@ spec:
                   name: "{{ .Release.Name }}-secret"
             resources:
               requests:
+                cpu: 4000m
+                memory: 12Gi
                 gpu.intel.com/i915: 1
               limits:
                 gpu.intel.com/i915: 1
@@ -46,9 +48,19 @@ spec:
                     port: &httpPort 5000
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
+                  timeoutSeconds: 5
                   failureThreshold: 3
               readiness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/version
+                    port: *httpPort
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
 
     persistence:
       coral-m2:
@@ -60,7 +72,13 @@ spec:
         medium: Memory
         sizeLimit: 2Gi
         globalMounts:
-        - path: /dev/shm
+          - path: /dev/shm
+      tmp-cache:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 2Gi
+        globalMounts:
+          - path: /tmp/cache
       config:
         existingClaim: "{{ .Release.Name }}"
       config-model-cache:
@@ -98,6 +116,9 @@ spec:
             port: 8554
           webrtc:
             port: 8555
+          webrtc-udp:
+            port: 8555
+            protocol: UDP
 
     route:
       app:
