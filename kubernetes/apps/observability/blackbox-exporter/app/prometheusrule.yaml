@@ -30,3 +30,17 @@ spec:
               Apps/Docker service or Plex container is down.
           labels:
             severity: critical
+
+        - alert: UniFiUILatencyHigh
+          expr: |
+            probe_duration_seconds{instance="https://unifi.batcave/"} > 2
+          for: 10m
+          annotations:
+            summary: >-
+              UniFi UI is responding slowly
+            description: >-
+              The blackbox HTTPS probe for https://unifi.batcave/ has taken
+              longer than two seconds for 10 minutes. This catches app-layer
+              slowness when ICMP still looks healthy.
+          labels:
+            severity: warning

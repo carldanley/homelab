@@ -40,3 +40,59 @@ spec:
               because disabled or standby WANs report 0.
           labels:
             severity: critical
+
+        - alert: UniFiControllerDown
+          expr: |
+            unpoller_controller_up{source="https://unifi.batcave"} == 0
+          for: 5m
+          annotations:
+            summary: >-
+              UniFi controller {{ $labels.source }} is unavailable to unpoller
+            description: >-
+              Unpoller cannot collect from the UniFi controller for five
+              minutes. This can mean the UniFi Network app is down, wedged, or
+              too slow to answer reliably.
+          labels:
+            severity: critical
+
+        - alert: UniFiGatewayCPUHigh
+          expr: |
+            avg_over_time(unpoller_device_cpu_utilization_ratio{type="udm"}[15m]) > 0.85
+          for: 15m
+          annotations:
+            summary: >-
+              {{ $labels.name }} CPU has been high for 15 minutes
+            description: >-
+              UniFi gateway CPU averaged above 85% over the last 15 minutes.
+              Sustained CPU pressure can make the Network UI and Integration
+              API slow even when basic connectivity is healthy.
+          labels:
+            severity: warning
+
+        - alert: UniFiGatewayMemoryHigh
+          expr: |
+            avg_over_time(unpoller_device_memory_utilization_ratio{type="udm"}[30m]) > 0.85
+          for: 10m
+          annotations:
+            summary: >-
+              {{ $labels.name }} memory has been high for 30 minutes
+            description: >-
+              UniFi gateway memory averaged above 85% over the last 30 minutes.
+              This is an early warning for swap pressure and slow UniFi app
+              behavior.
+          labels:
+            severity: warning
+
+        - alert: UniFiGatewayLoadHigh
+          expr: |
+            avg_over_time(unpoller_device_load_average_1{type="udm"}[15m]) > 3.5
+          for: 10m
+          annotations:
+            summary: >-
+              {{ $labels.name }} load is elevated
+            description: >-
+              UniFi gateway 1-minute load averaged above 3.5 over the last
+              15 minutes. This catches the app-layer pressure pattern where
+              ping remains healthy but the UniFi UI and API become sluggish.
+          labels:
+            severity: warning

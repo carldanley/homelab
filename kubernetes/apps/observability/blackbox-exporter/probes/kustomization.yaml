@@ -6,3 +6,4 @@ resources:
   - ./devices.yaml
   - ./nfs.yaml
   - ./plex.yaml
+  - ./unifi.yaml

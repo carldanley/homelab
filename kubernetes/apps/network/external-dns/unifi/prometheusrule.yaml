@@ -16,3 +16,44 @@ spec:
               ExternalDNS ({{ $labels.job }}) has not synced successfully in the last five minutes
           labels:
             severity: critical
+
+        - alert: ExternalDNSUnifiAPILatencyHigh
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (le, operation) (
+                rate(externaldns_webhook_unifi_api_duration_seconds_bucket{
+                  job="external-dns-unifi",
+                  operation="get_endpoints"
+                }[15m])
+              )
+            ) > 3
+          for: 10m
+          annotations:
+            summary: >-
+              UniFi ExternalDNS API latency is elevated
+            description: >-
+              The p95 UniFi Integration API latency for {{ $labels.operation }}
+              has been above 3 seconds. This usually indicates UniFi Network app
+              pressure rather than packet loss.
+          labels:
+            severity: warning
+
+        - alert: ExternalDNSUnifiAPIErrors
+          expr: |
+            sum by (operation) (
+              increase(externaldns_webhook_unifi_api_errors_total{
+                job="external-dns-unifi",
+                operation="get_endpoints"
+              }[15m])
+            ) > 2
+          for: 5m
+          annotations:
+            summary: >-
+              UniFi ExternalDNS API calls are failing
+            description: >-
+              The ExternalDNS UniFi webhook saw more than two
+              {{ $labels.operation }} API errors in 15 minutes. Check UDM load,
+              UniFi Network health, and webhook logs.
+          labels:
+            severity: warning
