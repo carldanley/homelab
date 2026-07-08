@@ -10,8 +10,10 @@ machine:
       enabled: true
       allowedRoles:
         - os:admin
+        - os:operator
       allowedKubernetesNamespaces:
         - actions-runner-system
+        - flux-system
         - system-upgrade
   nodeLabels:
     topology.kubernetes.io/zone: controlplane
