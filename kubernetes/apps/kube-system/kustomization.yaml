@@ -16,4 +16,16 @@ resources:
   - ./descheduler/ks.yaml
   - ./amd-device-plugin/ks.yaml
   - ./k8s-gpu-dra-driver/ks.yaml
+  - ./drm-exporter/ks.yaml
   - ./intel-device-plugin/ks.yaml
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: not-used
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    target:
+      kind: Namespace
+      name: not-used
