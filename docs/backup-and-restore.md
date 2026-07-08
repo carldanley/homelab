@@ -129,24 +129,3 @@ Useful Prometheus metrics:
 The Kopiur Helm chart installs its own `ServiceMonitor`, `PrometheusRule`, and
 Grafana dashboard. This repository also adds homelab-specific alerting in
 `kubernetes/apps/kopiur-system/kopiur/repository/prometheusrule.yaml`.
-
-## Post-Migration Cleanup
-
-VolSync and Restic are no longer used for application PVC backups.
-
-Manual cleanup candidates after the Kopiur retention window has had time to
-settle:
-
-- 1Password item: `volsync`
-- R2 target: the bucket or prefix referenced by the `REPO_PREFIX` field in the
-  `volsync` 1Password item
-
-Do not delete:
-
-- `kopia-storage` in 1Password
-- `batcave-kopia-backups`
-- `calamityxi-mariadb-api-server`
-- `calamityxi-mariadb-early-access`
-
-The CalamityXI buckets are used by MariaDB operator `PhysicalBackup` resources,
-not by the old VolSync provider.
