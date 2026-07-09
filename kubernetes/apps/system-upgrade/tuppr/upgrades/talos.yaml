@@ -10,7 +10,7 @@ spec:
     nodrain: true
   talos:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
-    version: v1.13.5
+    version: v1.13.6
   healthChecks:
     - apiVersion: ceph.rook.io/v1
       kind: CephCluster
