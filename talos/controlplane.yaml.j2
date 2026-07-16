@@ -49,7 +49,7 @@ cluster:
       listen-metrics-urls: "http://0.0.0.0:2381"
   extraManifests:
     - # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-      https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/experimental-install.yaml
+      https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.1/experimental-install.yaml
   proxy:
     disabled: true
     image: registry.k8s.io/kube-proxy:{{ ENV.KUBERNETES_VERSION }}
