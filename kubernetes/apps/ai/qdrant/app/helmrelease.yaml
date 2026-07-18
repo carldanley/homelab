@@ -24,7 +24,7 @@ spec:
           app:
             image:
               repository: ghcr.io/qdrant/qdrant/qdrant
-              tag: v1.18.2-unprivileged@sha256:ee77466ae0d2d443300c5893ef09d9fc937c022fd4c15b0946ce1f243de09abd
+              tag: v1.18.3-unprivileged@sha256:baf54c666825f6834a94facc5def76524d978212cbfc69b21dce9f32df386167
             env:
               QDRANT__SERVICE__HTTP_PORT: &httpPort 6333
               QDRANT__SERVICE__GRPC_PORT: &grpcPort 6334
