@@ -1,0 +1,404 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: gitea
+spec:
+  interval: 1h
+  url: https://dl.gitea.com/charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gitea
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: gitea
+      version: 12.6.0
+      sourceRef:
+        kind: HelmRepository
+        name: gitea
+      interval: 1h
+  values:
+    strategy:
+      type: Recreate
+
+    image:
+      registry: docker.gitea.com
+      repository: gitea
+      tag: 1.27.0
+      digest: sha256:414ba5b2b1163480e9ed4213a989cd798579cfa88582a2359303273009b2b852
+      rootless: true
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+        ephemeral-storage: 1Gi
+      limits:
+        memory: 4Gi
+        ephemeral-storage: 10Gi
+
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
+      seccompProfile:
+        type: RuntimeDefault
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      capabilities:
+        drop:
+          - ALL
+      seccompProfile:
+        type: RuntimeDefault
+
+    deployment:
+      terminationGracePeriodSeconds: 60
+
+    service:
+      http:
+        type: ClusterIP
+        port: 3000
+        clusterIP: ""
+      ssh:
+        type: ClusterIP
+        port: 2222
+        clusterIP: ""
+
+    persistence:
+      enabled: true
+      create: false
+      mount: true
+      claimName: gitea
+      accessModes:
+        - ReadWriteOnce
+
+    extraVolumes:
+      - name: packages
+        persistentVolumeClaim:
+          claimName: gitea-packages
+
+    extraContainerVolumeMounts:
+      - name: packages
+        mountPath: /data-packages
+
+    preExtraInitContainers:
+      - name: init-db
+        image: ghcr.io/home-operations/postgres-init:18
+        envFrom:
+          - secretRef:
+              name: gitea-secret
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+
+    # Keep a portable, per-application PostgreSQL dump beside the repositories.
+    # Kopiur then captures both in the same off-cluster snapshot generation.
+    extraContainers:
+      - name: database-backup
+        image: public.ecr.aws/docker/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+        command:
+          - /bin/sh
+          - -ec
+        args:
+          - |-
+            mkdir -p /data/backups
+            chmod 0700 /data/backups
+
+            while true; do
+              backup=/data/backups/gitea.dump
+              backup_tmp=/data/backups/gitea.dump.tmp
+              timestamp=/data/backups/gitea.dump.timestamp
+              timestamp_tmp=/data/backups/gitea.dump.timestamp.tmp
+
+              pg_dump \
+                --format=custom \
+                --no-owner \
+                --no-privileges \
+                --file="$backup_tmp"
+
+              mv "$backup_tmp" "$backup"
+              date -u +%Y-%m-%dT%H:%M:%SZ > "$timestamp_tmp"
+              mv "$timestamp_tmp" "$timestamp"
+              sleep 900
+            done
+        env:
+          - name: PGDATABASE
+            value: gitea
+          - name: PGHOST
+            value: postgres-rw.databases.svc.cluster.local
+          - name: PGUSER
+            value: gitea
+          - name: PGPASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: gitea-secret
+                key: GITEA_POSTGRES_PASS
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        volumeMounts:
+          - name: data
+            mountPath: /data
+          - name: temp
+            mountPath: /tmp
+
+    gitea:
+      podAnnotations:
+        secret.reloader.stakater.com/reload: gitea-secret
+
+      admin:
+        existingSecret: ""
+        username: ""
+        password: ""
+        email: ""
+
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: false
+
+      livenessProbe:
+        enabled: true
+        httpGet:
+          path: /api/healthz
+          port: http
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 6
+
+      readinessProbe:
+        enabled: true
+        httpGet:
+          path: /api/healthz
+          port: http
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+      startupProbe:
+        enabled: true
+        httpGet:
+          path: /api/healthz
+          port: http
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 5
+        failureThreshold: 60
+
+      config:
+        APP_NAME: Gitea
+        RUN_MODE: prod
+        actions:
+          ENABLED: false
+        database:
+          DB_TYPE: postgres
+          HOST: postgres-rw.databases.svc.cluster.local:5432
+          NAME: gitea
+          USER: gitea
+          SSL_MODE: disable
+          MAX_OPEN_CONNS: 25
+          MAX_IDLE_CONNS: 10
+          CONN_MAX_LIFETIME: 5m
+          SLOW_QUERY_THRESHOLD: 2s
+        cache:
+          ADAPTER: twoqueue
+          HOST: "50000"
+          ITEM_TTL: 16h
+        session:
+          PROVIDER: db
+          COOKIE_SECURE: true
+          SAME_SITE: lax
+          SESSION_LIFE_TIME: 86400
+        queue:
+          TYPE: level
+          DATADIR: /data/queues/common
+          MAX_WORKERS: 4
+          BATCH_LENGTH: 20
+        indexer:
+          ISSUE_INDEXER_TYPE: db
+          REPO_INDEXER_ENABLED: false
+        log:
+          LEVEL: info
+          MODE: console
+        mailer:
+          ENABLED: true
+          FROM: "Gitea <gitea@mail.${DOMAIN_5}>"
+          PROTOCOL: smtps
+        openid:
+          ENABLE_OPENID_SIGNIN: false
+          ENABLE_OPENID_SIGNUP: false
+        packages:
+          ENABLED: true
+          STORAGE_TYPE: local
+          PATH: /data-packages/blobs
+          CHUNKED_UPLOAD_PATH: /data-packages/tmp
+          LIMIT_TOTAL_OWNER_COUNT: 5000
+          LIMIT_TOTAL_OWNER_SIZE: 450 GiB
+          LIMIT_SIZE_CONTAINER: 10 GiB
+        cron.cleanup_packages:
+          ENABLED: true
+          RUN_AT_START: true
+          SCHEDULE: "@every 6h"
+          OLDER_THAN: 24h
+        cron.git_gc_repos:
+          ENABLED: true
+          RUN_AT_START: false
+          SCHEDULE: "@every 168h"
+          TIMEOUT: 3600
+          ARGS: --auto
+        repository:
+          DEFAULT_BRANCH: main
+          DEFAULT_PRIVATE: private
+          ENABLE_PUSH_CREATE_USER: true
+        admin:
+          DISABLE_REGULAR_ORG_CREATION: true
+        api:
+          ENABLE_SWAGGER: false
+        security:
+          ALLOWED_HOST_LIST: external,private
+          DISABLE_QUERY_AUTH_TOKEN: true
+          INSTALL_LOCK: true
+          LOGIN_REMEMBER_DAYS: 14
+          MIN_PASSWORD_LENGTH: 14
+          PASSWORD_COMPLEXITY: "off"
+          REVERSE_PROXY_LIMIT: 1
+          REVERSE_PROXY_TRUSTED_PROXIES: 172.22.0.0/16
+          SUCCESSFUL_TOKENS_CACHE_SIZE: 100
+        server:
+          DOMAIN: "git.${DOMAIN_7}"
+          ROOT_URL: "https://git.${DOMAIN_7}/"
+          LOCAL_ROOT_URL: http://localhost:3000/
+          PUBLIC_URL_DETECTION: never
+          HTTP_ADDR: 0.0.0.0
+          HTTP_PORT: 3000
+          PROTOCOL: http
+          ENABLE_GZIP: true
+          LFS_START_SERVER: true
+          OFFLINE_MODE: true
+          SSH_DOMAIN: "ssh.${DOMAIN_7}"
+          DISABLE_SSH: false
+          START_SSH_SERVER: true
+          SSH_PORT: 22
+          SSH_LISTEN_PORT: 2222
+        service:
+          DISABLE_REGISTRATION: true
+          REQUIRE_SIGNIN_VIEW: false
+
+      additionalConfigFromEnvs:
+        - name: GITEA__database__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_POSTGRES_PASS
+        - name: GITEA__security__SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_SECRET_KEY
+        - name: GITEA__security__INTERNAL_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_INTERNAL_TOKEN
+        - name: GITEA__oauth2__JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_JWT_SECRET
+        - name: GITEA__server__LFS_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_LFS_JWT_SECRET
+        - name: GITEA__metrics__TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_METRICS_TOKEN
+        - name: GITEA__mailer__SMTP_ADDR
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_MAILER_ADDR
+        - name: GITEA__mailer__SMTP_PORT
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_MAILER_PORT
+        - name: GITEA__mailer__USER
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_MAILER_USER
+        - name: GITEA__mailer__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_MAILER_PASSWD
+
+    postgresql-ha:
+      enabled: false
+    postgresql:
+      enabled: false
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: false
+    test:
+      enabled: false
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: Deployment
+              name: gitea
+            patch: |-
+              - op: add
+                path: /spec/template/spec/enableServiceLinks
+                value: false
+              - op: add
+                path: /spec/template/spec/automountServiceAccountToken
+                value: false
+              - op: add
+                path: /spec/template/spec/hostUsers
+                value: false

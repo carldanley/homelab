@@ -8,6 +8,7 @@ components:
 resources:
   - ./n8n/ks.yaml
   - ./docmost/ks.yaml
+  - ./gitea/ks.yaml
   - ./tandoor/ks.yaml
   - ./teslamate/ks.yaml
   - ./powerwall-dashboard/ks.yaml

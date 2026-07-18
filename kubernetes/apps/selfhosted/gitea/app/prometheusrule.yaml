@@ -1,0 +1,55 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gitea
+spec:
+  groups:
+    - name: gitea.rules
+      rules:
+        - alert: GiteaRegistryVolumeFillingUp
+          expr: |-
+            (
+              kubelet_volume_stats_used_bytes{
+                namespace="selfhosted",
+                persistentvolumeclaim="gitea-packages"
+              }
+              /
+              kubelet_volume_stats_capacity_bytes{
+                namespace="selfhosted",
+                persistentvolumeclaim="gitea-packages"
+              }
+            ) > 0.80
+          for: 30m
+          annotations:
+            summary: Gitea registry storage is filling up
+            description: >-
+              The disposable Gitea package volume is more than 80 percent full.
+              Review package cleanup rules and prune old commit images before
+              the registry reaches capacity.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: GiteaRegistryVolumeAlmostFull
+          expr: |-
+            (
+              kubelet_volume_stats_used_bytes{
+                namespace="selfhosted",
+                persistentvolumeclaim="gitea-packages"
+              }
+              /
+              kubelet_volume_stats_capacity_bytes{
+                namespace="selfhosted",
+                persistentvolumeclaim="gitea-packages"
+              }
+            ) > 0.90
+          for: 15m
+          annotations:
+            summary: Gitea registry storage is almost full
+            description: >-
+              The disposable Gitea package volume is more than 90 percent full.
+              Prune package versions or expand the PVC before image pushes fail.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
