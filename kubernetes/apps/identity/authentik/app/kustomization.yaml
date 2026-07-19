@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./externalsecret.yaml
+  - ./helmrelease.yaml
+  - ./httproute.yaml
+  - ./dnsendpoint.yaml
+patches:
+  # Component names are still ${APP} when patches run; postBuild substitution
+  # happens afterward, so these patches intentionally match by kind.
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: Restore
+    patch: |-
+      - op: replace
+        path: /spec/policy/onMissingSnapshot
+        value: Fail
+      - op: add
+        path: /spec/mover
+        value:
+          podSecurityContext:
+            fsGroup: 1000
+            fsGroupChangePolicy: OnRootMismatch
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsGroup: 1000
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: SnapshotPolicy
+    patch: |-
+      - op: replace
+        path: /spec/retention/keepHourly
+        value: 48
+      - op: replace
+        path: /spec/retention/keepDaily
+        value: 30
+      - op: add
+        path: /spec/retention/keepWeekly
+        value: 12
+      - op: add
+        path: /spec/retention/keepMonthly
+        value: 12
+      - op: add
+        path: /spec/retention/keepAnnual
+        value: 3
+      - op: add
+        path: /spec/mover
+        value:
+          inheritSecurityContextFrom:
+            pvcConsumer:
+              container: server
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: SnapshotSchedule
+    patch: |-
+      - op: add
+        path: /spec/schedule/runOnCreate
+        value: true
