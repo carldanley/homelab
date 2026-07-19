@@ -1,0 +1,227 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: authentik
+spec:
+  interval: 1h
+  url: https://charts.goauthentik.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: authentik
+      version: 2026.5.5
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+      interval: 1h
+  values:
+    global:
+      image:
+        repository: ghcr.io/goauthentik/server
+        tag: 2026.5.5
+        digest: sha256:50a833c48a714709f15d4f8846ec6b81a41d0d6a6bd2975087dfed3000d0d72e
+      deploymentAnnotations:
+        secret.reloader.stakater.com/reload: authentik-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+    authentik:
+      existingSecret:
+        secretName: authentik-secret
+      error_reporting:
+        enabled: false
+
+    server:
+      replicas: 1
+      deploymentStrategy:
+        type: Recreate
+      initContainers:
+        - name: init-db
+          image: ghcr.io/home-operations/postgres-init:18
+          envFrom:
+            - secretRef:
+                name: authentik-secret
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+      extraContainers:
+        - name: database-backup
+          image: public.ecr.aws/docker/library/postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - |-
+              mkdir -p /data/backups
+              chmod 0700 /data/backups
+
+              until wget -q -O /dev/null http://127.0.0.1:9000/-/health/ready/; do
+                sleep 5
+              done
+
+              while true; do
+                backup=/data/backups/authentik.dump
+                backup_tmp=/data/backups/authentik.dump.tmp
+                timestamp=/data/backups/authentik.dump.timestamp
+                timestamp_tmp=/data/backups/authentik.dump.timestamp.tmp
+
+                pg_dump \
+                  --format=custom \
+                  --no-owner \
+                  --no-privileges \
+                  --file="$backup_tmp"
+
+                mv "$backup_tmp" "$backup"
+                date -u +%Y-%m-%dT%H:%M:%SZ > "$timestamp_tmp"
+                mv "$timestamp_tmp" "$timestamp"
+                sleep 900
+              done
+          env:
+            - name: PGDATABASE
+              value: authentik
+            - name: PGHOST
+              value: postgres-rw.databases.svc.cluster.local
+            - name: PGUSER
+              value: authentik
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secret
+                  key: AUTHENTIK_POSTGRESQL__PASSWORD
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: temp
+              mountPath: /tmp
+      volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: temp
+          mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: authentik
+        - name: temp
+          emptyDir: {}
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 2Gi
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+
+    worker:
+      replicas: 1
+      volumeMounts:
+        - name: temp
+          mountPath: /tmp
+      volumes:
+        - name: temp
+          emptyDir: {}
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 1536Mi
+      containerSecurityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+
+    prometheus:
+      rules:
+        enabled: true
+
+    serviceAccount:
+      create: false
+
+    postgresql:
+      enabled: false
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              labelSelector: app.kubernetes.io/instance=authentik
+            patch: |-
+              - op: add
+                path: /spec/template/spec/enableServiceLinks
+                value: false
+              - op: add
+                path: /spec/template/spec/automountServiceAccountToken
+                value: false
+              - op: add
+                path: /spec/template/spec/hostUsers
+                value: false
