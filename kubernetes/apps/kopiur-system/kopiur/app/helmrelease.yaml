@@ -45,3 +45,16 @@ spec:
           memory: 128Mi
       serviceMonitor:
         enabled: true
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: grafana.integreatly.org
+              version: v1beta1
+              kind: GrafanaDashboard
+              name: kopiur-dashboard
+            patch: |-
+              - op: add
+                path: /spec/folderUID
+                value: private-kopiur-system

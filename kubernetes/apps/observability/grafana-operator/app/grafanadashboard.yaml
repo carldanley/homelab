@@ -15,3 +15,4 @@ spec:
   datasources:
     - datasourceName: Prometheus
       inputName: DS_PROMETHEUS
+  folderUID: private-dashboards

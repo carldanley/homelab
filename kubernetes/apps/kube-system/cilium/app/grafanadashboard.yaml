@@ -14,3 +14,4 @@ spec:
       inputName: DS_AFRANET_PROMETHEUS
   # renovate: depName="Envoy Proxy Monitoring gRPC"
   url: https://grafana.com/api/dashboards/23239/revisions/1/download
+  folderUID: private-dashboards

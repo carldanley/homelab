@@ -11,3 +11,4 @@ spec:
       dashboards: grafana
   # renovate: depName="External-dns"
   url: https://grafana.com/api/dashboards/15038/revisions/3/download
+  folderUID: private-dashboards

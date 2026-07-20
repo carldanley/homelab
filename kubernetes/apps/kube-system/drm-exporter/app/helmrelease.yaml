@@ -49,3 +49,16 @@ spec:
         cpu: 10m
       limits:
         memory: 128Mi
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: grafana.integreatly.org
+              version: v1beta1
+              kind: GrafanaDashboard
+              name: drm-exporter-dashboard
+            patch: |-
+              - op: add
+                path: /spec/folderUID
+                value: private-kube-system

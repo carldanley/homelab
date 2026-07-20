@@ -11,3 +11,4 @@ spec:
       dashboards: grafana
   # renovate: depName="Cert-manager-Kubernetes"
   url: https://grafana.com/api/dashboards/20842/revisions/3/download
+  folderUID: private-dashboards

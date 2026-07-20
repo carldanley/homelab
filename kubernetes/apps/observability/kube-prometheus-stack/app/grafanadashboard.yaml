@@ -14,6 +14,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / System / API Server"
   url: https://grafana.com/api/dashboards/15761/revisions/21/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -30,6 +31,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / System / CoreDNS"
   url: https://grafana.com/api/dashboards/15762/revisions/22/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -46,6 +48,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / Views / Global"
   url: https://grafana.com/api/dashboards/15757/revisions/43/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -62,6 +65,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / Views / Namespaces"
   url: https://grafana.com/api/dashboards/15758/revisions/46/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -78,6 +82,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / Views / Nodes"
   url: https://grafana.com/api/dashboards/15759/revisions/40/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -94,6 +99,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Kubernetes / Views / Pods"
   url: https://grafana.com/api/dashboards/15760/revisions/39/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -110,6 +116,7 @@ spec:
       inputName: DS_OPENSHIFT_PROMETHEUS
   # renovate: depName="K8s / Storage / Volumes / Cluster"
   url: https://grafana.com/api/dashboards/11454/revisions/14/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -123,6 +130,7 @@ spec:
       dashboards: grafana
   # renovate: depName="Node Exporter Full"
   url: https://grafana.com/api/dashboards/1860/revisions/45/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -139,3 +147,4 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="Prometheus"
   url: https://grafana.com/api/dashboards/19105/revisions/9/download
+  folderUID: private-dashboards

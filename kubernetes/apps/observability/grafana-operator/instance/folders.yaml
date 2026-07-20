@@ -1,0 +1,82 @@
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: private-dashboards
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  title: Private
+  uid: private-dashboards
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: teslamate
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  parentFolderRef: private-dashboards
+  title: TeslaMate
+  uid: private-teslamate
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: powerwall
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  parentFolderRef: private-dashboards
+  title: Powerwall
+  uid: private-powerwall
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: kopiur-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  parentFolderRef: private-dashboards
+  title: kopiur-system
+  uid: private-kopiur-system
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: kube-system
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  parentFolderRef: private-dashboards
+  title: kube-system
+  uid: private-kube-system
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: system-upgrade
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  parentFolderRef: private-dashboards
+  title: system-upgrade
+  uid: private-system-upgrade
+---
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaFolder
+metadata:
+  name: unbound-dashboards
+spec:
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  title: Unbound
+  uid: unbound-dashboards

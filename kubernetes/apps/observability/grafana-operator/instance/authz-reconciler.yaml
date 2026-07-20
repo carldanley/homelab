@@ -1,0 +1,238 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-authz-reconciler
+data:
+  reconcile.py: |-
+    import base64
+    import json
+    import os
+    import sys
+    import time
+    import urllib.error
+    import urllib.parse
+    import urllib.request
+
+    base_url = os.environ["GRAFANA_URL"].rstrip("/")
+    credentials = (
+        f'{os.environ["GRAFANA_ADMIN_USER"]}:'
+        f'{os.environ["GRAFANA_ADMIN_PASSWORD"]}'
+    ).encode()
+    authorization = "Basic " + base64.b64encode(credentials).decode()
+    desired = json.loads(os.environ["GRAFANA_AUTHZ_CONFIG"])
+
+
+    def request(path, method="GET", body=None, allowed=()):
+        payload = None if body is None else json.dumps(body).encode()
+        headers = {"Authorization": authorization}
+        if payload is not None:
+            headers["Content-Type"] = "application/json"
+        req = urllib.request.Request(
+            f"{base_url}{path}", data=payload, headers=headers, method=method
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                data = response.read()
+                return None if not data else json.loads(data)
+        except urllib.error.HTTPError as error:
+            if error.code in allowed:
+                return None
+            detail = error.read().decode(errors="replace")
+            raise RuntimeError(f"{method} {path}: HTTP {error.code}: {detail}") from error
+
+
+    def wait_for_grafana():
+        for attempt in range(30):
+            try:
+                request("/api/health")
+                return
+            except Exception as error:
+                if attempt == 29:
+                    raise
+                print(f"Grafana is not ready: {error}", file=sys.stderr)
+                time.sleep(5)
+
+
+    def find_team(name):
+        result = request(
+            "/api/teams/search?perpage=1000&query=" + urllib.parse.quote(name)
+        )
+        for team in result.get("teams", []):
+            if team.get("name") == name:
+                return team
+        return None
+
+
+    def reconcile_teams():
+        users = request("/api/org/users?perpage=1000")
+        teams = {}
+        for team_spec in desired.get("teams", []):
+            name = team_spec["name"]
+            team = find_team(name)
+            if team is None:
+                request("/api/teams", method="POST", body={"name": name})
+                team = find_team(name)
+            if team is None:
+                raise RuntimeError(f"team was not created: {name}")
+
+            team_id = team["id"]
+            teams[name] = team_id
+            wanted_roles = set(team_spec.get("member_roles", []))
+            wanted = {
+                user["userId"] for user in users if user.get("role") in wanted_roles
+            }
+            current = {
+                member["userId"]
+                for member in request(f"/api/teams/{team_id}/members")
+            }
+            for user_id in sorted(wanted - current):
+                request(
+                    f"/api/teams/{team_id}/members",
+                    method="POST",
+                    body={"userId": user_id},
+                )
+            for user_id in sorted(current - wanted):
+                request(
+                    f"/api/teams/{team_id}/members/{user_id}",
+                    method="DELETE",
+                    allowed=(404,),
+                )
+        return teams
+
+
+    def permissions(items, teams):
+        resolved = []
+        for item in items:
+            item = dict(item)
+            team_name = item.pop("team", None)
+            if team_name is not None:
+                item["teamId"] = teams[team_name]
+            resolved.append(item)
+        return resolved
+
+
+    def reconcile_folders(teams):
+        folder_specs = {folder["uid"]: folder for folder in desired.get("folders", [])}
+        existing = {folder["uid"]: folder for folder in request("/api/folders?limit=1000")}
+        for uid, folder_spec in folder_specs.items():
+            if uid not in existing:
+                request(
+                    "/api/folders",
+                    method="POST",
+                    body={"uid": uid, "title": folder_spec["title"]},
+                )
+
+        existing = {folder["uid"]: folder for folder in request("/api/folders?limit=1000")}
+        default_permissions = desired.get("default_permissions", [])
+        for uid in sorted(existing):
+            folder_spec = folder_specs.get(uid, {})
+            items = folder_spec.get("permissions", default_permissions)
+            request(
+                f"/api/folders/{urllib.parse.quote(uid, safe='')}/permissions",
+                method="POST",
+                body={"items": permissions(items, teams)},
+            )
+        return existing
+
+
+    def reconcile_general_dashboards(teams):
+        dashboards = request("/api/search?type=dash-db&limit=5000")
+        items = permissions(desired.get("default_permissions", []), teams)
+        count = 0
+        for dashboard in dashboards:
+            if dashboard.get("folderUid"):
+                continue
+            uid = urllib.parse.quote(dashboard["uid"], safe="")
+            request(
+                f"/api/dashboards/uid/{uid}/permissions",
+                method="POST",
+                body={"items": items},
+            )
+            count += 1
+        return count
+
+
+    wait_for_grafana()
+    managed_teams = reconcile_teams()
+    managed_folders = reconcile_folders(managed_teams)
+    general_dashboards = reconcile_general_dashboards(managed_teams)
+    print(
+        "Reconciled "
+        f"{len(managed_teams)} team(s), "
+        f"{len(managed_folders)} folder(s), and "
+        f"{general_dashboards} top-level dashboard(s)"
+    )
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: grafana-authz-reconciler
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 3
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: grafana-authz-reconciler
+        spec:
+          automountServiceAccountToken: false
+          containers:
+            - name: reconciler
+              image: docker.io/library/python:3.14.6-alpine3.24@sha256:26730869004e2b9c4b9ad09cab8625e81d256d1ce97e72df5520e806b1709f92
+              command:
+                - python
+                - -B
+                - /app/reconcile.py
+              env:
+                - name: GRAFANA_URL
+                  value: http://grafana-service:3000
+                - name: GRAFANA_ADMIN_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: admin-user
+                - name: GRAFANA_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: admin-password
+                - name: GRAFANA_AUTHZ_CONFIG
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: authz-config
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsGroup: 65532
+                runAsNonRoot: true
+                runAsUser: 65532
+                seccompProfile:
+                  type: RuntimeDefault
+              volumeMounts:
+                - name: script
+                  mountPath: /app
+                  readOnly: true
+          restartPolicy: Never
+          securityContext:
+            fsGroup: 65532
+          volumes:
+            - name: script
+              configMap:
+                name: grafana-authz-reconciler
+  schedule: "*/2 * * * *"
+  successfulJobsHistoryLimit: 1

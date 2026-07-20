@@ -9,7 +9,6 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: powerwall
   datasources:
     - datasourceName: Prometheus
       inputName: DS_PROMETHEUS
@@ -296,3 +295,4 @@ spec:
         }
       ]
     }
+  folderUID: private-powerwall

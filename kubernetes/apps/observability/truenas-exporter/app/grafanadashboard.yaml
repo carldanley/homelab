@@ -13,6 +13,7 @@ spec:
     - datasourceName: Prometheus
       inputName: DS_MIMIR
   url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale.json
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -28,6 +29,7 @@ spec:
     - datasourceName: Prometheus
       inputName: DS_MIMIR
   url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_cgroups.json
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -43,6 +45,7 @@ spec:
     - datasourceName: Prometheus
       inputName: DS_MIMIR
   url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_disk_insights.json
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -58,3 +61,4 @@ spec:
     - datasourceName: Prometheus
       inputName: DS_PROMETHEUS
   url: https://raw.githubusercontent.com/Supporterino/truenas-graphite-to-prometheus/refs/heads/main/dashboards/truenas_scale_temperatures.json
+  folderUID: private-dashboards

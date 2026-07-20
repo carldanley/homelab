@@ -12,10 +12,18 @@ spec:
       check_for_plugin_updates: "false"
       reporting_enabled: "false"
     auth.anonymous:
+      enabled: "false"
+    auth.generic_oauth:
+      allow_sign_up: "true"
+      api_url: "https://auth.${DOMAIN_7}/application/o/userinfo/"
+      auth_url: "https://auth.${DOMAIN_7}/application/o/authorize/"
       enabled: "true"
-      org_id: "1"
-      org_name: Main Org.
-      org_role: Viewer
+      name: authentik
+      role_attribute_strict: "true"
+      scopes: openid profile email
+      skip_org_role_sync: "false"
+      token_url: "https://auth.${DOMAIN_7}/application/o/token/"
+      use_pkce: "true"
     date_formats:
       use_browser_locale: "true"
     explore:
@@ -30,9 +38,10 @@ spec:
       plugin_admin_enabled: "false"
     security:
       angular_support_enabled: "true"
+      cookie_secure: "true"
     server:
       enable_gzip: "true"
-      root_url: "https://grafana.${DOMAIN_5}"
+      root_url: "https://grafana.${DOMAIN_7}"
   service:
     metadata:
       labels:
@@ -42,6 +51,9 @@ spec:
       strategy:
         type: Recreate
       template:
+        metadata:
+          annotations:
+            secret.reloader.stakater.com/reload: grafana-secret
         spec:
           containers:
             - name: grafana
@@ -56,6 +68,21 @@ spec:
                     secretKeyRef:
                       name: grafana-secret
                       key: admin-password
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: oauth-client-id
+                - name: GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: oauth-client-secret
+                - name: GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: oauth-role-attribute-path
                 - name: GF_INSTALL_PLUGINS
                   value: fetzerch-sunandmoon-datasource
               securityContext:
@@ -77,11 +104,14 @@ spec:
   httpRoute:
     spec:
       hostnames:
-        - "grafana.${DOMAIN_5}"
+        - "grafana.${DOMAIN_7}"
       parentRefs:
+        - name: external
+          namespace: kube-system
+          sectionName: domain-7-subdomain-https
         - name: internal
           namespace: kube-system
-          sectionName: domain-5-subdomain-https
+          sectionName: domain-7-subdomain-https
   persistentVolumeClaim:
     spec:
       accessModes:

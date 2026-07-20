@@ -2,13 +2,27 @@
 apiVersion: externaldns.k8s.io/v1alpha1
 kind: DNSEndpoint
 metadata:
-  name: grafana
+  name: grafana-internal
   labels:
     dns.homelab/external: "false"
 spec:
   endpoints:
-  - dnsName: "grafana.${DOMAIN_5}"
-    recordTTL: 60
-    recordType: CNAME
-    targets:
-    - "internal.${DOMAIN_5}"
+    - dnsName: "grafana.${DOMAIN_7}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "internal.${DOMAIN_7}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: grafana-external
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: "grafana.${DOMAIN_7}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "external.${DOMAIN_7}"

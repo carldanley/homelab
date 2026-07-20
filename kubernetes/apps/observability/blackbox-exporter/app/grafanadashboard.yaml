@@ -14,3 +14,4 @@ spec:
       inputName: DS_SIGNCL-PROMETHEUS
   # renovate: depName="Prometheus Blackbox Exporter"
   url: https://grafana.com/api/dashboards/7587/revisions/3/download
+  folderUID: private-dashboards

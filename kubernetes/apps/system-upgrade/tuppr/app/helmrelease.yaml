@@ -36,3 +36,16 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
+
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: grafana.integreatly.org
+              version: v1beta1
+              kind: GrafanaDashboard
+              name: tuppr-dashboard
+            patch: |-
+              - op: add
+                path: /spec/folderUID
+                value: private-system-upgrade

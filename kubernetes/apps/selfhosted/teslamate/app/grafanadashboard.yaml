@@ -9,8 +9,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/battery-health.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -22,8 +22,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/charge-level.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -35,8 +35,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/charges.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -48,8 +48,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/charging-stats.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -61,8 +61,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/database-info.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -74,8 +74,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/drive-stats.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -87,8 +87,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/drives.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -100,8 +100,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/efficiency.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -113,8 +113,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/locations.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -126,8 +126,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/mileage.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -139,8 +139,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/overview.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -152,8 +152,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/projected-range.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -165,8 +165,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/states.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -178,8 +178,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/statistics.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -191,8 +191,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/timeline.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -204,8 +204,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/trip.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -217,8 +217,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/updates.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -230,8 +230,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/vampire-drain.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -243,8 +243,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/visited.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -256,8 +256,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/internal/charge-details.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -269,8 +269,8 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/internal/drive-details.json
+  folderUID: private-teslamate
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -282,5 +282,5 @@ spec:
   instanceSelector:
     matchLabels:
       dashboards: grafana
-  folder: teslamate
   url: https://raw.githubusercontent.com/teslamate-org/teslamate/main/grafana/dashboards/internal/home.json
+  folderUID: private-teslamate

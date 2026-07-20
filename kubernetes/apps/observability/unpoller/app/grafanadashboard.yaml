@@ -14,6 +14,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="UniFi-Poller: Client Insights - Prometheus"
   url: https://grafana.com/api/dashboards/11315/revisions/9/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -30,6 +31,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="UniFi-Poller: Network Sites - Prometheus"
   url: https://grafana.com/api/dashboards/11311/revisions/5/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -46,6 +48,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="UniFi-Poller: PDU Insights - Prometheus"
   url: https://grafana.com/api/dashboards/23027/revisions/1/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -62,6 +65,7 @@ spec:
       inputName: DS_PROMETHEUS
   # renovate: depName="UniFi-Poller: USW Insights - Prometheus"
   url: https://grafana.com/api/dashboards/11312/revisions/9/download
+  folderUID: private-dashboards
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
 apiVersion: grafana.integreatly.org/v1beta1
@@ -79,3 +83,4 @@ spec:
   datasources:
     - datasourceName: Prometheus
       inputName: DS_PROMETHEUS
+  folderUID: private-dashboards
