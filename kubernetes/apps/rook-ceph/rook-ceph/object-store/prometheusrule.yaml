@@ -1,0 +1,29 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: ceph-cache
+spec:
+  groups:
+    - name: ceph-cache.rules
+      rules:
+        - alert: CephInternalCacheRGWReplicasUnavailable
+          expr: |-
+            (
+              sum(
+                max by (deployment) (
+                  kube_deployment_status_replicas_available{
+                    job="kube-state-metrics",
+                    namespace="rook-ceph",
+                    deployment=~"rook-ceph-rgw-internal-cache-.*"
+                  }
+                )
+              )
+              or vector(0)
+            ) < 2
+          for: 10m
+          annotations:
+            summary: Fewer than two internal cache RGW gateways are available.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts

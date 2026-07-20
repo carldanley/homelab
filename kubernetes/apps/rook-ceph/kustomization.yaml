@@ -7,3 +7,14 @@ components:
   - ../../components/common
 resources:
   - ./rook-ceph/ks.yaml
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: not-used
+        labels:
+          storage.homelab/object-cache-access: "true"
+    target:
+      kind: Namespace
+      name: not-used

@@ -121,4 +121,54 @@ spec:
       deletionPolicy: Delete
 
     cephFileSystems: []
-    cephObjectStores: []
+    cephObjectStores:
+      - name: internal-cache
+        spec:
+          metadataPool:
+            failureDomain: host
+            replicated:
+              size: 3
+            parameters:
+              bulk: "false"
+              min_size: "2"
+              pg_autoscale_mode: "on"
+          dataPool:
+            failureDomain: host
+            erasureCoded:
+              dataChunks: 2
+              codingChunks: 2
+            parameters:
+              bulk: "false"
+              min_size: "3"
+              pg_autoscale_mode: "on"
+              target_size_bytes: "100G"
+          preservePoolsOnDelete: true
+          gateway:
+            hostNetwork: false
+            port: 80
+            instances: 2
+            placement:
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchLabels:
+                        rook_object_store: internal-cache
+                    topologyKey: kubernetes.io/hostname
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                cpu: "2"
+                memory: 2Gi
+        storageClass:
+          enabled: true
+          name: ceph-object-cache
+          reclaimPolicy: Delete
+          volumeBindingMode: Immediate
+          parameters:
+            region: us-east-1
+        ingress:
+          enabled: false
+        route:
+          enabled: false

@@ -37,10 +37,14 @@ spec:
       serviceMonitor:
         enabled: true
 
+    enableOBCWatchOperatorNamespace: true
+
     image:
       repository: ghcr.io/rook/ceph
     monitoring:
       enabled: true
+
+    obcAllowAdditionalConfigFields: "maxObjects,maxSize,bucketLifecycle"
 
     resources:
       requests:
