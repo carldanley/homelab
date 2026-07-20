@@ -108,7 +108,6 @@ spec:
                 evictableNamespaces:
                   exclude:
                     - actions-runner-system
-                    - calamityxi
                     - cert-manager
                     - databases
                     - external-secrets

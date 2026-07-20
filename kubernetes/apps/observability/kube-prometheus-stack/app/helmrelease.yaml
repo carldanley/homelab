@@ -26,8 +26,7 @@ spec:
 
     defaultRules:
       disabled:
-        # cxi-world is active/passive: standby replicas intentionally fail
-        # /readyz while they are healthy but not the elected world leader.
+        # Replaced by locally tuned rules with longer alert windows.
         KubeDeploymentReplicasMismatch: true
         KubeDeploymentRolloutStuck: true
         KubePodNotReady: true

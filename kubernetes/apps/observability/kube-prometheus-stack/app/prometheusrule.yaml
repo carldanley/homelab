@@ -59,29 +59,13 @@ spec:
         - alert: KubeDeploymentReplicasMismatch
           expr: |-
             (
-              (
-                kube_deployment_spec_replicas{job="kube-state-metrics", namespace!="calamityxi"}
-                or
-                kube_deployment_spec_replicas{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
-              )
-                >
-              (
-                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace!="calamityxi"}
-                or
-                kube_deployment_status_replicas_available{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
-              )
+              kube_deployment_spec_replicas{job="kube-state-metrics"}
+              >
+              kube_deployment_status_replicas_available{job="kube-state-metrics"}
             ) and (
-              (
-                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace!="calamityxi"}[10m])
-                ==
-                0
-              )
-              or
-              (
-                changes(kube_deployment_status_replicas_updated{job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}[10m])
-                ==
-                0
-              )
+              changes(kube_deployment_status_replicas_updated{job="kube-state-metrics"}[10m])
+              ==
+              0
             )
           for: 15m
           annotations:
@@ -96,15 +80,8 @@ spec:
 
         - alert: KubeDeploymentRolloutStuck
           expr: |-
-            (
-              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace!="calamityxi"}
-              != 0
-            )
-            or
-            (
-              kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics", namespace="calamityxi", deployment!~"cxi-world($|-.*)"}
-              != 0
-            )
+            kube_deployment_status_condition{condition="Progressing", status="false", job="kube-state-metrics"}
+            != 0
           for: 15m
           annotations:
             description: >-
@@ -120,12 +97,12 @@ spec:
           expr: |-
             sum by (namespace, pod, job, cluster) (
               max by (namespace, pod, job, cluster) (
-                kube_pod_status_phase{job="kube-state-metrics", pod!~"cxi-world-.*", namespace=~".*", phase=~"Pending|Unknown"}
+                kube_pod_status_phase{job="kube-state-metrics", namespace=~".*", phase=~"Pending|Unknown"}
                 or
                 (
-                  kube_pod_status_phase{job="kube-state-metrics", pod!~"cxi-world-.*", namespace=~".*", phase="Running"} == 1
+                  kube_pod_status_phase{job="kube-state-metrics", namespace=~".*", phase="Running"} == 1
                   and on (namespace, pod, cluster)
-                  kube_pod_status_ready{job="kube-state-metrics", pod!~"cxi-world-.*", namespace=~".*", condition="true"} == 0
+                  kube_pod_status_ready{job="kube-state-metrics", namespace=~".*", condition="true"} == 0
                 )
               ) * on (namespace, pod, cluster) group_left() topk by (namespace, pod, cluster) (
                 1, max by (namespace, pod, owner_kind, cluster) (kube_pod_owner{owner_kind!="Job"})

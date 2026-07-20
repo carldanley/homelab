@@ -19,36 +19,6 @@ spec:
           - name: alertname
             value: InfoInhibitor
             matchType: "="
-      - receiver: discord-calamityxi-search-server
-        matchers:
-          - name: discord_channel
-            value: calamityxi-search-server
-            matchType: "="
-      - receiver: discord-calamityxi-world-server
-        matchers:
-          - name: discord_channel
-            value: calamityxi-world-server
-            matchType: "="
-      - receiver: discord-calamityxi-connect-server
-        matchers:
-          - name: discord_channel
-            value: calamityxi-connect-server
-            matchType: "="
-      - receiver: discord-calamityxi-operator
-        matchers:
-          - name: discord_channel
-            value: calamityxi-operator
-            matchType: "="
-      - receiver: discord-calamityxi-api-server
-        matchers:
-          - name: discord_channel
-            value: calamityxi-api-server
-            matchType: "="
-      - receiver: discord-calamityxi-map-servers
-        matchers:
-          - name: discord_channel
-            value: calamityxi-map-servers
-            matchType: "="
       - receiver: discord-homelab-alerts
         matchers:
           - name: discord_channel
@@ -68,42 +38,6 @@ spec:
           matchType: "="
   receivers:
     - name: "null"
-    - name: discord-calamityxi-search-server
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-search-server
-          sendResolved: true
-    - name: discord-calamityxi-world-server
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-world-server
-          sendResolved: true
-    - name: discord-calamityxi-connect-server
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-connect-server
-          sendResolved: true
-    - name: discord-calamityxi-operator
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-operator
-          sendResolved: true
-    - name: discord-calamityxi-api-server
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-api-server
-          sendResolved: true
-    - name: discord-calamityxi-map-servers
-      discordConfigs:
-        - apiURL:
-            name: alertmanager-discord-webhooks
-            key: calamityxi-map-servers
-          sendResolved: true
     - name: discord-homelab-alerts
       discordConfigs:
         - apiURL:

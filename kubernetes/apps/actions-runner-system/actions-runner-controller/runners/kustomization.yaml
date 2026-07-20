@@ -5,6 +5,3 @@ kind: Kustomization
 resources:
   - ./ocirepository.yaml
   - ./homelab
-  - ./calamityxi-upstream-game-server
-  - ./calamityxi-custom-game-server
-  - ./calamityxi-operator
