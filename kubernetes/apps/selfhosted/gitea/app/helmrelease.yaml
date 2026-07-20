@@ -291,6 +291,16 @@ spec:
           LIMIT_TOTAL_OWNER_COUNT: 5000
           LIMIT_TOTAL_OWNER_SIZE: 450 GiB
           LIMIT_SIZE_CONTAINER: 10 GiB
+        lfs:
+          STORAGE_TYPE: r2
+        storage.r2:
+          STORAGE_TYPE: minio
+          MINIO_ENDPOINT: d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
+          MINIO_BUCKET: batcave-gitea-lfs
+          MINIO_LOCATION: us-east-1
+          MINIO_USE_SSL: true
+          MINIO_BUCKET_LOOKUP_TYPE: path
+          SERVE_DIRECT: false
         cron.cleanup_packages:
           ENABLED: true
           RUN_AT_START: true
@@ -368,6 +378,16 @@ spec:
             secretKeyRef:
               name: gitea-secret
               key: GITEA_LFS_JWT_SECRET
+        - name: GITEA__STORAGE_0X2E_R2__MINIO_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_LFS_ACCESS_KEY_ID
+        - name: GITEA__STORAGE_0X2E_R2__MINIO_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: gitea-secret
+              key: GITEA_LFS_SECRET_ACCESS_KEY
         - name: GITEA__metrics__TOKEN
           valueFrom:
             secretKeyRef:
