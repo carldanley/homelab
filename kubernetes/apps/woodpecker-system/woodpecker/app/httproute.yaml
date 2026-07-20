@@ -1,0 +1,22 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: woodpecker
+  annotations:
+    gatus.home-operations.com/endpoint: |-
+      url: https://ci.${DOMAIN_7}/healthz
+spec:
+  hostnames:
+    - "ci.${DOMAIN_7}"
+  parentRefs:
+    - name: external
+      namespace: kube-system
+      sectionName: domain-7-subdomain-https
+    - name: internal
+      namespace: kube-system
+      sectionName: domain-7-subdomain-https
+  rules:
+    - backendRefs:
+        - name: woodpecker-server
+          port: 80

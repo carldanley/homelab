@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: woodpecker
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+        ephemeral-storage: 1Gi
+      default:
+        cpu: "4"
+        memory: 8Gi
+        ephemeral-storage: 20Gi
+      min:
+        cpu: 10m
+        memory: 32Mi
+      max:
+        cpu: "8"
+        memory: 16Gi
+        ephemeral-storage: 50Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: woodpecker
+spec:
+  hard:
+    pods: "30"
+    requests.cpu: "12"
+    requests.memory: 24Gi
+    requests.ephemeral-storage: 100Gi
+    limits.cpu: "24"
+    limits.memory: 48Gi
+    limits.ephemeral-storage: 300Gi
+    persistentvolumeclaims: "25"
+    requests.storage: 250Gi
+    services: "30"
+    secrets: "50"

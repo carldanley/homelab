@@ -1,0 +1,177 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: woodpecker
+spec:
+  interval: 1h
+  url: oci://ghcr.io/woodpecker-ci/helm/woodpecker
+  ref:
+    tag: 3.6.5
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: woodpecker
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: woodpecker
+  values:
+    agent:
+      replicaCount: 2
+
+      env:
+        WOODPECKER_SERVER: woodpecker-server:9000
+        WOODPECKER_BACKEND: kubernetes
+        WOODPECKER_BACKEND_K8S_NAMESPACE: woodpecker-system
+        WOODPECKER_BACKEND_K8S_NAMESPACE_PER_ORGANIZATION: "false"
+        WOODPECKER_BACKEND_K8S_STORAGE_CLASS: openebs-hostpath
+        WOODPECKER_BACKEND_K8S_VOLUME_SIZE: 10Gi
+        WOODPECKER_BACKEND_K8S_STORAGE_RWX: "false"
+        WOODPECKER_BACKEND_K8S_ALLOW_NATIVE_SECRETS: "false"
+        WOODPECKER_BACKEND_K8S_SERVICE_ACCOUNT_NAME_ALLOW_FROM_STEP: "false"
+        WOODPECKER_BACKEND_K8S_PULL_SECRET_NAMES: woodpecker-registry
+        WOODPECKER_CONNECT_RETRY_COUNT: "10"
+        WOODPECKER_MAX_WORKFLOWS: "1"
+
+      persistence:
+        enabled: true
+        size: 1Gi
+        storageClass: ceph-block
+
+      extraVolumes:
+        - name: temp
+          emptyDir: {}
+
+      extraVolumeMounts:
+        - name: temp
+          mountPath: /tmp
+
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: woodpecker
+              app.kubernetes.io/name: agent
+
+      podAnnotations:
+        secret.reloader.stakater.com/reload: woodpecker-default-agent-secret
+
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 1
+          memory: 512Mi
+
+    server:
+      env:
+        WOODPECKER_HOST: https://ci.${DOMAIN_7}
+        WOODPECKER_OPEN: "false"
+        WOODPECKER_GITEA: "true"
+        WOODPECKER_GITEA_URL: https://git.${DOMAIN_7}
+        WOODPECKER_DATABASE_DRIVER: postgres
+        WOODPECKER_FORCE_IGNORE_SERVICE_FAILURE: "false"
+
+      extraSecretNamesForEnvFrom:
+        - woodpecker-secret
+
+      createAgentSecret: false
+
+      initContainers:
+        - name: init-db
+          image: ghcr.io/home-operations/postgres-init:18
+          envFrom:
+            - secretRef:
+                name: woodpecker-secret
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+
+      persistentVolume:
+        enabled: false
+
+      extraVolumes:
+        - name: data
+          emptyDir: {}
+        - name: temp
+          emptyDir: {}
+
+      extraVolumeMounts:
+        - name: data
+          mountPath: /var/lib/woodpecker
+        - name: temp
+          mountPath: /tmp
+
+      podAnnotations:
+        secret.reloader.stakater.com/reload: woodpecker-secret
+
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 2
+          memory: 1Gi

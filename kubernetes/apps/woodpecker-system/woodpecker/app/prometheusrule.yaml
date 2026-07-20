@@ -1,0 +1,49 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: woodpecker
+spec:
+  groups:
+    - name: woodpecker.rules
+      rules:
+        - alert: WoodpeckerServerDown
+          expr: |-
+            (max(up{namespace="woodpecker-system", service="woodpecker-server"}) or vector(0)) == 0
+          for: 5m
+          annotations:
+            summary: Woodpecker server metrics have been unavailable for 5 minutes.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: WoodpeckerNoWorkers
+          expr: |-
+            (max(woodpecker_worker_count{namespace="woodpecker-system", service="woodpecker-server"}) or vector(0)) < 1
+          for: 5m
+          annotations:
+            summary: Woodpecker has no connected workers.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: WoodpeckerQueueBacklog
+          expr: |-
+            max(woodpecker_pending_steps{namespace="woodpecker-system", service="woodpecker-server"}) > 0
+          for: 15m
+          annotations:
+            summary: Woodpecker has had pending pipeline steps for 15 minutes.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: WoodpeckerAgentReplicasUnavailable
+          expr: |-
+            kube_statefulset_status_replicas_ready{namespace="woodpecker-system", statefulset="woodpecker-agent"}
+              < kube_statefulset_replicas{namespace="woodpecker-system", statefulset="woodpecker-agent"}
+          for: 10m
+          annotations:
+            summary: One or more Woodpecker agent replicas are unavailable.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts

@@ -76,3 +76,26 @@ spec:
               Replica {{ $labels.pod }} is failing to replicate
           labels:
             severity: critical
+
+        - alert: CloudNativePGBackupStale
+          expr: |-
+            (
+              time() - max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="databases", job="databases/postgres"}) > 129600
+            ) or absent(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="databases", job="databases/postgres"})
+          for: 30m
+          annotations:
+            summary: The latest available CloudNativePG backup is more than 36 hours old.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: CloudNativePGLatestBackupFailed
+          expr: |-
+            max(barman_cloud_cloudnative_pg_io_last_failed_backup_timestamp{namespace="databases", job="databases/postgres"})
+              > max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="databases", job="databases/postgres"})
+          for: 15m
+          annotations:
+            summary: The latest CloudNativePG backup attempt failed.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
