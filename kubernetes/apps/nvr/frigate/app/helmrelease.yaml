@@ -119,6 +119,7 @@ spec:
           webrtc-udp:
             port: 8555
             protocol: UDP
+            nodePort: 32423
 
     route:
       app:
