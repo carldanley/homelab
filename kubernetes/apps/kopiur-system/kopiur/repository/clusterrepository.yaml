@@ -38,6 +38,9 @@ spec:
   identityDefaults:
     hostnameExpr: namespace
     usernameExpr: "namespace + '-' + policyName"
+  parameters:
+    epoch:
+      minDuration: 6h
   moverDefaults:
     cache:
       capacity: 2Gi
