@@ -273,8 +273,11 @@ spec:
           MODE: console
         mailer:
           ENABLED: true
-          FROM: "Gitea <gitea@mail.${DOMAIN_5}>"
+          FROM: "Gitea <noreply@git.${DOMAIN_7}>"
           PROTOCOL: smtps
+          SMTP_ADDR: smtp.resend.com
+          SMTP_PORT: 465
+          USER: resend
         openid:
           ENABLE_OPENID_SIGNIN: false
           ENABLE_OPENID_SIGNUP: false
@@ -393,21 +396,6 @@ spec:
             secretKeyRef:
               name: gitea-secret
               key: GITEA_METRICS_TOKEN
-        - name: GITEA__mailer__SMTP_ADDR
-          valueFrom:
-            secretKeyRef:
-              name: gitea-secret
-              key: GITEA_MAILER_ADDR
-        - name: GITEA__mailer__SMTP_PORT
-          valueFrom:
-            secretKeyRef:
-              name: gitea-secret
-              key: GITEA_MAILER_PORT
-        - name: GITEA__mailer__USER
-          valueFrom:
-            secretKeyRef:
-              name: gitea-secret
-              key: GITEA_MAILER_USER
         - name: GITEA__mailer__PASSWD
           valueFrom:
             secretKeyRef:
