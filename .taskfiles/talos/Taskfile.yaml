@@ -40,6 +40,14 @@ tasks:
   apply-node:
     desc: Apply Talos config to a node [NODE=required] [MODE=auto] [DEBUG=false]
     cmds:
+      # Refresh and validate the same Talos client config used by apply-config.
+      - task: write-talconfig
+        vars:
+          FILE: "{{ .TALOSCONFIG_PATH }}"
+      - task: check-talconfig
+        vars:
+          FILE: "{{ .TALOSCONFIG_PATH }}"
+
       # Cleanup the rendered template files
       - defer: rm -f {{ .COMMON_TEMPLATE_FILE }}
       - defer: rm -f {{ .ROLE_TEMPLATE_FILE }}
@@ -66,8 +74,6 @@ tasks:
             {{ if deepEqual (.INSECURE | lower) "true" }}--insecure {{ end -}}
         {{ end }}
 
-      # Finally, make sure the talconfig file is written to disk
-      - task: write-talconfig
     vars:
       MODE: '{{ .MODE | default "auto" }}'
       MACHINE_TYPE:
@@ -130,12 +136,18 @@ tasks:
     desc: Write the Talos config to disk [FILE=optional]
     prompt: Write Talos config to "{{ .TALOSCONFIG_PATH }}" (WILL OVERWRITE) ...?
     cmds:
+      - defer: rm -f "{{ .TALOSCONFIG_TEMP_FILE }}"
       - task: render-template
         vars:
           TEMPLATE_FILE: "{{ .TALOS_DIR }}/talconfig.yaml.j2"
-          OUTPUT_FILE: "{{ .TALOSCONFIG_PATH }}"
+          OUTPUT_FILE: "{{ .TALOSCONFIG_TEMP_FILE }}"
           ENDPOINTS: "{{ .ENDPOINTS }}"
           NODES: "{{ .NODES }}"
+      - task: check-talconfig
+        vars:
+          FILE: "{{ .TALOSCONFIG_TEMP_FILE }}"
+      - chmod 0600 "{{ .TALOSCONFIG_TEMP_FILE }}"
+      - mv -f "{{ .TALOSCONFIG_TEMP_FILE }}" "{{ .TALOSCONFIG_PATH }}"
     vars:
       TALOSCONFIG_PATH:
         sh: |-
@@ -144,6 +156,10 @@ tasks:
           {{ else }}
           echo "{{ .TALOS_DIR }}/talosconfig"
           {{ end }}
+      TALOSCONFIG_TEMP_FILE:
+        sh: |-
+          destination_dir=$(dirname "{{ .TALOSCONFIG_PATH }}")
+          mktemp "${destination_dir}/.talosconfig.XXXXXXXXXX"
       ENDPOINTS:
         sh: |-
           FILES=()
@@ -169,13 +185,39 @@ tasks:
           fi
           echo "${FILES[@]}" | tr ' ' ','
     preconditions:
-      - which op yq
+      - which chmod dirname mktemp mv op yq
 
       # make sure the output path resolved
       - test -n "{{ .TALOSCONFIG_PATH }}"
+      - test -d "$(dirname "{{ .TALOSCONFIG_PATH }}")"
 
       # make sure we're logged into onepassword
       - op vault list &>/dev/null
+
+  check-talconfig:
+    desc: Check that the Talos CA and client certificates are valid for at least 30 days [FILE=optional]
+    cmds:
+      - |-
+        for field in ca crt; do
+          if ! yq -r ".contexts[.context].${field}" "{{ .TALOSCONFIG_PATH }}" \
+            | base64 --decode \
+            | openssl x509 -checkend 2592000 -noout >/dev/null 2>&1; then
+            echo "Talos context ${field} certificate is invalid or expires within 30 days." >&2
+            echo "Renew the corresponding Talos certificate in 1Password before applying node configuration." >&2
+            exit 1
+          fi
+        done
+    vars:
+      TALOSCONFIG_PATH:
+        sh: |-
+          {{ if not (deepEqual (.FILE | default "" | trim) "") }}
+          echo "{{ .FILE }}"
+          {{ else }}
+          echo "{{ .TALOS_DIR }}/talosconfig"
+          {{ end }}
+    preconditions:
+      - which base64 openssl yq
+      - test -f "{{ .TALOSCONFIG_PATH }}"
 
   write-kubeconfig:
     desc: Write kubeconfig
