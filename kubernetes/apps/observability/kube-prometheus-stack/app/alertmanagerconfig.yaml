@@ -20,6 +20,25 @@ spec:
             value: InfoInhibitor
             matchType: "="
       - receiver: discord-homelab-alerts
+        groupWait: 0s
+        groupInterval: 5m
+        repeatInterval: 30m
+        matchers:
+          - name: alertname
+            value: BlackboxInstanceDown
+            matchType: "="
+          - name: instance
+            value: nas.batcave:2049
+            matchType: "="
+      - receiver: discord-homelab-alerts
+        groupWait: 0s
+        groupInterval: 5m
+        repeatInterval: 30m
+        matchers:
+          - name: alertname
+            value: "^(TalosUpgradeFailed|TalosUpgradeNodeFailed|TalosUpgradeStuck|TupprOperatorAbsent)$"
+            matchType: "=~"
+      - receiver: discord-homelab-alerts
         matchers:
           - name: discord_channel
             value: homelab-alerts

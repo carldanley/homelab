@@ -7,6 +7,7 @@ talosctl = "1.13.7"
 flux2 = "2.9.2"
 helm = "4.2.3"
 helmfile = "1.7.1"
+kustomize = "5.8.1"
 "pipx:flux-local" = "8.4.0"
 
 # Repository automation and operator tools.

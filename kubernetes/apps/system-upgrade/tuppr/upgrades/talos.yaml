@@ -4,10 +4,14 @@ kind: TalosUpgrade
 metadata:
   name: talos
 spec:
+  parallelism: 1
   policy:
-    # Worker nodes host singleton/PDB-protected workloads; let Talos reboot
-    # handle disruption instead of blocking on Kubernetes eviction.
-    nodrain: true
+    waitForVolumeDetach: true
+  maintenance:
+    windows:
+      - start: "0 3 * * 1,5"
+        duration: 3h
+        timezone: America/New_York
   talos:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
     version: v1.13.7

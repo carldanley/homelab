@@ -23,6 +23,14 @@ spec:
   interval: 1h
   values:
     replicaCount: 2
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: tuppr
+                app.kubernetes.io/instance: tuppr
+            topologyKey: kubernetes.io/hostname
     controller:
       logLevel: info
     monitoring:
@@ -49,3 +57,21 @@ spec:
               - op: add
                 path: /spec/folderUID
                 value: private-system-upgrade
+          - target:
+              group: monitoring.coreos.com
+              version: v1
+              kind: PrometheusRule
+              name: tuppr
+            patch: |-
+              - op: test
+                path: /spec/groups/0/rules/2/alert
+                value: TalosUpgradeStuck
+              - op: replace
+                path: /spec/groups/0/rules/2/for
+                value: 15m
+              - op: replace
+                path: /spec/groups/0/rules/2/annotations/description
+                value: >-
+                  Talos upgrade {{ $labels.name }} has been in the
+                  {{ $labels.phase }} phase for more than 15 minutes.
+                  Check the upgrade job and target node for errors.

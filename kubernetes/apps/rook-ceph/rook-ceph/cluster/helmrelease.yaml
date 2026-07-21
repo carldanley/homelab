@@ -40,13 +40,41 @@ spec:
         CephNodeDiskspaceWarning:
           expr: |-
             (
-              predict_linear(
-                (max without (pod) (node_filesystem_free_bytes{device=~"/.*"}))[2d:],
-                3600 * 24 * 5
+              (
+                predict_linear(
+                  (
+                    max without (device, pod) (
+                      node_filesystem_avail_bytes{mountpoint="/var"}
+                    )
+                  )[2d:],
+                  3600 * 24 * 5
+                ) < 0
               )
-              * on(cluster, instance) group_left(nodename)
-                max by (cluster, instance, nodename) (node_uname_info)
-            ) < 0
+              and on(cluster, instance, mountpoint)
+              (
+                (
+                  max without (device, pod) (
+                    node_filesystem_avail_bytes{mountpoint="/var"}
+                  )
+                  /
+                  max without (device, pod) (
+                    node_filesystem_size_bytes{mountpoint="/var"}
+                  )
+                ) < 0.20
+              )
+              and on(cluster, instance, mountpoint)
+              (
+                count_over_time(
+                  (
+                    max without (device, pod) (
+                      node_filesystem_avail_bytes{mountpoint="/var"}
+                    )
+                  )[2d:1h]
+                ) >= 24
+              )
+            )
+            * on(cluster, instance) group_left(nodename)
+              max by (cluster, instance, nodename) (node_uname_info)
 
     toolbox:
       enabled: true
