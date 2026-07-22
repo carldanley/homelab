@@ -318,7 +318,9 @@ spec:
         repository:
           DEFAULT_BRANCH: main
           DEFAULT_PRIVATE: private
-          ENABLE_PUSH_CREATE_USER: true
+          MAX_CREATION_LIMIT: 0
+          DISABLE_MIGRATIONS: true
+          ENABLE_PUSH_CREATE_USER: false
         admin:
           DISABLE_REGULAR_ORG_CREATION: true
         api:
