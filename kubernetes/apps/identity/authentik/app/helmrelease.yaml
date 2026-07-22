@@ -25,7 +25,7 @@ spec:
     global:
       image:
         repository: ghcr.io/goauthentik/server
-        tag: 2026.5.5
+        tag: 2026.5.6
         digest: sha256:50a833c48a714709f15d4f8846ec6b81a41d0d6a6bd2975087dfed3000d0d72e
       deploymentAnnotations:
         secret.reloader.stakater.com/reload: authentik-secret
