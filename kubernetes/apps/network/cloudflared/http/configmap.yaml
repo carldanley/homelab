@@ -95,4 +95,14 @@ data:
         originRequest:
           originServerName: "external.${DOMAIN_8}"
 
+      - hostname: "${DOMAIN_9}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_9}"
+
+      - hostname: "*.${DOMAIN_9}"
+        service: *service
+        originRequest:
+          originServerName: "external.${DOMAIN_9}"
+
       - service: http_status:404
