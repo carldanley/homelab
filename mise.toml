@@ -4,7 +4,7 @@ kubectl = "1.36.3"
 talosctl = "1.13.7"
 
 # Flux/Helm workflow tools.
-flux2 = "2.9.2"
+flux2 = "2.9.3"
 helm = "4.2.3"
 helmfile = "1.7.1"
 kustomize = "5.8.1"
