@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bootstrap
-          image: git.r1p.dev/unbound-xi/bug-bounty-server:${BUG_BOUNTY_SERVER_VERSION}@${BUG_BOUNTY_SERVER_DIGEST}
+          image: git.r1p.dev/unbound-xi/bug-bounty-server:${BUG_BOUNTY_BOOTSTRAP_SERVER_VERSION}@${BUG_BOUNTY_BOOTSTRAP_SERVER_DIGEST}
           imagePullPolicy: IfNotPresent
           args:
             - bootstrap
@@ -50,6 +50,11 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: bug-bounty-exporter-database
+                  key: DATABASE_PASSWORD
+            - name: BUG_BOUNTY_STAFF_ADMIN_DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bug-bounty-staff-admin-database
                   key: DATABASE_PASSWORD
           resources:
             requests:
