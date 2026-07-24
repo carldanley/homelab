@@ -271,6 +271,7 @@ spec:
         log:
           LEVEL: info
           MODE: console
+          ENABLE_SSH_LOG: true
         mailer:
           ENABLED: true
           FROM: "Gitea <noreply@git.${DOMAIN_7}>"

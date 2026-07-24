@@ -53,3 +53,36 @@ spec:
           labels:
             severity: critical
             discord_channel: homelab-alerts
+
+        - alert: GiteaSSHAuthenticationFailures
+          expr: |-
+            sum by (remote_ip) (
+              increase(gitea_ssh_failed_authentications[10m])
+            ) > 50
+          annotations:
+            summary: Repeated Gitea SSH authentication failures
+            description: >-
+              Gitea received {{ $value | humanize }} failed SSH authentication
+              attempts from {{ $labels.remote_ip }} in the last 10 minutes.
+              Review the source in VictoriaLogs before blocking it.
+          labels:
+            namespace: selfhosted
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: GiteaSSHAuthenticationFailures
+          expr: |-
+            sum(
+              increase(gitea_ssh_failed_authentications[10m])
+            ) > 500
+          annotations:
+            summary: High volume of Gitea SSH authentication failures
+            description: >-
+              Gitea received {{ $value | humanize }} failed SSH authentication
+              attempts in the last 10 minutes across all source addresses.
+              Investigate a possible scan or attack and consider ingress
+              rate-limiting.
+          labels:
+            namespace: selfhosted
+            severity: critical
+            discord_channel: homelab-alerts
