@@ -13,17 +13,24 @@ spec:
       reporting_enabled: "false"
     auth.anonymous:
       enabled: "false"
+    auth:
+      login_maximum_inactive_lifetime_duration: 1h
+      login_maximum_lifetime_duration: 8h
     auth.generic_oauth:
       allow_sign_up: "true"
       api_url: "https://auth.${DOMAIN_7}/application/o/userinfo/"
       auth_url: "https://auth.${DOMAIN_7}/application/o/authorize/"
       enabled: "true"
+      jwk_set_url: "https://auth.${DOMAIN_7}/application/o/grafana/jwks/"
+      login_prompt: login
       name: authentik
       role_attribute_strict: "true"
       scopes: openid profile email
       skip_org_role_sync: "false"
       token_url: "https://auth.${DOMAIN_7}/application/o/token/"
       use_pkce: "true"
+      use_refresh_token: "false"
+      validate_id_token: "true"
     date_formats:
       use_browser_locale: "true"
     explore:
