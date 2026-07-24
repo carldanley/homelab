@@ -41,6 +41,7 @@ spec:
               - --domain-filter=${DOMAIN_6}
               - --domain-filter=${DOMAIN_7}
               - --domain-filter=${DOMAIN_8}
+              - --domain-filter=${DOMAIN_9}
               - --provider=webhook
               - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
               - --crd-source-kind=DNSEndpoint

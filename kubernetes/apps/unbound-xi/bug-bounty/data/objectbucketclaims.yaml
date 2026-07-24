@@ -1,0 +1,52 @@
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: bug-bounty-object-store-quarantine
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+    bug-bounty.unbound-xi.org/bucket-role: quarantine
+spec:
+  generateBucketName: bug-bounty-quarantine
+  storageClassName: ceph-object-cache
+  additionalConfig:
+    maxSize: "25G"
+    bucketLifecycle: |
+      {
+        "Rules": [
+          {
+            "ID": "AbortIncompleteMultipartUploads",
+            "Status": "Enabled",
+            "Prefix": "",
+            "AbortIncompleteMultipartUpload": {
+              "DaysAfterInitiation": 1
+            }
+          }
+        ]
+      }
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: bug-bounty-object-store-clean
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+    bug-bounty.unbound-xi.org/bucket-role: clean
+spec:
+  generateBucketName: bug-bounty-clean
+  storageClassName: ceph-object-cache
+  additionalConfig:
+    maxSize: "25G"
+    bucketLifecycle: |
+      {
+        "Rules": [
+          {
+            "ID": "AbortIncompleteMultipartUploads",
+            "Status": "Enabled",
+            "Prefix": "",
+            "AbortIncompleteMultipartUpload": {
+              "DaysAfterInitiation": 1
+            }
+          }
+        ]
+      }

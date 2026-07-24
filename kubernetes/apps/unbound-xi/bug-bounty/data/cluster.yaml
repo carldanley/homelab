@@ -1,0 +1,32 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: bug-bounty-postgres
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:${POSTGRESQL_VERSION}
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath
+  superuserSecret:
+    name: bug-bounty-postgres-superuser
+  enableSuperuserAccess: true
+  bootstrap:
+    initdb:
+      database: bug_bounty
+      owner: app
+      dataChecksums: true
+  postgresql:
+    parameters:
+      max_connections: "50"
+      shared_buffers: 128MB
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi
+  monitoring:
+    enablePodMonitor: true

@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: unbound-xi
+components:
+  - ../../components/common
+resources:
+  - ./bug-bounty/ks.yaml
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: not-used
+        labels:
+          storage.homelab/object-cache-access: "true"
+    target:
+      kind: Namespace
+      name: not-used

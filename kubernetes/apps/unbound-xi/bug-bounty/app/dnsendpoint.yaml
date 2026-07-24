@@ -1,0 +1,35 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: bug-bounty
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: "bugs.${DOMAIN_9}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "external.${DOMAIN_9}"
+    - dnsName: "bug-assets.${DOMAIN_9}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "external.${DOMAIN_9}"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: bug-bounty-internal
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+    - dnsName: "bug-assets-service.${DOMAIN_9}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "internal.${DOMAIN_9}"

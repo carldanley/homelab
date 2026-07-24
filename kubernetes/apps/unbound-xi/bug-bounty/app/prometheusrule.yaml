@@ -1,0 +1,339 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: bug-bounty
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+spec:
+  # Application rules and alerts are vendored from v0.1.3. The platform
+  # adapter below materializes this staging environment's four stable labels.
+  groups:
+    - name: bug-bounty-application-stable
+      interval: 30s
+      rules:
+        - record: bug_bounty:reports_submitted:rate5m
+          expr: |
+            sum by (cluster, environment, namespace, workload, intake_route, visibility_class, attachment_state) (
+              rate(bug_bounty_reports_submitted_total[5m])
+            )
+        - record: bug_bounty:bugs_current:max
+          expr: |
+            label_replace(
+              max by (cluster, environment, namespace, state_axis, state) (bug_bounty_bugs_current),
+              "workload", "domain-global", "__name__", ".*"
+            )
+        - record: bug_bounty:bug_link_transitions:rate5m
+          expr: |
+            sum by (cluster, environment, namespace, workload, relationship, transition) (
+              rate(bug_bounty_bug_link_transitions_total[5m])
+            )
+        - record: bug_bounty:bug_relationships_current:max
+          expr: |
+            label_replace(
+              max by (cluster, environment, namespace, relationship) (bug_bounty_bug_relationships_current),
+              "workload", "domain-global", "__name__", ".*"
+            )
+        - record: bug_bounty:bug_resolutions:rate5m
+          expr: |
+            sum by (cluster, environment, namespace, workload, resolution_basis) (
+              rate(bug_bounty_bug_resolutions_total[5m])
+            )
+        - record: bug_bounty:http_requests:rate5m
+          expr: |
+            sum by (cluster, environment, namespace, workload, route, method, status_class) (
+              rate(bug_bounty_http_requests_total[5m])
+            )
+        - record: bug_bounty:http_errors:ratio5m
+          expr: |
+            sum by (cluster, environment, namespace, workload, route, method) (
+              rate(bug_bounty_http_requests_total{status_class="5xx"}[5m])
+            )
+            /
+            sum by (cluster, environment, namespace, workload, route, method) (
+              rate(bug_bounty_http_requests_total[5m])
+            )
+        - record: bug_bounty:http_duration_seconds:p95_5m
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (cluster, environment, namespace, workload, route, method, le) (
+                rate(bug_bounty_http_request_duration_seconds_bucket[5m])
+              )
+            )
+        - record: bug_bounty:report_time_to_first_triage_seconds:p50_24h
+          expr: |
+            histogram_quantile(
+              0.50,
+              sum by (cluster, environment, namespace, workload, intake_route, le) (
+                rate(bug_bounty_report_time_to_first_triage_seconds_bucket[24h])
+              )
+            )
+        - record: bug_bounty:report_time_to_first_triage_seconds:p95_24h
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (cluster, environment, namespace, workload, intake_route, le) (
+                rate(bug_bounty_report_time_to_first_triage_seconds_bucket[24h])
+              )
+            )
+        - record: bug_bounty:bug_time_to_first_resolution_seconds:p50_7d
+          expr: |
+            histogram_quantile(
+              0.50,
+              sum by (cluster, environment, namespace, workload, resolution_basis, le) (
+                rate(bug_bounty_bug_time_to_first_resolution_seconds_bucket[7d])
+              )
+            )
+        - record: bug_bounty:bug_time_to_first_resolution_seconds:p95_7d
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum by (cluster, environment, namespace, workload, resolution_basis, le) (
+                rate(bug_bounty_bug_time_to_first_resolution_seconds_bucket[7d])
+              )
+            )
+        - record: bug_bounty:attachment_processing_backlog:max
+          expr: |
+            label_replace(
+              max by (cluster, environment, namespace, stage) (bug_bounty_attachment_processing_backlog),
+              "workload", "domain-global", "__name__", ".*"
+            )
+        - record: bug_bounty:jobs_pending:max
+          expr: |
+            label_replace(
+              max by (cluster, environment, namespace, job_class) (bug_bounty_jobs_pending),
+              "workload", "domain-global", "__name__", ".*"
+            )
+        - record: bug_bounty:outbox_oldest_pending_age_seconds:max
+          expr: |
+            label_replace(
+              max by (cluster, environment, namespace) (bug_bounty_outbox_oldest_pending_age_seconds),
+              "workload", "domain-global", "__name__", ".*"
+            )
+
+    - name: bug-bounty-homelab-platform-adapter
+      interval: 1m
+      rules:
+        - record: bug_bounty:platform:postgres_up:max
+          expr: |
+            label_replace(
+              label_replace(
+                label_replace(
+                  label_replace(
+                    max(pg_up{namespace="unbound-xi",workload="postgres"}),
+                    "cluster", "homelab", "__name__", ".*"
+                  ),
+                  "environment", "staging", "__name__", ".*"
+                ),
+                "namespace", "unbound-xi", "__name__", ".*"
+              ),
+              "workload", "postgres", "__name__", ".*"
+            )
+        - record: bug_bounty:platform:object_store_up:max
+          expr: |
+            label_replace(
+              label_replace(
+                label_replace(
+                  label_replace(
+                    max(ceph_health_status) < bool 2,
+                    "cluster", "homelab", "__name__", ".*"
+                  ),
+                  "environment", "staging", "__name__", ".*"
+                ),
+                "namespace", "unbound-xi", "__name__", ".*"
+              ),
+              "workload", "object-store", "__name__", ".*"
+            )
+        - record: bug_bounty:platform:object_store_capacity_bytes:sum
+          expr: |
+            label_replace(
+              label_replace(
+                label_replace(
+                  label_replace(
+                    vector(21474836480),
+                    "cluster", "homelab", "__name__", ".*"
+                  ),
+                  "environment", "staging", "__name__", ".*"
+                ),
+                "namespace", "unbound-xi", "__name__", ".*"
+              ),
+              "workload", "object-store", "__name__", ".*"
+            )
+        - record: bug_bounty:platform:object_store_used_bytes:sum
+          expr: |
+            label_replace(
+              label_replace(
+                label_replace(
+                  label_replace(
+                    sum(bug_bounty_evidence_retained_bytes{namespace="unbound-xi"}),
+                    "cluster", "homelab", "__name__", ".*"
+                  ),
+                  "environment", "staging", "__name__", ".*"
+                ),
+                "namespace", "unbound-xi", "__name__", ".*"
+              ),
+              "workload", "object-store", "__name__", ".*"
+            )
+
+    - name: bug-bounty-platform-derived-stable
+      interval: 5m
+      rules:
+        - record: bug_bounty:platform:object_store_utilization:ratio
+          expr: |
+            bug_bounty:platform:object_store_used_bytes:sum
+            /
+            bug_bounty:platform:object_store_capacity_bytes:sum
+        - record: bug_bounty:platform:evidence_growth_bytes_per_second:rate7d
+          expr: |
+            label_replace(
+              clamp_min(
+                deriv(
+                  sum by (cluster, environment, namespace) (bug_bounty_evidence_retained_bytes)[7d:5m]
+                ),
+                0
+              ),
+              "workload", "object-store", "__name__", ".*"
+            )
+        - record: bug_bounty:platform:evidence_days_to_capacity:estimate
+          expr: |
+            (
+              bug_bounty:platform:object_store_capacity_bytes:sum
+              - bug_bounty:platform:object_store_used_bytes:sum
+            )
+            /
+            on (cluster, environment, namespace, workload)
+            (bug_bounty:platform:evidence_growth_bytes_per_second:rate7d > 0)
+            / 86400
+
+    - name: bug-bounty-security-and-intake
+      rules:
+        - alert: BugBountyAuthenticationFailuresHigh
+          expr: |
+            sum by (cluster, environment, namespace, flow, provider) (
+              rate(bug_bounty_auth_attempts_total{outcome=~"rejected|conflict|degraded|error"}[5m])
+            ) > 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty authentication failures are elevated
+            impact: Players or staff may be unable to establish the required assurance.
+            degradation: Fail closed for new assurance while preserving behavior allowed by existing valid sessions.
+        - alert: BugBountyDeniedStaffActionsHigh
+          expr: |
+            sum by (cluster, environment, namespace, action_class) (
+              increase(bug_bounty_staff_actions_total{outcome="denied"}[5m])
+            ) > 3
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty denied elevated actions are elevated
+            impact: A staff workflow may be misconfigured or an elevated boundary may be under attack.
+            degradation: Preserve denial and audit behavior; do not broaden capabilities to restore workflow access.
+        - alert: BugBountyReportCompletionRejectionsHigh
+          expr: |
+            sum by (cluster, environment, namespace, intake_route) (
+              increase(bug_bounty_report_completion_attempts_total{outcome="rejected"}[10m])
+            ) > 20
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty report completion rejections are elevated
+            impact: Players may be unable to finish report or evidence intake.
+            degradation: Preserve local drafts and retry semantics; do not bypass validation or upload constraints.
+        - alert: BugBountyRetentionRunsFailing
+          expr: |
+            sum by (cluster, environment, namespace, target) (
+              increase(bug_bounty_retention_runs_total{outcome=~"retry|failure"}[30m])
+            ) > 0
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty retention work is failing
+            impact: Expired evidence may remain beyond its intended deadline.
+            degradation: Preserve holds and audit state; repair idempotent cleanup without widening object-store access.
+
+    - name: bug-bounty-user-impact
+      rules:
+        - alert: BugBountyApiErrorRatioHigh
+          expr: |
+            max by (cluster, environment, namespace) (
+              bug_bounty:http_errors:ratio5m{workload="api"}
+            ) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty API error ratio is elevated
+            impact: Players may be unable to submit or browse reports.
+            degradation: Preserve client drafts and retry with the same idempotency key; do not bypass intake validation.
+        - alert: BugBountyPostgresUnavailable
+          expr: bug_bounty:platform:postgres_up:max == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Bug bounty PostgreSQL is unavailable
+            impact: Durable commands cannot be acknowledged.
+            degradation: Keep clients retrying the same idempotent command and do not accept writes elsewhere.
+        - alert: BugBountyObjectStoreUnavailable
+          expr: bug_bounty:platform:object_store_up:max == 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty evidence storage is unavailable
+            impact: Screenshot evidence cannot be accepted or processed.
+            degradation: Preserve written reports and mark evidence unavailable or retryable.
+
+    - name: bug-bounty-durable-work
+      rules:
+        - alert: BugBountyOutboxStalled
+          expr: bug_bounty:outbox_oldest_pending_age_seconds:max > 300
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty outbox delivery is delayed
+            impact: Notifications and derived projections may be stale.
+            degradation: Domain commits remain authoritative; repair workers without replaying user commands.
+        - alert: BugBountyAttachmentBacklogHigh
+          expr: sum by (cluster, environment, namespace) (bug_bounty:attachment_processing_backlog:max) > 100
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty attachment processing backlog is high
+            impact: Private screenshot evidence is delayed.
+            degradation: Written reports remain available; scale or repair workers before changing evidence policy.
+        - alert: BugBountyRetentionNotRunning
+          expr: time() - max by (cluster, environment, namespace, target) (bug_bounty_retention_last_success_timestamp_seconds) > 86400
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty retention has not completed recently
+            impact: Quarantine or expired evidence may be retained beyond policy.
+            degradation: Preserve holds and audit history while repairing the idempotent retention worker.
+
+    - name: bug-bounty-capacity
+      rules:
+        - alert: BugBountyObjectStoreCapacityHigh
+          expr: bug_bounty:platform:object_store_utilization:ratio > 0.85
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty evidence storage is nearing the supplied logical budget
+            impact: New screenshots may soon degrade to missing evidence.
+            degradation: Preserve text intake and use the evidence-unavailable path; the platform owns capacity action.
+        - alert: BugBountyObjectStoreCapacityForecastLow
+          expr: bug_bounty:platform:evidence_days_to_capacity:estimate < 14
+          for: 1h
+          labels:
+            severity: warning
+          annotations:
+            summary: Bug bounty evidence forecast is low against the supplied logical budget
+            impact: Evidence intake may exhaust capacity within the forecast window.
+            degradation: Preserve report narratives and use the documented evidence-unavailable path.

@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./configmaps.yaml
+  - ./helmrelease.yaml
+  - ./httproutes.yaml
+  - ./dnsendpoint.yaml
+  - ./networkpolicies.yaml
+  - ./monitoring.yaml
+  - ./prometheusrule.yaml
+  - ./grafanadashboard.yaml
+configMapGenerator:
+  - name: bug-bounty-dashboard
+    files:
+      - bug-bounty-overview.json=./bug-bounty-overview.json
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/part-of: bug-bounty

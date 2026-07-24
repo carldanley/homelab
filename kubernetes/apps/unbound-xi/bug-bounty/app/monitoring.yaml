@@ -1,0 +1,31 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: bug-bounty
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: bug-bounty
+      bug-bounty.unbound-xi.org/metrics: "true"
+  namespaceSelector:
+    matchNames:
+      - unbound-xi
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      relabelings:
+        - targetLabel: cluster
+          replacement: homelab
+        - targetLabel: environment
+          replacement: staging
+        - sourceLabels:
+            - __meta_kubernetes_namespace
+          targetLabel: namespace
+        - sourceLabels:
+            - __meta_kubernetes_service_label_app_kubernetes_io_component
+          targetLabel: workload

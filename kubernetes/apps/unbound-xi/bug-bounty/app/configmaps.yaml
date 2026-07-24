@@ -1,0 +1,98 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bug-bounty-config
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+data:
+  BUG_BOUNTY_ENVIRONMENT: production
+  BUG_BOUNTY_HTTP_ADDR: "0.0.0.0:8080"
+  BUG_BOUNTY_METRICS_ADDR: "0.0.0.0:9090"
+  BUG_BOUNTY_ADAPTER_MODE: external
+  BUG_BOUNTY_PUBLIC_ORIGIN: https://bugs.${DOMAIN_9}
+  BUG_BOUNTY_DISCORD_CLIENT_ID: |-
+    ${BUG_BOUNTY_DISCORD_CLIENT_ID}
+  BUG_BOUNTY_AUTHENTIK_ENABLED: "true"
+  BUG_BOUNTY_AUTHENTIK_DISCOVERY_URL: https://auth.r1p.dev/application/o/unbound-bug-bounty/.well-known/openid-configuration
+  BUG_BOUNTY_AUTHENTIK_ISSUER: https://auth.r1p.dev/application/o/unbound-bug-bounty/
+  BUG_BOUNTY_AUTHENTIK_CLIENT_ID: |-
+    ${BUG_BOUNTY_AUTHENTIK_CLIENT_ID}
+  BUG_BOUNTY_AUTHENTIK_RANK_SCOPE: bug_bounty_staff
+  BUG_BOUNTY_AUTHENTIK_RANK_CLAIM: bug_bounty_rank
+  BUG_BOUNTY_AUTHENTIK_REQUIRED_AMR: |-
+    ${BUG_BOUNTY_AUTHENTIK_REQUIRED_AMR}
+  BUG_BOUNTY_HARDENING_POLICY: >-
+    {"schema_version":1,"window_seconds":60,"game_account_requests":1000,"internal_user_requests":1000,"active_session_requests":1000,"network_requests":2000,"report_reservations":100,"report_completions":200,"upload_intents":100,"upload_bytes":104857600,"upload_concurrency":4,"abandoned_upload_cleanup_grace_seconds":60,"worker_max_job_attempts":5,"maintenance_scan_interval_seconds":15,"evidence_reconciliation_interval_seconds":3600,"cleanup_slow_retry_seconds":21600,"messages":500,"affected_commands":500,"staff_commands":1000,"global_report_reservations":10000,"maximum_receiving_reports":10000,"maximum_worker_backlog":10000,"maximum_retained_evidence_bytes":21474836480}
+  BUG_BOUNTY_DISCORD_LOGIN_TTL_SECONDS: "600"
+  BUG_BOUNTY_PLAYER_SESSION_TTL_SECONDS: "604800"
+  BUG_BOUNTY_STAFF_ELEVATION_TTL_SECONDS: "600"
+  BUG_BOUNTY_STAFF_ASSURANCE_TTL_SECONDS: "1800"
+  BUG_BOUNTY_OBJECT_STORE_UPLOAD_URL_TTL_SECONDS: "600"
+  BUG_BOUNTY_OBJECT_STORE_DOWNLOAD_URL_TTL_SECONDS: "300"
+  BUG_BOUNTY_OBJECT_STORE_QUARANTINE_ENDPOINT: https://bug-assets-service.${DOMAIN_9}
+  BUG_BOUNTY_OBJECT_STORE_QUARANTINE_PRESIGN_ENDPOINT: https://bug-assets.${DOMAIN_9}
+  BUG_BOUNTY_OBJECT_STORE_QUARANTINE_ALLOW_HTTP_PRESIGN: "false"
+  BUG_BOUNTY_OBJECT_STORE_QUARANTINE_REGION: us-east-1
+  BUG_BOUNTY_OBJECT_STORE_QUARANTINE_FORCE_PATH_STYLE: "true"
+  BUG_BOUNTY_OBJECT_STORE_CLEAN_ENDPOINT: https://bug-assets-service.${DOMAIN_9}
+  BUG_BOUNTY_OBJECT_STORE_CLEAN_PRESIGN_ENDPOINT: https://bug-assets.${DOMAIN_9}
+  BUG_BOUNTY_OBJECT_STORE_CLEAN_ALLOW_HTTP_PRESIGN: "false"
+  BUG_BOUNTY_OBJECT_STORE_CLEAN_REGION: us-east-1
+  BUG_BOUNTY_OBJECT_STORE_CLEAN_FORCE_PATH_STYLE: "true"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bug-bounty-assets-proxy
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+data:
+  default.conf: |
+    server {
+      listen 8080;
+      server_name _;
+      server_tokens off;
+
+      access_log off;
+      client_max_body_size 40m;
+      client_body_timeout 60s;
+
+      location / {
+        limit_except GET HEAD PUT {
+          deny all;
+        }
+
+        proxy_pass http://rook-ceph-rgw-internal-cache.rook-ceph.svc.cluster.local:80;
+        proxy_http_version 1.1;
+        proxy_set_header Host $http_host;
+        proxy_set_header Connection "";
+        proxy_pass_request_headers on;
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_max_temp_file_size 0;
+      }
+    }
+
+    server {
+      listen 8081;
+      server_name _;
+      server_tokens off;
+
+      access_log off;
+      client_max_body_size 40m;
+      client_body_timeout 60s;
+
+      location / {
+        proxy_pass http://rook-ceph-rgw-internal-cache.rook-ceph.svc.cluster.local:80;
+        proxy_http_version 1.1;
+        proxy_set_header Host $http_host;
+        proxy_set_header Connection "";
+        proxy_pass_request_headers on;
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_max_temp_file_size 0;
+      }
+    }
