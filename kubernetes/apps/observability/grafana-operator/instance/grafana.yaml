@@ -19,10 +19,11 @@ spec:
     auth.generic_oauth:
       allow_sign_up: "true"
       api_url: "https://auth.${DOMAIN_7}/application/o/userinfo/"
-      auth_url: "https://auth.${DOMAIN_7}/application/o/authorize/"
+      # Authentik treats max_age=0 as unset; this short positive window lets the
+      # logout-first Discord flow complete without prompt=login's reauth loop.
+      auth_url: "https://auth.${DOMAIN_7}/application/o/authorize/?max_age=60"
       enabled: "true"
       jwk_set_url: "https://auth.${DOMAIN_7}/application/o/grafana/jwks/"
-      login_prompt: login
       name: authentik
       role_attribute_strict: "true"
       scopes: openid profile email
