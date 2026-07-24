@@ -59,6 +59,26 @@ spec:
               - op: add
                 path: /spec/endpoints/0/honorLabels
                 value: true
+          # Alert on active policy failures, not retained failed Snapshot CRs.
+          - target:
+              group: monitoring.coreos.com
+              version: v1
+              kind: PrometheusRule
+              name: kopiur-controller
+            patch: |-
+              - op: replace
+                path: /spec/groups/0/rules/0/expr
+                value: kopiur_snapshot_consecutive_failures > 0
+              - op: replace
+                path: /spec/groups/0/rules/0/for
+                value: 10m
+              - op: replace
+                path: /spec/groups/0/rules/0/annotations/description
+                value: >-
+                  {{ $value }} consecutive backup failure(s) for SnapshotPolicy
+                  {{ $labels.namespace }}/{{ $labels.name }}.
+              - op: remove
+                path: /spec/groups/0/rules/3
           - target:
               group: grafana.integreatly.org
               version: v1beta1
