@@ -1,0 +1,47 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bug-bounty-staff-admin-default-deny-egress
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+spec:
+  podSelector:
+    matchLabels:
+      bug-bounty.unbound-xi.org/workload: staff-admin
+  policyTypes:
+    - Egress
+  egress: []
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bug-bounty-staff-admin-required-egress
+  labels:
+    app.kubernetes.io/part-of: bug-bounty
+spec:
+  podSelector:
+    matchLabels:
+      bug-bounty.unbound-xi.org/workload: staff-admin
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              cnpg.io/cluster: bug-bounty-postgres
+      ports:
+        - protocol: TCP
+          port: 5432

@@ -1,0 +1,59 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bug-bounty-staff-admin
+  labels:
+    app.kubernetes.io/name: bug-bounty-staff-admin
+    app.kubernetes.io/part-of: bug-bounty
+spec:
+  activeDeadlineSeconds: 300
+  backoffLimit: 3
+  suspend: true
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bug-bounty-staff-admin
+        app.kubernetes.io/part-of: bug-bounty
+        bug-bounty.unbound-xi.org/workload: staff-admin
+    spec:
+      serviceAccountName: bug-bounty-staff-admin
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: staff-admin
+          image: git.r1p.dev/unbound-xi/bug-bounty-server:${BUG_BOUNTY_STAFF_ADMIN_SERVER_VERSION}@${BUG_BOUNTY_STAFF_ADMIN_SERVER_DIGEST}
+          imagePullPolicy: IfNotPresent
+          args:
+            - staff-admin
+          env:
+            - name: BUG_BOUNTY_STAFF_ADMIN_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: bug-bounty-staff-admin-database
+                  key: url
+            - name: BUG_BOUNTY_STAFF_ADMIN_REQUEST
+              valueFrom:
+                secretKeyRef:
+                  name: bug-bounty-staff-admin-request
+                  key: request.json
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsGroup: 65532
+            runAsNonRoot: true
+            runAsUser: 65532
