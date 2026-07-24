@@ -22,7 +22,7 @@ spec:
         replicas: 1
         labels:
           app.kubernetes.io/component: api
-          app.kubernetes.io/version: v0.1.3
+          app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
         annotations:
           configmap.reloader.stakater.com/reload: bug-bounty-config
           secret.reloader.stakater.com/reload: bug-bounty-runtime-database,bug-bounty-secrets,bug-bounty-object-store-quarantine,bug-bounty-object-store-clean
@@ -31,14 +31,14 @@ spec:
             - name: bug-bounty-registry
           labels:
             app.kubernetes.io/component: api
-            app.kubernetes.io/version: v0.1.3
+            app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
             bug-bounty.unbound-xi.org/workload: api
         containers:
           app:
             image:
               repository: git.r1p.dev/unbound-xi/bug-bounty-server
-              tag: v0.1.3
-              digest: sha256:14bb11f4c2d180b044060c2084db9b44f442f60abd87f19522ccc853496181ff
+              tag: "${BUG_BOUNTY_SERVER_VERSION}"
+              digest: "${BUG_BOUNTY_SERVER_DIGEST}"
               pullPolicy: IfNotPresent
             args:
               - api
@@ -131,7 +131,7 @@ spec:
         replicas: 1
         labels:
           app.kubernetes.io/component: worker
-          app.kubernetes.io/version: v0.1.3
+          app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
         annotations:
           configmap.reloader.stakater.com/reload: bug-bounty-config
           secret.reloader.stakater.com/reload: bug-bounty-runtime-database,bug-bounty-object-store-quarantine,bug-bounty-object-store-clean
@@ -140,14 +140,14 @@ spec:
             - name: bug-bounty-registry
           labels:
             app.kubernetes.io/component: worker
-            app.kubernetes.io/version: v0.1.3
+            app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
             bug-bounty.unbound-xi.org/workload: worker
         containers:
           app:
             image:
               repository: git.r1p.dev/unbound-xi/bug-bounty-server
-              tag: v0.1.3
-              digest: sha256:14bb11f4c2d180b044060c2084db9b44f442f60abd87f19522ccc853496181ff
+              tag: "${BUG_BOUNTY_SERVER_VERSION}"
+              digest: "${BUG_BOUNTY_SERVER_DIGEST}"
               pullPolicy: IfNotPresent
             args:
               - worker
@@ -227,20 +227,20 @@ spec:
         replicas: 1
         labels:
           app.kubernetes.io/component: website
-          app.kubernetes.io/version: v0.1.3
+          app.kubernetes.io/version: "${BUG_BOUNTY_WEBSITE_VERSION}"
         pod:
           imagePullSecrets:
             - name: bug-bounty-registry
           labels:
             app.kubernetes.io/component: website
-            app.kubernetes.io/version: v0.1.3
+            app.kubernetes.io/version: "${BUG_BOUNTY_WEBSITE_VERSION}"
             bug-bounty.unbound-xi.org/workload: website
         containers:
           app:
             image:
               repository: git.r1p.dev/unbound-xi/bug-bounty-website
-              tag: v0.1.3
-              digest: sha256:c6bcf716dd57cd162867cd350e2425e783f138ee5093e8161e9782cfe2e58ca3
+              tag: "${BUG_BOUNTY_WEBSITE_VERSION}"
+              digest: "${BUG_BOUNTY_WEBSITE_DIGEST}"
               pullPolicy: IfNotPresent
             ports:
               - name: http

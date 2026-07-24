@@ -26,7 +26,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: bootstrap
-          image: git.r1p.dev/unbound-xi/bug-bounty-server@sha256:14bb11f4c2d180b044060c2084db9b44f442f60abd87f19522ccc853496181ff
+          image: git.r1p.dev/unbound-xi/bug-bounty-server:${BUG_BOUNTY_SERVER_VERSION}@${BUG_BOUNTY_SERVER_DIGEST}
           imagePullPolicy: IfNotPresent
           args:
             - bootstrap

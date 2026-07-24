@@ -12,11 +12,11 @@ imagePullSecrets:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: bug-bounty-migrate-v0-1-3
+  name: bug-bounty-migrate
   labels:
     app.kubernetes.io/name: bug-bounty-migrate
     app.kubernetes.io/part-of: bug-bounty
-    app.kubernetes.io/version: v0.1.3
+    app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
 spec:
   backoffLimit: 3
   template:
@@ -24,7 +24,7 @@ spec:
       labels:
         app.kubernetes.io/name: bug-bounty-migrate
         app.kubernetes.io/part-of: bug-bounty
-        app.kubernetes.io/version: v0.1.3
+        app.kubernetes.io/version: "${BUG_BOUNTY_SERVER_VERSION}"
         bug-bounty.unbound-xi.org/workload: migrate
     spec:
       restartPolicy: OnFailure
@@ -37,7 +37,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migrate
-          image: git.r1p.dev/unbound-xi/bug-bounty-server@sha256:14bb11f4c2d180b044060c2084db9b44f442f60abd87f19522ccc853496181ff
+          image: git.r1p.dev/unbound-xi/bug-bounty-server:${BUG_BOUNTY_SERVER_VERSION}@${BUG_BOUNTY_SERVER_DIGEST}
           imagePullPolicy: IfNotPresent
           args:
             - migrate

@@ -85,5 +85,17 @@
         commitMessageTopic: "{{{groupName}}} group",
       },
     },
+    {
+      description: "Unbound XI Bug Bounty release images",
+      groupName: "Unbound XI Bug Bounty",
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "git.r1p.dev/unbound-xi/bug-bounty-server",
+        "git.r1p.dev/unbound-xi/bug-bounty-website",
+      ],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+    },
   ],
 }

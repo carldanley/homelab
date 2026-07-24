@@ -9,8 +9,8 @@ tasks:
   all:
     desc: Run all local validation checks
     cmds:
-      - task: validate:kustomize
-      - task: validate:flux-local
+      - task: kustomize
+      - task: flux-local
 
   kustomize:
     desc: Render Kubernetes kustomization roots

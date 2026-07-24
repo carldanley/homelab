@@ -109,6 +109,12 @@ spec:
       current: status.conditions.exists(e, e.type == 'Complete' && e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/unbound-xi/bug-bounty/bootstrap
+  force: true
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: bug-bounty-release
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository
@@ -133,7 +139,7 @@ spec:
   healthChecks:
     - apiVersion: batch/v1
       kind: Job
-      name: bug-bounty-migrate-v0-1-3
+      name: bug-bounty-migrate
       namespace: *namespace
   healthCheckExprs:
     - apiVersion: batch/v1
@@ -143,6 +149,12 @@ spec:
       current: status.conditions.exists(e, e.type == 'Complete' && e.status == 'True')
   interval: 1h
   path: ./kubernetes/apps/unbound-xi/bug-bounty/migrate
+  force: true
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: bug-bounty-release
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository
@@ -195,6 +207,9 @@ spec:
   path: ./kubernetes/apps/unbound-xi/bug-bounty/app
   postBuild:
     substituteFrom:
+      - kind: ConfigMap
+        name: bug-bounty-release
+        optional: false
       - kind: Secret
         name: domains-secret
         optional: false

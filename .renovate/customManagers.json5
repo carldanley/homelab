@@ -15,5 +15,18 @@
       ],
       datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
     },
+    {
+      customType: "regex",
+      description: "Update the paired tag and digest for Bug Bounty release images",
+      managerFilePatterns: [
+        "/(^|/)kubernetes/apps/unbound-xi/bug-bounty/secrets/release\\.yaml$/",
+      ],
+      matchStrings: [
+        "  # renovate-release: depName=(?<depName>\\S+)\\n  (?<versionKey>[A-Z0-9_]+_VERSION): (?<currentValue>\\S+)\\n  (?<digestKey>[A-Z0-9_]+_DIGEST): (?<currentDigest>sha256:[a-f0-9]+)",
+      ],
+      datasourceTemplate: "docker",
+      versioningTemplate: "semver",
+      autoReplaceStringTemplate: "  # renovate-release: depName={{{depName}}}\n  {{{versionKey}}}: {{{newValue}}}\n  {{{digestKey}}}: {{{newDigest}}}",
+    },
   ],
 }

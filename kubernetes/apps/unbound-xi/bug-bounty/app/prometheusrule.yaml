@@ -6,7 +6,7 @@ metadata:
   labels:
     app.kubernetes.io/part-of: bug-bounty
 spec:
-  # Application rules and alerts are vendored from v0.1.3. The platform
+  # Application rules and alerts are vendored from the matching release. The platform
   # adapter below materializes this staging environment's four stable labels.
   groups:
     - name: bug-bounty-application-stable
