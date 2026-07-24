@@ -74,7 +74,7 @@ This Git repository contains the following directories under [kubernetes](./kube
 | PiKVM (RasPi 4)                         | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM             | KVM                     |
 | TESmart 8 Port KVM Switch               | 1     | -            | -                         | -    | -                 | Network KVM (for PiKVM) |
 | UniFi Dream Machine Beast              | 1     | -            | -                         | -    | UniFi OS          | Router & NVR            |
-| UniFi USW Aggregation                   | 1     | -            | -                         | -    | UniFi OS          | 10G Core Switch         |
+| UniFi USW Pro Aggregation               | 1     | -            | -                         | -    | UniFi OS          | 10G Core Switch         |
 | Tesla Powerwall 3                       | 1     | -            | 13.5 kWh battery          | -    | Tesla firmware    | Home battery & inverter |
 | Generac Guardian 22 kW                  | 1     | -            | Natural gas               | -    | Generac firmware  | Backup generator        |
 
