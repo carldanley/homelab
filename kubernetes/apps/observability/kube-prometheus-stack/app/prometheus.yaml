@@ -41,7 +41,7 @@ spec:
   enableOTLPReceiver: false
   externalUrl: "https://prometheus.${DOMAIN_5}"
   hostNetwork: false
-  image: docker.io/prompp/prompp:0.8.4
+  image: docker.io/prompp/prompp:0.8.5
   imagePullPolicy: IfNotPresent
   listenLocal: false
   logFormat: logfmt
