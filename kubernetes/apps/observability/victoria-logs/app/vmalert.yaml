@@ -1,0 +1,113 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: vmalert
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 0.45.0
+  url: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-alert
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: vmalert
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: vmalert
+  dependsOn:
+    - name: victoria-logs
+  interval: 1h
+  values:
+    serviceAccount:
+      automountToken: false
+
+    server:
+      datasource:
+        url: http://victoria-logs-server.observability.svc.cluster.local:9428
+
+      notifier:
+        url: http://kube-prometheus-stack-alertmanager.observability.svc.cluster.local:9093
+
+      extraArgs:
+        rule.evalDelay: 5s
+
+      config:
+        alerts:
+          groups:
+            - name: gitea-ssh.rules
+              type: vlogs
+              interval: 1m
+              rules:
+                - alert: GiteaSSHAuthenticationFailures
+                  expr: >-
+                    _time:10m k_namespace_name:selfhosted app:gitea
+                    "Failed authentication attempt from"
+                    | extract_regexp "Failed authentication attempt from
+                    (?P<remote_ip>(?:[0-9]{1,3}\\.){3}[0-9]{1,3}|\\[[0-9A-Fa-f:]+\\])(?::[0-9]+)?"
+                    | stats by (remote_ip) count() as failed_authentications
+                    | filter failed_authentications:>50
+                    | fields remote_ip, failed_authentications
+                  annotations:
+                    summary: Repeated Gitea SSH authentication failures
+                    description: >-
+                      Gitea received {{ $value | humanize }} failed SSH
+                      authentication attempts from {{ $labels.remote_ip }} in
+                      the last 10 minutes. Review the source in VictoriaLogs
+                      before blocking it.
+                  labels:
+                    namespace: selfhosted
+                    severity: warning
+                    discord_channel: homelab-alerts
+
+                - alert: GiteaSSHAuthenticationFailuresHighVolume
+                  expr: >-
+                    _time:10m k_namespace_name:selfhosted app:gitea
+                    "Failed authentication attempt from"
+                    | stats count() as failed_authentications
+                    | filter failed_authentications:>500
+                    | fields failed_authentications
+                  annotations:
+                    summary: High volume of Gitea SSH authentication failures
+                    description: >-
+                      Gitea received {{ $value | humanize }} failed SSH
+                      authentication attempts in the last 10 minutes across all
+                      source addresses. Investigate a possible scan or attack
+                      and consider ingress rate-limiting.
+                  labels:
+                    namespace: selfhosted
+                    severity: critical
+                    discord_channel: homelab-alerts
+
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+      podSecurityContext:
+        enabled: true
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+      securityContext:
+        enabled: true
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+
+    serviceMonitor:
+      enabled: true
