@@ -49,6 +49,16 @@ spec:
   postRenderers:
     - kustomize:
         patches:
+          # Preserve Kopiur's resource namespace instead of the scrape namespace.
+          - target:
+              group: monitoring.coreos.com
+              version: v1
+              kind: ServiceMonitor
+              name: kopiur-controller
+            patch: |-
+              - op: add
+                path: /spec/endpoints/0/honorLabels
+                value: true
           - target:
               group: grafana.integreatly.org
               version: v1beta1
