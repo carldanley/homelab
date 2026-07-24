@@ -350,7 +350,7 @@ spec:
           app:
             image:
               repository: quay.io/prometheuscommunity/postgres-exporter
-              tag: v0.17.1@sha256:38606faa38c54787525fb0ff2fd6b41b4cfb75d455c1df294927c5f611699b17
+              tag: v0.20.1@sha256:ac5ec343104fae0e2d84a27bb8d69b38430a11910c5382cad85d478d2bab713e
               pullPolicy: IfNotPresent
             args:
               - --web.listen-address=:9187
