@@ -17,16 +17,31 @@
     },
     {
       customType: "regex",
-      description: "Update the paired tag and digest for Bug Bounty release images",
+      description: "Update the paired tag and digest for the Bug Bounty server image",
       managerFilePatterns: [
         "/(^|/)kubernetes/apps/unbound-xi/bug-bounty/secrets/release\\.yaml$/",
       ],
       matchStrings: [
-        "  # renovate-release: depName=(?<depName>\\S+)\\n  (?<versionKey>[A-Z0-9_]+_VERSION): (?<currentValue>\\S+)\\n  (?<digestKey>[A-Z0-9_]+_DIGEST): (?<currentDigest>sha256:[a-f0-9]+)",
+        "  # renovate-release: depName=git\\.r1p\\.dev/unbound-xi/bug-bounty-server\\n  BUG_BOUNTY_SERVER_VERSION: (?<currentValue>\\S+)\\n  BUG_BOUNTY_SERVER_DIGEST: (?<currentDigest>sha256:[a-f0-9]+)",
       ],
+      depNameTemplate: "git.r1p.dev/unbound-xi/bug-bounty-server",
       datasourceTemplate: "docker",
       versioningTemplate: "semver",
-      autoReplaceStringTemplate: "  # renovate-release: depName={{{depName}}}\n  {{{versionKey}}}: {{{newValue}}}\n  {{{digestKey}}}: {{{newDigest}}}",
+      autoReplaceStringTemplate: "  # renovate-release: depName=git.r1p.dev/unbound-xi/bug-bounty-server\n  BUG_BOUNTY_SERVER_VERSION: {{{newValue}}}\n  BUG_BOUNTY_SERVER_DIGEST: {{{newDigest}}}",
+    },
+    {
+      customType: "regex",
+      description: "Update the paired tag and digest for the Bug Bounty website image",
+      managerFilePatterns: [
+        "/(^|/)kubernetes/apps/unbound-xi/bug-bounty/secrets/release\\.yaml$/",
+      ],
+      matchStrings: [
+        "  # renovate-release: depName=git\\.r1p\\.dev/unbound-xi/bug-bounty-website\\n  BUG_BOUNTY_WEBSITE_VERSION: (?<currentValue>\\S+)\\n  BUG_BOUNTY_WEBSITE_DIGEST: (?<currentDigest>sha256:[a-f0-9]+)",
+      ],
+      depNameTemplate: "git.r1p.dev/unbound-xi/bug-bounty-website",
+      datasourceTemplate: "docker",
+      versioningTemplate: "semver",
+      autoReplaceStringTemplate: "  # renovate-release: depName=git.r1p.dev/unbound-xi/bug-bounty-website\n  BUG_BOUNTY_WEBSITE_VERSION: {{{newValue}}}\n  BUG_BOUNTY_WEBSITE_DIGEST: {{{newDigest}}}",
     },
   ],
 }
