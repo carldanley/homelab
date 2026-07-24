@@ -38,6 +38,8 @@ spec:
   identityDefaults:
     hostnameExpr: namespace
     usernameExpr: "namespace + '-' + policyName"
+  health:
+    indexBlobWarnThreshold: 5000
   parameters:
     epoch:
       minDuration: 6h
