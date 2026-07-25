@@ -194,11 +194,18 @@ spec:
           existingSecret: gitea-secret
           autoDiscoverUrl: https://auth.${DOMAIN_7}/application/o/gitea/.well-known/openid-configuration
           iconUrl: https://auth.${DOMAIN_7}/static/dist/assets/icons/icon.png
-          scopes: email profile
-          groupClaimName: groups
-          # Flux unescapes this to a shell variable that the configure-gitea init
-          # container receives from the 1Password-backed Secret at runtime.
-          groupTeamMap: '$${GITEA_AUTHENTIK_GROUP_TEAM_MAP}'
+          scopes: email profile gitea
+          requiredClaimName: gitea_access
+          # Gitea 1.27 compares this as a string, so Authentik deliberately emits
+          # the string "true" rather than a JSON boolean.
+          requiredClaimValue: "true"
+          groupClaimName: gitea_groups
+          groupTeamMap: >-
+            {"unbound-dev-client":{"unbound-xi":["client"]},
+            "unbound-dev-research":{"unbound-xi":["research"]},
+            "unbound-dev-server":{"unbound-xi":["server"]},
+            "unbound-dev-website":{"unbound-xi":["websites"]},
+            "unbound-dev-lead":{"unbound-xi":["client","research","server","websites"]}}
           groupTeamMapRemoval: true
 
       metrics:
@@ -286,7 +293,7 @@ spec:
           ENABLE_AUTO_REGISTRATION: true
           UPDATE_AVATAR: true
           USERNAME: preferred_username
-          ACCOUNT_LINKING: login
+          ACCOUNT_LINKING: disabled
         packages:
           ENABLED: true
           STORAGE_TYPE: local
@@ -356,6 +363,8 @@ spec:
           SSH_LISTEN_PORT: 2222
         service:
           DISABLE_REGISTRATION: true
+          # Preserve the single local administrator as break-glass access.
+          ENABLE_PASSWORD_SIGNIN_FORM: true
           REQUIRE_SIGNIN_VIEW: false
 
       additionalConfigFromEnvs:
@@ -433,23 +442,3 @@ spec:
               - op: add
                 path: /spec/template/spec/hostUsers
                 value: false
-          - target:
-              version: v1
-              kind: Deployment
-              name: gitea
-            patch: |-
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata:
-                name: gitea
-              spec:
-                template:
-                  spec:
-                    initContainers:
-                      - name: configure-gitea
-                        env:
-                          - name: GITEA_AUTHENTIK_GROUP_TEAM_MAP
-                            valueFrom:
-                              secretKeyRef:
-                                name: gitea-secret
-                                key: GITEA_AUTHENTIK_GROUP_TEAM_MAP

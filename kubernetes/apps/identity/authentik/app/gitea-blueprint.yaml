@@ -1,0 +1,125 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-gitea-blueprint
+data:
+  gitea.yaml: |-
+    version: 1
+    metadata:
+      name: Unbound Gitea
+    entries:
+      - id: gitea-scope
+        model: authentik_providers_oauth2.scopemapping
+        identifiers:
+          name: Unbound Gitea OAuth scope
+        attrs:
+          name: Unbound Gitea OAuth scope
+          scope_name: gitea
+          description: Gitea access and team assignments for authorized Unbound developers
+          expression: |
+            group_names = {group.name for group in request.user.all_groups()}
+            if "unbound-devs" not in group_names:
+                return {}
+
+            managed_groups = [
+                "unbound-dev-client",
+                "unbound-dev-research",
+                "unbound-dev-server",
+                "unbound-dev-website",
+                "unbound-dev-lead",
+            ]
+            return {
+                "gitea_access": "true",
+                "gitea_groups": [
+                    group_name
+                    for group_name in managed_groups
+                    if group_name in group_names
+                ],
+            }
+
+      - id: gitea-provider
+        model: authentik_providers_oauth2.oauth2provider
+        identifiers:
+          name: Provider for Gitea
+        attrs:
+          name: Provider for Gitea
+          authentication_flow: !Find
+            - authentik_flows.flow
+            - - slug
+              - unbound-staff-authentication
+          authorization_flow: !Find
+            - authentik_flows.flow
+            - - slug
+              - default-provider-authorization-implicit-consent
+          invalidation_flow: !Find
+            - authentik_flows.flow
+            - - slug
+              - default-provider-invalidation-flow
+          client_type: confidential
+          client_id: !Env GITEA_AUTHENTIK_CLIENT_ID
+          client_secret: !Env GITEA_AUTHENTIK_CLIENT_SECRET
+          redirect_uris:
+            - matching_mode: strict
+              url: https://git.${DOMAIN_7}/user/oauth2/authentik/callback
+              redirect_uri_type: authorization
+          grant_types:
+            - authorization_code
+            - refresh_token
+          access_code_validity: minutes=1
+          access_token_validity: minutes=5
+          refresh_token_validity: days=30
+          include_claims_in_id_token: true
+          signing_key: !Find
+            - authentik_crypto.certificatekeypair
+            - - name
+              - authentik Self-signed Certificate
+          sub_mode: hashed_user_id
+          issuer_mode: per_provider
+          property_mappings:
+            - !Find
+              - authentik_providers_oauth2.scopemapping
+              - - managed
+                - goauthentik.io/providers/oauth2/scope-openid
+            - !Find
+              - authentik_providers_oauth2.scopemapping
+              - - managed
+                - goauthentik.io/providers/oauth2/scope-email
+            - !Find
+              - authentik_providers_oauth2.scopemapping
+              - - managed
+                - goauthentik.io/providers/oauth2/scope-profile
+            - !KeyOf gitea-scope
+
+      - id: gitea-application
+        model: authentik_core.application
+        identifiers:
+          slug: gitea
+        attrs:
+          name: Gitea
+          provider: !KeyOf gitea-provider
+          meta_launch_url: https://git.${DOMAIN_7}/
+          policy_engine_mode: all
+
+      - model: authentik_policies.policybinding
+        identifiers:
+          target: !KeyOf gitea-application
+          group: !Find
+            - authentik_core.group
+            - - name
+              - unbound-devs
+        attrs:
+          order: 0
+          enabled: true
+          negate: false
+          timeout: 30
+          failure_result: false
+
+      - model: authentik_policies.policybinding
+        state: absent
+        identifiers:
+          target: !KeyOf gitea-application
+          group: !Find
+            - authentik_core.group
+            - - name
+              - authentik Admins
