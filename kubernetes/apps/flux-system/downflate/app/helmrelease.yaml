@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/home-operations/downflate
-              tag: main@sha256:9a121cd83c24f3ead3e0023fe4834cff630cdd43600d94866b400831255fbfc6
+              tag: main@sha256:b49809465cdb7662a8904dcfdc931c21266b45aead620dbdb39de2217f0edd2e
             env:
               DOWNFLATE_ADDR: :80
               DOWNFLATE_REPO: github://carldanley/homelab
