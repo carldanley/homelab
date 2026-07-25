@@ -1,0 +1,45 @@
+schema_version = 1
+listen_endpoint = "0.0.0.0:8080"
+internal_listen_endpoint = "0.0.0.0:8443"
+shutdown_timeout = "10s"
+catalog_version = 2
+world_catalog_version = 1
+
+[database]
+host = "unbound-postgres-rw"
+port = 5432
+name = "unbound"
+user = "unbound_app"
+password = { file = "application-password" }
+max_connections = 8
+acquire_timeout = "2s"
+
+[internal_tls]
+server_certificate = { file = "api-internal-tls/tls.crt" }
+server_private_key = { file = "api-internal-tls/tls.key" }
+client_ca_certificate = { file = "api-internal-tls/ca.crt" }
+
+[login]
+credential_transport = "external_tls"
+password_workers = 2
+
+[admission]
+ticket_lifetime = "60s"
+
+[character_creation]
+creation_catalog_version = 1
+initial_zone_id = "playground"
+initial_position = ["-10.0", "0.0", "0.0"]
+initial_heading = "0.0"
+
+[region]
+region_id = "us-east"
+display_name = "US East"
+
+[region.compatibility]
+client_contract_min = 1
+client_contract_max = 1
+
+[world]
+world_id = "unbound-xi"
+display_name = "Unbound XI"

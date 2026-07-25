@@ -5,6 +5,8 @@ namespace: unbound-xi-game
 components:
   - ../../components/common
 resources:
+  - ./api-server/ks.yaml
+  - ./api-server/release.yaml
   - ./postgres/ks.yaml
 patches:
   - patch: |-

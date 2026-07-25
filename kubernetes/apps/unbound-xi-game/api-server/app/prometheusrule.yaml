@@ -1,0 +1,44 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-api
+  labels:
+    app.kubernetes.io/name: unbound-api
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  groups:
+    - name: unbound-api.rules
+      rules:
+        - alert: UnboundApiReplicaUnavailable
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-api"} < 2
+              or absent(kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-api"})
+          for: 5m
+          annotations:
+            summary: Fewer than two Unbound XI API replicas are available.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: UnboundApiDatabasePoolSaturated
+          expr: |-
+            unbound_api_database_connections{namespace="unbound-xi-game"}
+              >= unbound_api_database_connection_capacity{namespace="unbound-xi-game"}
+            and unbound_api_database_idle_connections{namespace="unbound-xi-game"} == 0
+          for: 5m
+          annotations:
+            summary: An Unbound XI API PostgreSQL pool is saturated.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
+        - alert: UnboundApiRestarting
+          expr: |-
+            increase(kube_pod_container_status_restarts_total{namespace="unbound-xi-game", container="api"}[15m]) > 2
+          for: 5m
+          annotations:
+            summary: An Unbound XI API container is repeatedly restarting.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts

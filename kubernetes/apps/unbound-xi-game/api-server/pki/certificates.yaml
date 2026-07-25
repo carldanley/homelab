@@ -1,0 +1,58 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unbound-xi-internal-ca
+spec:
+  commonName: Unbound XI Internal CA
+  duration: 87600h
+  isCA: true
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: unbound-xi-selfsigned
+  privateKey:
+    algorithm: ECDSA
+    encoding: PKCS8
+    rotationPolicy: Never
+    size: 256
+  renewBefore: 8760h
+  secretName: unbound-xi-internal-ca
+  subject:
+    organizations:
+      - Unbound XI
+  usages:
+    - cert sign
+    - crl sign
+    - digital signature
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: unbound-api-internal
+spec:
+  commonName: unbound-api-internal.unbound-xi-game.svc
+  dnsNames:
+    - unbound-api-internal
+    - unbound-api-internal.unbound-xi-game
+    - unbound-api-internal.unbound-xi-game.svc
+    - unbound-api-internal.unbound-xi-game.svc.cluster.local
+  duration: 2160h
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: unbound-xi-internal-ca
+  privateKey:
+    algorithm: ECDSA
+    encoding: PKCS8
+    rotationPolicy: Always
+    size: 256
+  renewBefore: 720h
+  secretName: unbound-api-internal-tls
+  subject:
+    organizations:
+      - Unbound XI
+  usages:
+    - server auth
+    - digital signature
+    - key encipherment

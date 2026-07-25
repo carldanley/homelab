@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-api-release
+  labels:
+    app.kubernetes.io/name: unbound-api
+    app.kubernetes.io/part-of: unbound-xi-game
+data:
+  # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-api
+  API_VERSION: v0.2.0
+  API_DIGEST: sha256:eb4996591b178eb0af8d29dde27fdeab00054d827244b0c4097f1cc11d32f090
