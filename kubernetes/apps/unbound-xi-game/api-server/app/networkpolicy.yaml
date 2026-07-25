@@ -31,7 +31,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: unbound-api-internal-mtls
+  name: unbound-api-gateway-internal
 spec:
   podSelector:
     matchLabels:
@@ -42,15 +42,31 @@ spec:
   ingress:
     - from:
         - podSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - unbound-gateway
-                  - unbound-game-server
+            matchLabels:
+              app.kubernetes.io/name: unbound-gateway
       ports:
         - protocol: TCP
-          port: 8443
+          port: 8082
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: unbound-api-game-internal
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-api
+      app.kubernetes.io/component: public-api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: unbound-game-server
+      ports:
+        - protocol: TCP
+          port: 8083
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

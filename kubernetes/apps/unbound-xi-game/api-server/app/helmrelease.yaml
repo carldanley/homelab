@@ -32,7 +32,7 @@ spec:
           app.kubernetes.io/version: "${API_VERSION}"
         annotations:
           configmap.reloader.stakater.com/reload: unbound-api-config
-          secret.reloader.stakater.com/reload: unbound-postgres-application,unbound-api-internal-tls
+          secret.reloader.stakater.com/reload: unbound-postgres-application
         pod:
           imagePullSecrets:
             - name: unbound-xi-registry
@@ -58,8 +58,11 @@ spec:
               - name: http
                 containerPort: 8080
                 protocol: TCP
-              - name: internal-https
-                containerPort: 8443
+              - name: gateway-http
+                containerPort: 8082
+                protocol: TCP
+              - name: game-http
+                containerPort: 8083
                 protocol: TCP
             probes:
               startup:
@@ -159,22 +162,6 @@ spec:
               - path: /var/run/secrets/unbound-xi/application-password
                 subPath: application-password
                 readOnly: true
-      api-internal-tls:
-        type: secret
-        name: unbound-api-internal-tls
-        defaultMode: 0440
-        advancedMounts:
-          unbound-api:
-            api:
-              - path: /var/run/secrets/unbound-xi/api-internal-tls/tls.crt
-                subPath: tls.crt
-                readOnly: true
-              - path: /var/run/secrets/unbound-xi/api-internal-tls/tls.key
-                subPath: tls.key
-                readOnly: true
-              - path: /var/run/secrets/unbound-xi/api-internal-tls/ca.crt
-                subPath: ca.crt
-                readOnly: true
 
     service:
       app:
@@ -188,15 +175,26 @@ spec:
             port: 8080
             targetPort: http
             appProtocol: http
-      internal:
+      gateway:
+        forceRename: unbound-api-gateway
         controller: unbound-api
         labels:
-          app.kubernetes.io/component: internal-api
+          app.kubernetes.io/component: gateway-internal-api
         ports:
-          internal-https:
-            port: 8443
-            targetPort: internal-https
-            appProtocol: https
+          http:
+            port: 8082
+            targetPort: gateway-http
+            appProtocol: http
+      game:
+        forceRename: unbound-api-game
+        controller: unbound-api
+        labels:
+          app.kubernetes.io/component: game-internal-api
+        ports:
+          http:
+            port: 8083
+            targetPort: game-http
+            appProtocol: http
 
     route:
       app:

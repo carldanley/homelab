@@ -30,38 +30,6 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app unbound-api-pki
-  namespace: &namespace unbound-xi-game
-spec:
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
-      app.kubernetes.io/part-of: unbound-xi-game
-  dependsOn:
-    - name: cert-manager
-      namespace: cert-manager
-  healthCheckExprs:
-    - apiVersion: cert-manager.io/v1
-      kind: Issuer
-      inProgress: '!has(status.conditions) || status.conditions.filter(e, e.type == "Ready").all(e, e.status != "True")'
-      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
-    - apiVersion: cert-manager.io/v1
-      kind: Certificate
-      inProgress: '!has(status.conditions) || status.conditions.filter(e, e.type == "Ready").all(e, e.status != "True")'
-      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
-  interval: 1h
-  path: ./kubernetes/apps/unbound-xi-game/api-server/pki
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-    namespace: flux-system
-  targetNamespace: *namespace
-  wait: true
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
   name: &app unbound-api-migrate
   namespace: &namespace unbound-xi-game
 spec:
@@ -106,8 +74,6 @@ spec:
       app.kubernetes.io/part-of: unbound-xi-game
   dependsOn:
     - name: unbound-api-migrate
-      namespace: *namespace
-    - name: unbound-api-pki
       namespace: *namespace
     - name: unbound-api-secrets
       namespace: *namespace

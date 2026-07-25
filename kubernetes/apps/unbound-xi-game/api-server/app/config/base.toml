@@ -1,6 +1,7 @@
 schema_version = 1
 listen_endpoint = "0.0.0.0:8080"
-internal_listen_endpoint = "0.0.0.0:8443"
+gateway_internal_listen_endpoint = "0.0.0.0:8082"
+game_internal_listen_endpoint = "0.0.0.0:8083"
 shutdown_timeout = "10s"
 catalog_version = 2
 world_catalog_version = 1
@@ -13,11 +14,6 @@ user = "unbound_app"
 password = { file = "application-password" }
 max_connections = 8
 acquire_timeout = "2s"
-
-[internal_tls]
-server_certificate = { file = "api-internal-tls/tls.crt" }
-server_private_key = { file = "api-internal-tls/tls.key" }
-client_ca_certificate = { file = "api-internal-tls/ca.crt" }
 
 [login]
 credential_transport = "external_tls"
