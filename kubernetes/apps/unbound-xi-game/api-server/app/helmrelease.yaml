@@ -166,7 +166,14 @@ spec:
         advancedMounts:
           unbound-api:
             api:
-              - path: /var/run/secrets/unbound-xi/api-internal-tls
+              - path: /var/run/secrets/unbound-xi/api-internal-tls/tls.crt
+                subPath: tls.crt
+                readOnly: true
+              - path: /var/run/secrets/unbound-xi/api-internal-tls/tls.key
+                subPath: tls.key
+                readOnly: true
+              - path: /var/run/secrets/unbound-xi/api-internal-tls/ca.crt
+                subPath: ca.crt
                 readOnly: true
 
     service:
