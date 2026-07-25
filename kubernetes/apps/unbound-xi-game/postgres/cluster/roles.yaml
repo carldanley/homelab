@@ -1,0 +1,42 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: unbound-postgres-migrator
+spec:
+  cluster:
+    name: unbound-postgres
+  name: unbound_migrator
+  login: true
+  connectionLimit: 4
+  databaseRoleReclaimPolicy: retain
+  passwordSecret:
+    name: unbound-postgres-migrator
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: unbound-postgres-application
+spec:
+  cluster:
+    name: unbound-postgres
+  name: unbound_app
+  login: true
+  connectionLimit: 32
+  databaseRoleReclaimPolicy: retain
+  passwordSecret:
+    name: unbound-postgres-application
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: DatabaseRole
+metadata:
+  name: unbound-postgres-state-owner
+spec:
+  cluster:
+    name: unbound-postgres
+  name: unbound_state_owner
+  login: true
+  connectionLimit: 8
+  databaseRoleReclaimPolicy: retain
+  passwordSecret:
+    name: unbound-postgres-state-owner

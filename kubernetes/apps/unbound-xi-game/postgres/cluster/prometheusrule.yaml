@@ -1,0 +1,31 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-postgres
+spec:
+  groups:
+    - name: unbound-postgres.rules
+      rules:
+        - alert: UnboundPostgresBackupStale
+          expr: |-
+            (
+              time() - max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="unbound-xi-game", job="unbound-xi-game/unbound-postgres"}) > 129600
+            ) or absent(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="unbound-xi-game", job="unbound-xi-game/unbound-postgres"})
+          for: 30m
+          annotations:
+            summary: The latest available Unbound XI PostgreSQL backup is more than 36 hours old.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: UnboundPostgresLatestBackupFailed
+          expr: |-
+            max(barman_cloud_cloudnative_pg_io_last_failed_backup_timestamp{namespace="unbound-xi-game", job="unbound-xi-game/unbound-postgres"})
+              > max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="unbound-xi-game", job="unbound-xi-game/unbound-postgres"})
+          for: 15m
+          annotations:
+            summary: The latest Unbound XI PostgreSQL backup attempt failed.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts

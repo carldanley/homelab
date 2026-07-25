@@ -1,0 +1,11 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: unbound-postgres
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: unbound-postgres
+  podMetricsEndpoints:
+    - port: metrics
