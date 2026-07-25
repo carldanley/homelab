@@ -209,6 +209,9 @@ spec:
           - name: external
             namespace: kube-system
             sectionName: domain-9-subdomain-https
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-9-subdomain-https
         rules:
           - matches:
               - path:
