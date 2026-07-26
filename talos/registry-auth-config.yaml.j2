@@ -1,5 +1,5 @@
 {% set ghcrSecretPath = "op://homelab kubernetes/talos-private-packages" %}
-{% set woodpeckerSecretPath = "op://homelab kubernetes/woodpecker" %}
+{% set giteaSecretPath = "op://homelab kubernetes/bug-bounty-registry" %}
 ---
 apiVersion: v1alpha1
 kind: RegistryAuthConfig
@@ -9,6 +9,6 @@ password: {{ ghcrSecretPath }}/ghcr-token
 ---
 apiVersion: v1alpha1
 kind: RegistryAuthConfig
-name: {{ woodpeckerSecretPath }}/WOODPECKER_REGISTRY
-username: {{ woodpeckerSecretPath }}/WOODPECKER_REGISTRY_USERNAME
-password: {{ woodpeckerSecretPath }}/WOODPECKER_REGISTRY_TOKEN
+name: git.r1p.dev
+username: {{ giteaSecretPath }}/REGISTRY_USERNAME
+password: {{ giteaSecretPath }}/REGISTRY_TOKEN
