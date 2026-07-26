@@ -1,0 +1,33 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-coordinator
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  groups:
+    - name: unbound-coordinator.rules
+      rules:
+        - alert: UnboundCoordinatorUnavailable
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-coordinator"} < 1
+              or absent(kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-coordinator"})
+          for: 2m
+          labels:
+            discord_channel: homelab-alerts
+            severity: critical
+          annotations:
+            summary: The Unbound XI Coordinator is unavailable.
+        - alert: UnboundCoordinatorRouteUnavailable
+          expr: |-
+            unbound_coordinator_ready{namespace="unbound-xi-game"} == 1
+              and unbound_coordinator_route_eligible{namespace="unbound-xi-game"} == 0
+              and unbound_coordinator_handoff_active{namespace="unbound-xi-game"} == 0
+          for: 2m
+          labels:
+            discord_channel: homelab-alerts
+            severity: warning
+          annotations:
+            summary: The public Zone has no eligible Coordinator route.

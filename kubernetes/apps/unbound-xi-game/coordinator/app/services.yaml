@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-coordinator
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: world-control-plane
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: world-control-plane
+  ports:
+    - name: management
+      port: 8082
+      targetPort: management
+      protocol: TCP
+      appProtocol: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-coordinator-worker-control
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: worker-control
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: world-control-plane
+  ports:
+    - name: worker-control
+      port: 7443
+      targetPort: worker-control
+      protocol: TCP
+      appProtocol: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-coordinator-route-read
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: route-read
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/component: world-control-plane
+  ports:
+    - name: route-read
+      port: 7442
+      targetPort: route-read
+      protocol: TCP
+      appProtocol: http

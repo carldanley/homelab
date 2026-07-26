@@ -1,0 +1,128 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unbound-state-owner
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: zone-state-owner
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-state-owner
+      app.kubernetes.io/component: zone-state-owner
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: unbound-state-owner
+        app.kubernetes.io/component: zone-state-owner
+        app.kubernetes.io/part-of: unbound-xi-game
+        unbound-xi.dev/postgres-client: "true"
+      annotations:
+        unbound-xi.dev/state-owner-config-revision: "${STATE_OWNER_CONFIG_REVISION}"
+    spec:
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: unbound-xi-registry
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - w01
+      containers:
+        - name: state-owner
+          image: git.r1p.dev/unbound-xi/unbound-state-owner:${STATE_OWNER_VERSION}@${STATE_OWNER_DIGEST}
+          imagePullPolicy: IfNotPresent
+          args:
+            - --base-config
+            - /etc/unbound-xi/config/base.toml
+            - --environment-config
+            - /etc/unbound-xi/config/environment.toml
+            - --secret-root
+            - /var/run/secrets/unbound-xi
+          ports:
+            - name: lease-control
+              containerPort: 7450
+              protocol: TCP
+            - name: worker
+              containerPort: 7451
+              protocol: TCP
+            - name: lifecycle
+              containerPort: 7452
+              protocol: TCP
+            - name: management
+              containerPort: 8083
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: management
+            periodSeconds: 1
+            timeoutSeconds: 1
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: management
+            periodSeconds: 2
+            timeoutSeconds: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: management
+            periodSeconds: 10
+            timeoutSeconds: 1
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 192Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: configuration
+              mountPath: /etc/unbound-xi/config
+              readOnly: true
+            - name: database-password
+              mountPath: /var/run/secrets/unbound-xi/state-owner-password
+              subPath: state-owner-password
+              readOnly: true
+      volumes:
+        - name: configuration
+          configMap:
+            name: unbound-state-owner-config
+            defaultMode: 0444
+        - name: database-password
+          secret:
+            secretName: unbound-postgres-state-owner
+            defaultMode: 0440
+            items:
+              - key: password
+                path: state-owner-password
+                mode: 0440

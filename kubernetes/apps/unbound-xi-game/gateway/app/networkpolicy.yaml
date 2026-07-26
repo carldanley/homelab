@@ -1,0 +1,36 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: unbound-gateway-public-quic
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-gateway
+      app.kubernetes.io/component: edge-gateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: UDP
+          port: 15420
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: unbound-gateway-private-metrics
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-gateway
+      app.kubernetes.io/component: edge-gateway
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+      ports:
+        - protocol: TCP
+          port: 8081

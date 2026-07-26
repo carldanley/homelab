@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+configMapGenerator:
+  - name: unbound-state-owner-config
+    files:
+      - base.toml=./base.toml
+      - environment.toml=./environment.toml
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/part-of: unbound-xi-game

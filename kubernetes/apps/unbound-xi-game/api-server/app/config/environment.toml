@@ -1,5 +1,4 @@
 schema_version = 1
 
 [admission]
-# TEST-NET-1 fail-safe until the gameplay Gateway's public UDP endpoint is assigned.
-gateway_endpoint = "192.0.2.1:15420"
+gateway_endpoint = "10.50.100.6:15420"

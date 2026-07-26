@@ -1,0 +1,83 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app unbound-gateway-edge
+  namespace: &namespace unbound-xi-game
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+      app.kubernetes.io/part-of: unbound-xi-game
+  dependsOn:
+    - name: cert-manager-issuers
+      namespace: cert-manager
+    - name: external-dns-unifi
+      namespace: network
+  healthCheckExprs:
+    - apiVersion: cert-manager.io/v1
+      kind: Certificate
+      current: status.conditions.filter(e, e.type == 'Ready').all(e, e.status == 'True')
+  interval: 1h
+  path: ./kubernetes/apps/unbound-xi-game/gateway/edge
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  wait: true
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app unbound-gateway
+  namespace: &namespace unbound-xi-game
+spec:
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+      app.kubernetes.io/part-of: unbound-xi-game
+  dependsOn:
+    - name: unbound-api
+      namespace: *namespace
+    - name: unbound-api-secrets
+      namespace: *namespace
+    - name: unbound-coordinator
+      namespace: *namespace
+    - name: unbound-game-server
+      namespace: *namespace
+    - name: unbound-gateway-edge
+      namespace: *namespace
+    - name: cilium-config
+      namespace: kube-system
+    - name: kube-prometheus-stack
+      namespace: observability
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: unbound-gateway
+      namespace: *namespace
+    - apiVersion: v1
+      kind: Service
+      name: unbound-gateway
+      namespace: *namespace
+  interval: 1h
+  path: ./kubernetes/apps/unbound-xi-game/gateway/app
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: unbound-gateway-release
+        optional: false
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: *namespace
+  wait: true

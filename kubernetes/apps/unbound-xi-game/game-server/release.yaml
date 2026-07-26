@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-game-server-release
+  labels:
+    app.kubernetes.io/name: unbound-game-server
+    app.kubernetes.io/part-of: unbound-xi-game
+data:
+  # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-game-server
+  GAME_SERVER_VERSION: v0.4.0
+  GAME_SERVER_DIGEST: sha256:2fccc5cc5d0e141d4fc3cbeeb0646ff677de3bb143f072bcc027b198ac995226

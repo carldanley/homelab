@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-coordinator-release
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/part-of: unbound-xi-game
+data:
+  # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-coordinator
+  COORDINATOR_VERSION: v0.4.0
+  COORDINATOR_DIGEST: sha256:a4e507ab379208c692e33eb93f4f0bc188f86d1095db8e6b5b3308da0a4392c1

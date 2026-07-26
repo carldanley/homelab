@@ -1,0 +1,39 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-state-owner
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  groups:
+    - name: unbound-state-owner.rules
+      rules:
+        - alert: UnboundStateOwnerUnavailable
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-state-owner"} < 1
+              or absent(kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-state-owner"})
+          for: 2m
+          labels:
+            discord_channel: homelab-alerts
+            severity: critical
+          annotations:
+            summary: The Unbound XI State Owner is unavailable.
+        - alert: UnboundStateOwnerWriteBehindFailClosed
+          expr: unbound_state_owner_write_behind_fail_closed{namespace="unbound-xi-game"} == 1
+          for: 30s
+          labels:
+            discord_channel: homelab-alerts
+            severity: critical
+          annotations:
+            summary: The State Owner has frozen mutation admission.
+        - alert: UnboundStateOwnerWriteBehindLagOutsideBound
+          expr: |-
+            unbound_state_owner_write_behind_lag_versions{namespace="unbound-xi-game"} > 30
+              or unbound_state_owner_write_behind_pending_mutation_span_seconds{namespace="unbound-xi-game"} > 1
+          labels:
+            discord_channel: homelab-alerts
+            severity: critical
+          annotations:
+            summary: The State Owner write-behind suffix exceeds its recovery bound.

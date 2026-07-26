@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-state-owner-lease-control
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: lease-control
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: zone-state-owner
+  ports:
+    - name: lease-control
+      port: 7450
+      targetPort: lease-control
+      protocol: TCP
+      appProtocol: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-state-owner-worker
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: worker-state
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: zone-state-owner
+  ports:
+    - name: worker
+      port: 7451
+      targetPort: worker
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound-state-owner-lifecycle
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: instance-lifecycle
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/component: zone-state-owner
+  ports:
+    - name: lifecycle
+      port: 7452
+      targetPort: lifecycle
+      protocol: TCP
+      appProtocol: http

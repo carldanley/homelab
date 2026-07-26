@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: unbound-coordinator
+  labels:
+    app.kubernetes.io/name: unbound-coordinator
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-coordinator
+      app.kubernetes.io/component: world-control-plane
+  podMetricsEndpoints:
+    - port: management
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 5s

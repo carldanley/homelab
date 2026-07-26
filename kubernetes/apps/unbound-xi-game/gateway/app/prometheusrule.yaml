@@ -1,0 +1,30 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-gateway
+  labels:
+    app.kubernetes.io/name: unbound-gateway
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  groups:
+    - name: unbound-gateway.rules
+      rules:
+        - alert: UnboundGatewayUnavailable
+          expr: |-
+            kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-gateway"} < 1
+              or absent(kube_deployment_status_replicas_available{namespace="unbound-xi-game", deployment="unbound-gateway"})
+          for: 2m
+          labels:
+            discord_channel: homelab-alerts
+            severity: critical
+          annotations:
+            summary: The Unbound XI UDP Gateway is unavailable.
+        - alert: UnboundGatewayNotReady
+          expr: unbound_gateway_ready{namespace="unbound-xi-game"} == 0
+          for: 2m
+          labels:
+            discord_channel: homelab-alerts
+            severity: warning
+          annotations:
+            summary: The Unbound XI Gateway is not ready to admit clients.

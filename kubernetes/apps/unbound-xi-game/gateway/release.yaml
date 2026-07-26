@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-gateway-release
+  labels:
+    app.kubernetes.io/name: unbound-gateway
+    app.kubernetes.io/part-of: unbound-xi-game
+data:
+  # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-gateway
+  GATEWAY_VERSION: v0.4.0
+  GATEWAY_DIGEST: sha256:225419e6b828f35a1ad6fa3dc9e78a4183343e62bb75ca8daca20d3c3a9bea08

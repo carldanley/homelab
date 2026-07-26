@@ -1,0 +1,18 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: unbound-state-owner
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/part-of: unbound-xi-game
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-state-owner
+      app.kubernetes.io/component: zone-state-owner
+  podMetricsEndpoints:
+    - port: management
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 5s

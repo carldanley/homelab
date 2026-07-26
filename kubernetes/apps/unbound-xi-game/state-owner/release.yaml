@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: unbound-state-owner-release
+  labels:
+    app.kubernetes.io/name: unbound-state-owner
+    app.kubernetes.io/part-of: unbound-xi-game
+data:
+  # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-state-owner
+  STATE_OWNER_VERSION: v0.4.0
+  STATE_OWNER_DIGEST: sha256:a560da80c35d645f997ce71452a88a17e6f16fa80d43aef7b36fdbae1af8312b
+  STATE_OWNER_CONFIG_REVISION: v0.4.0-development-initial

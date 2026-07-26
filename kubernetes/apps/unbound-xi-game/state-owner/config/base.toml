@@ -1,0 +1,33 @@
+schema_version = 1
+lease_control_listen_endpoint = "0.0.0.0:7450"
+worker_listen_endpoint = "0.0.0.0:7451"
+instance_lifecycle_listen_endpoint = "0.0.0.0:7452"
+management_listen_endpoint = "0.0.0.0:8083"
+shutdown_timeout = "5s"
+request_timeout = "3s"
+snapshot_interval_versions = 100
+write_behind_flush_interval = "250ms"
+write_behind_max_volatile_simulation_mutations = 30
+write_behind_max_volatile_proposals = 32
+write_behind_max_volatile_bytes = 8388608
+write_behind_attempt_timeout = "250ms"
+write_behind_max_attempts = 3
+write_behind_initial_backoff = "25ms"
+lifecycle_maintenance_interval = "1s"
+lifecycle_maintenance_batch_size = 8
+
+[database]
+host = "unbound-postgres-rw"
+port = 5432
+name = "unbound"
+user = "unbound_state_owner"
+password = { file = "state-owner-password" }
+max_connections = 4
+acquire_timeout = "2s"
+
+[private_instance]
+instance_id = "00000000-0000-4000-8000-000000000060"
+template_id = "playground-private"
+template_version = 1
+lifetime = "1h"
+retention = "168h"
