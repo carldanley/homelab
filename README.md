@@ -69,7 +69,7 @@ This Git repository contains the following directories under [kubernetes](./kube
 |-----------------------------------------|-------|--------------|---------------------------|------|-------------------|-------------------------|
 | MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 3     | 1TB M.2      | 1.92 TB U.2 + 1.92 TB M.2 | 96GB  | Talos             | Kubernetes Controlplane |
 | MinisForum MS-A2 (AMD Ryzen™ 9 9955HX)  | 2     | 1TB M.2      | 1.92 TB U.2 + 2TB M.2     | 128GB | Talos             | Kubernetes Workers      |
-| MinisForum MS-01 (Intel Core i9-13900H) | 1     | 1GB M.2      | 4GB M.2                   | 32GB | Talos             | Kubernetes (NVR)        |
+| MinisForum MS-01 (Intel Core i9-13900H) | 1     | 1TB M.2      | 4GB M.2                   | 32GB | Talos             | Kubernetes (NVR)        |
 | MinisForum N5 Pro                       | 1     | 64GB         | 5x20TB HDD                | 96GB | TrueNAS Community | NAS                     |
 | PiKVM (RasPi 4)                         | 1     | 64GB (SD)    | -                         | 4GB  | PiKVM             | KVM                     |
 | TESmart 8 Port KVM Switch               | 1     | -            | -                         | -    | -                 | Network KVM (for PiKVM) |
