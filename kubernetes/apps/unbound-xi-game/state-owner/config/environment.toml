@@ -1,7 +1,7 @@
 schema_version = 1
 
 [partition]
-world_id = "unbound-xi"
+world_id = "development"
 partition_id = "playground"
 content_zone_id = "playground"
 content_sha256 = "27b040ec9f9b1967c4729f9cda06a9057cd3704fce9d95cd22f2bbc7e4aeca41"
@@ -10,7 +10,7 @@ movement_controller_sha256 = "9135c71e78c76ca0dd3415fb6e7b3f2f13dcd1b291f488f74d
 aoi_profile = "aoi-grid-m1-v3|cell_m=16|enter_m=12|exit_m=14|max_zone_entities=16384|max_visible=2048|max_records=4096"
 
 [private_partition]
-world_id = "unbound-xi"
+world_id = "development"
 partition_id = "playground-private"
 content_zone_id = "playground"
 content_sha256 = "27b040ec9f9b1967c4729f9cda06a9057cd3704fce9d95cd22f2bbc7e4aeca41"
