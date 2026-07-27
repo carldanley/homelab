@@ -8,5 +8,5 @@ metadata:
     app.kubernetes.io/part-of: unbound-xi-game
 data:
   # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-gateway
-  GATEWAY_VERSION: v0.4.2
-  GATEWAY_DIGEST: sha256:259414c7de5eac8c1b5eaf54f44ba310b41d2a1d106a9fd505c43e884a280637
+  GATEWAY_VERSION: v0.4.3
+  GATEWAY_DIGEST: sha256:56e03a2872111bab02f8b2a5e8a0f7b7b62d89832a5fb441d2e6235196c4c94e

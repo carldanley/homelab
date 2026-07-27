@@ -1,19 +1,19 @@
 schema_version = 1
 
 [partition]
-world_id = "development"
+world_id = "unbound-xi"
 partition_id = "playground"
 content_zone_id = "playground"
-content_sha256 = "27b040ec9f9b1967c4729f9cda06a9057cd3704fce9d95cd22f2bbc7e4aeca41"
+content_sha256 = "6ea14331b04f2cc74257fc80dc965a33921d47cfe61af3a5571972b065182ec4"
 geometry_sha256 = "f88ae9e5cdbdf72cd6c4501cec0833e727905eb39c836b1ca67b588b5db70abb"
 movement_controller_sha256 = "9135c71e78c76ca0dd3415fb6e7b3f2f13dcd1b291f488f74dcbb53d3f8c0c4c"
 aoi_profile = "aoi-grid-m1-v3|cell_m=16|enter_m=12|exit_m=14|max_zone_entities=16384|max_visible=2048|max_records=4096"
 
 [private_partition]
-world_id = "development"
+world_id = "unbound-xi"
 partition_id = "playground-private"
 content_zone_id = "playground"
-content_sha256 = "27b040ec9f9b1967c4729f9cda06a9057cd3704fce9d95cd22f2bbc7e4aeca41"
+content_sha256 = "6ea14331b04f2cc74257fc80dc965a33921d47cfe61af3a5571972b065182ec4"
 geometry_sha256 = "f88ae9e5cdbdf72cd6c4501cec0833e727905eb39c836b1ca67b588b5db70abb"
 movement_controller_sha256 = "9135c71e78c76ca0dd3415fb6e7b3f2f13dcd1b291f488f74dcbb53d3f8c0c4c"
 aoi_profile = "aoi-grid-m1-v3|cell_m=16|enter_m=12|exit_m=14|max_zone_entities=16384|max_visible=2048|max_records=4096"

@@ -8,6 +8,6 @@ metadata:
     app.kubernetes.io/part-of: unbound-xi-game
 data:
   # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-state-owner
-  STATE_OWNER_VERSION: v0.4.2
-  STATE_OWNER_DIGEST: sha256:8b5b1a2561607f9f183cf26bdc1e7407f1b74ea3cf020ea23d3d4162fbf3e286
-  STATE_OWNER_CONFIG_REVISION: v0.4.0-development-initial
+  STATE_OWNER_VERSION: v0.4.3
+  STATE_OWNER_DIGEST: sha256:b6c8fa354ad667cd09eca3f36b10de54d42ab6e7ff59981161d7ed5230b8f2ca
+  STATE_OWNER_CONFIG_REVISION: unbound-xi-6ea14331-initial
