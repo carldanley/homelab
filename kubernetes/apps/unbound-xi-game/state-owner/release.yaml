@@ -10,4 +10,4 @@ data:
   # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-state-owner
   STATE_OWNER_VERSION: v0.4.1
   STATE_OWNER_DIGEST: sha256:efa7f66c7e97e544d7e9cedf431ed7271b254e9f0c0201feb41e411655adfaae
-  STATE_OWNER_CONFIG_REVISION: v0.4.0-development-initial
+  STATE_OWNER_CONFIG_REVISION: v0.4.1-unbound-xi-initial
