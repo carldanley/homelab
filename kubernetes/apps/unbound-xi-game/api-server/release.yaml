@@ -8,5 +8,5 @@ metadata:
     app.kubernetes.io/part-of: unbound-xi-game
 data:
   # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-api
-  API_VERSION: v0.4.0
-  API_DIGEST: sha256:47b948340c9d6c03c675de632e43a9b36f2516b8d7a04b6425d7b581c17b587e
+  API_VERSION: v0.4.2
+  API_DIGEST: sha256:6c48381d413662ef16b925266f2c62cc484e680a7aa2cf7dc51a022bfbfa0696
