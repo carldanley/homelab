@@ -2,8 +2,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./deployment.yaml
-  - ./services.yaml
+  - ./helmrelease.yaml
   - ./networkpolicy.yaml
   - ./podmonitor.yaml
   - ./prometheusrule.yaml
@@ -13,6 +12,7 @@ configMapGenerator:
       - base.toml=./config/base.toml
       - environment.toml=./config/environment.toml
 generatorOptions:
+  disableNameSuffixHash: true
   labels:
     app.kubernetes.io/name: unbound-coordinator
     app.kubernetes.io/part-of: unbound-xi-game
