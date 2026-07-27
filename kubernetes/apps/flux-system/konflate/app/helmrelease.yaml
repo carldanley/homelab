@@ -11,6 +11,7 @@ spec:
   values:
     config:
       clusterPath: ./kubernetes/flux/cluster
+      maxDiffConcurrency: 1
       prComments: true
       publicUrl: https://konflate.${DOMAIN_7}
       refreshInterval: "0"
