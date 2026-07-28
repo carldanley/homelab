@@ -36,3 +36,12 @@ spec:
             severity: critical
           annotations:
             summary: The Unbound XI Game Server has frozen persistence.
+        - alert: UnboundGameServerAttachmentRecoveryStuck
+          expr: |-
+            min_over_time(unbound_game_server_recovering_attachments{namespace="unbound-xi-game"}[10m]) > 0
+              or min_over_time(unbound_game_server_reaping_attachments{namespace="unbound-xi-game"}[5m]) > 0
+          labels:
+            discord_channel: homelab-alerts
+            severity: warning
+          annotations:
+            summary: Unbound XI player attachments are not completing bounded recovery.

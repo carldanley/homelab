@@ -3,6 +3,9 @@ management_listen_endpoint = "0.0.0.0:8083"
 gameplay_listen_endpoint = "0.0.0.0:7444"
 tick_rate_hz = 30
 shutdown_timeout = "5s"
+# Gateway holds a paused Zone route for 30 seconds. Retain an unclaimed
+# attachment beyond that window so its exact session can reclaim safely.
+attachment_recovery_grace = "45s"
 
 [internal_api]
 host = "unbound-api-game"
