@@ -1,1 +1,5 @@
 schema_version = 1
+
+# Homelab load tests originate from one source address. Zero disables only the
+# per-source bucket; max_pending_handshakes and max_sessions remain enforced.
+max_connections_per_source = 0
