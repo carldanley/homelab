@@ -78,10 +78,6 @@ machine:
     sunrpc.tcp_max_slot_table_entries: 128 # 10Gb/s | NFS
     user.max_user_namespaces: 11255        # User Namespaces
     vm.nr_hugepages: 1024                  # PostgreSQL
-  time:
-    disabled: false
-    servers:
-    - "time.cloudflare.com"
   udev:
     rules:
       - # GPU
@@ -110,3 +106,11 @@ cluster:
     - 172.23.0.0/16
   secret: {{ opSecretPath }}/cluster-secret
   token: {{ opSecretPath }}/cluster-token
+---
+apiVersion: v1alpha1
+kind: TimeSyncConfig
+ntp:
+  servers:
+    - time.google.com
+    - time.cloudflare.com
+    - 0.pool.ntp.org
