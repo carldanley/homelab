@@ -21,6 +21,20 @@ spec:
   chartRef:
     kind: OCIRepository
     name: cilium
+  # Cilium 1.20 forces socket LB into the host namespace when Gateway API is
+  # enabled. Keep socket LB active in pod namespaces to avoid same-node service
+  # replies being reverse-NATed and denied by endpoint ingress policy.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: cilium-config
+            patch: |
+              - op: replace
+                path: /data/bpf-lb-sock-hostns-only
+                value: "false"
   values:
     autoDirectNodeRoutes: true
     bandwidthManager:
