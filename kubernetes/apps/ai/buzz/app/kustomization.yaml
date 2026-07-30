@@ -6,5 +6,4 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./helmrelease-redis.yaml
-  - ./helmrelease-typesense.yaml
   - ./dnsendpoint.yaml
