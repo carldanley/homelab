@@ -12,3 +12,8 @@ spec:
     recordType: CNAME
     targets:
     - "internal.${DOMAIN_5}"
+  - dnsName: "buzz-pair.${DOMAIN_5}"
+    recordTTL: 60
+    recordType: CNAME
+    targets:
+    - "internal.${DOMAIN_5}"

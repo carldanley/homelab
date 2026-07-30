@@ -1,0 +1,16 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: buzz-pairing
+spec:
+  hostnames:
+    - "buzz-pair.${DOMAIN_5}"
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: domain-5-subdomain-https
+  rules:
+    - backendRefs:
+        - name: buzz-pairing
+          port: 5000

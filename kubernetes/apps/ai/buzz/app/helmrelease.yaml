@@ -68,6 +68,10 @@ spec:
         storageClass: ceph-block
         size: 10Gi
 
+    pairingRelay:
+      enabled: true
+      url: "wss://buzz-pair.${DOMAIN_5}"
+
     httproute:
       enabled: true
       hostnames:

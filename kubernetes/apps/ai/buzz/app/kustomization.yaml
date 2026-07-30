@@ -6,4 +6,5 @@ resources:
   - ./externalsecret.yaml
   - ./helmrelease.yaml
   - ./helmrelease-redis.yaml
+  - ./httproute-pairing.yaml
   - ./dnsendpoint.yaml
