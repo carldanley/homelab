@@ -15,10 +15,10 @@ spec:
       valuesKey: BUZZ_OWNER_PUBKEY
       targetPath: ownerPubkey
   values:
-    # v0.1.0 (chart appVersion) predates BUZZ_AUTO_MIGRATE support
+    # pinned: chart appVersion lags relay releases (0.1.0 lacked BUZZ_AUTO_MIGRATE)
     image:
       repository: ghcr.io/block/buzz
-      tag: 0.1.1
+      tag: 0.2.0
 
     relayUrl: "wss://buzz.${DOMAIN_5}"
 
@@ -40,15 +40,6 @@ spec:
       extraEnv:
         - name: BUZZ_S3_REGION
           value: auto
-        - name: BUZZ_S3_ADDRESSING_STYLE
-          value: path
-        - name: TYPESENSE_URL
-          value: http://buzz-typesense.ai.svc.cluster.local:8108
-        - name: TYPESENSE_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: buzz-secret
-              key: TYPESENSE_API_KEY
 
     extraInitContainers:
       - name: init-db
