@@ -1,0 +1,78 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: buzz
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: buzz
+    namespace: flux-system
+  valuesFrom:
+    - kind: Secret
+      name: buzz-secret
+      valuesKey: BUZZ_OWNER_PUBKEY
+      targetPath: ownerPubkey
+  values:
+    relayUrl: "wss://buzz.${DOMAIN_5}"
+
+    secrets:
+      existingSecret: buzz-secret
+
+    s3:
+      endpoint: https://d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
+      bucket: batcave-buzz-media
+
+    relay:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: null
+          memory: 2Gi
+      extraEnv:
+        - name: BUZZ_S3_REGION
+          value: auto
+        - name: BUZZ_S3_ADDRESSING_STYLE
+          value: path
+
+    extraInitContainers:
+      - name: init-db
+        image: ghcr.io/home-operations/postgres-init:18
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - secretRef:
+              name: buzz-secret
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
+          runAsNonRoot: true
+          runAsUser: 65532
+          runAsGroup: 65532
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 128Mi
+
+    persistence:
+      git:
+        enabled: true
+        storageClass: ceph-block
+        size: 10Gi
+
+    httproute:
+      enabled: true
+      hostnames:
+        - "buzz.${DOMAIN_5}"
+      parentRefs:
+        - name: internal
+          namespace: kube-system
+          sectionName: domain-5-subdomain-https
+
+    serviceMonitor:
+      enabled: true
