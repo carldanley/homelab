@@ -10,6 +10,9 @@ spec:
     - name: internal
       namespace: kube-system
       sectionName: domain-5-subdomain-https
+    - name: buzz-direct
+      namespace: kube-system
+      sectionName: domain-5-subdomain-https
   rules:
     - backendRefs:
         - name: buzz-pairing

@@ -1,0 +1,25 @@
+---
+# Exposes buzz on a fixed, directly-routable LB address for clients that
+# resolve DNS elsewhere and reach 10.50.100.0/24 via a static route,
+# bypassing the shared internal gateway. Safe to delete if unused.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: buzz-direct
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 10.50.100.7
+  listeners:
+    - name: domain-5-subdomain-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.${DOMAIN_5}"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-certificate-tls
