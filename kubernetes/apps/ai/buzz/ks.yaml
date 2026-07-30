@@ -22,6 +22,10 @@ spec:
       kind: HelmRelease
       name: buzz-redis
       namespace: *namespace
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: buzz-pairing
+      namespace: *namespace
   healthCheckExprs:
     - apiVersion: external-secrets.io/v1
       kind: ExternalSecret

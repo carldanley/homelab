@@ -69,7 +69,10 @@ spec:
         size: 10Gi
 
     pairingRelay:
-      enabled: true
+      # chart deployment disabled: no released image ships buzz-pair-relay yet
+      # (Dockerfile only builds it on main); we run it via helmrelease-pairing.yaml.
+      # When a relay release includes the binary: enable this and drop that file.
+      enabled: false
       url: "wss://buzz-pair.${DOMAIN_5}"
 
     httproute:
