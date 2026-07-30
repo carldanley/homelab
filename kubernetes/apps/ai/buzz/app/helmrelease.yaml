@@ -18,7 +18,7 @@ spec:
     # v0.1.0 (chart appVersion) predates BUZZ_AUTO_MIGRATE support
     image:
       repository: ghcr.io/block/buzz
-      tag: 0.1.1
+      tag: 0.2.0
 
     relayUrl: "wss://buzz.${DOMAIN_5}"
 
