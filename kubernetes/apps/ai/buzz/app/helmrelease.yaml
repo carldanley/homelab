@@ -15,10 +15,13 @@ spec:
       valuesKey: BUZZ_OWNER_PUBKEY
       targetPath: ownerPubkey
   values:
-    # pinned: chart appVersion lags relay releases (0.1.0 lacked BUZZ_AUTO_MIGRATE)
+    # pinned to main digest: released images (<=0.2.0) lack mobile pairing
+    # support (BUZZ_PAIRING_RELAY_URL + buzz-pair-relay binary). Keep in sync
+    # with helmrelease-pairing.yaml; move to the next semver release when it
+    # ships pairing. Forward-only: main's migrations preclude rollback to 0.2.0.
     image:
       repository: ghcr.io/block/buzz
-      tag: 0.2.0
+      tag: main@sha256:645adc1ae4e0e9c2043df55f5eb186a666e225cea8d0c0c3ac6b3db9d3879d40
 
     relayUrl: "wss://buzz.${DOMAIN_5}"
 
