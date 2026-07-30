@@ -15,6 +15,11 @@ spec:
       valuesKey: BUZZ_OWNER_PUBKEY
       targetPath: ownerPubkey
   values:
+    # v0.1.0 (chart appVersion) predates BUZZ_AUTO_MIGRATE support
+    image:
+      repository: ghcr.io/block/buzz
+      tag: 0.1.1
+
     relayUrl: "wss://buzz.${DOMAIN_5}"
 
     secrets:
