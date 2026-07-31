@@ -1,7 +1,7 @@
 schema_version = 1
 management_listen_endpoint = "0.0.0.0:8083"
 gameplay_listen_endpoint = "0.0.0.0:7444"
-tick_rate_hz = 30
+zone_logic_interval = "400ms"
 shutdown_timeout = "5s"
 # Gateway holds a paused Zone route for 30 seconds. Retain an unclaimed
 # attachment beyond that window so its exact session can reclaim safely.
