@@ -7,4 +7,3 @@ components:
   - ../../components/common
 resources:
   - ./actions-runner-controller/ks.yaml
-  - ./buildkit/ks.yaml
