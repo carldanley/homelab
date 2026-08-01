@@ -8,5 +8,5 @@ metadata:
     app.kubernetes.io/part-of: unbound-xi-game
 data:
   # renovate-release: depName=git.r1p.dev/unbound-xi/unbound-coordinator
-  COORDINATOR_VERSION: v0.4.7
-  COORDINATOR_DIGEST: sha256:30a2f1528181f13bdaeef724a0b8c3068435427451fb4bcf5a1f08b1b86226d0
+  COORDINATOR_VERSION: v0.4.8
+  COORDINATOR_DIGEST: sha256:8144a548768df90d9b9bc997f7c18db7ab55928148df20aa0ae0573b2f7ae4cb

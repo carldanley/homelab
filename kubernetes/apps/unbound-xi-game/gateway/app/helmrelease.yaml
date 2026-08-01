@@ -177,3 +177,15 @@ spec:
             port: 15420
             targetPort: quic
             protocol: UDP
+      management:
+        forceRename: unbound-gateway-management
+        controller: unbound-gateway
+        labels:
+          app.kubernetes.io/component: management-observation
+        annotations:
+          kustomize.toolkit.fluxcd.io/prune: disabled
+        ports:
+          management:
+            port: 8081
+            targetPort: management
+            protocol: TCP

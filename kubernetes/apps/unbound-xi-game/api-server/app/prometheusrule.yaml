@@ -33,6 +33,18 @@ spec:
             severity: warning
             discord_channel: homelab-alerts
 
+        - alert: UnboundApiWorldGameplayAdmissionUnavailable
+          expr: |-
+            unbound_api_ready{namespace="unbound-xi-game"} == 1
+              and unbound_api_world_gameplay_admission_available{namespace="unbound-xi-game"} == 0
+          for: 5m
+          annotations:
+            summary: The configured World is unavailable for gameplay admission.
+            description: The API remains ready, but its cached World projection has conservatively closed gameplay admission for five minutes. Inspect fixed-source freshness and the component-owned progress signals.
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+
         - alert: UnboundApiRestarting
           expr: |-
             increase(kube_pod_container_status_restarts_total{namespace="unbound-xi-game", container="api"}[15m]) > 2

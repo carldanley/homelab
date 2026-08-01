@@ -42,6 +42,27 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: unbound-api-world-observation-game-worker-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-game-server
+      app.kubernetes.io/component: public-zone
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: unbound-api
+              app.kubernetes.io/component: public-api
+      ports:
+        - protocol: TCP
+          port: 8083
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: unbound-game-server-private-metrics
 spec:
   podSelector:

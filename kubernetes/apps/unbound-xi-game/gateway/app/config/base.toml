@@ -25,6 +25,10 @@ host = "unbound-coordinator-route-read"
 port = 7442
 request_timeout = "1s"
 
+[public_partition]
+world_id = "unbound-xi"
+partition_id = "playground"
+
 [game_servers.public]
 host = "unbound-game-server"
 port = 7444

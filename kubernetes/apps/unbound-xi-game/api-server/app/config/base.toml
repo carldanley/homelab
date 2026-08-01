@@ -4,7 +4,28 @@ gateway_internal_listen_endpoint = "0.0.0.0:8082"
 game_internal_listen_endpoint = "0.0.0.0:8083"
 shutdown_timeout = "10s"
 catalog_version = 2
-world_catalog_version = 1
+world_catalog_version = 2
+
+[world_availability]
+poll_interval = "500ms"
+request_timeout = "500ms"
+freshness_budget = "2s"
+
+[world_availability.coordinator]
+host = "unbound-coordinator"
+port = 8082
+
+[world_availability.gateway]
+host = "unbound-gateway-management"
+port = 8081
+
+[world_availability.state_owner]
+host = "unbound-state-owner-management"
+port = 8083
+
+[world_availability.game_worker]
+host = "unbound-game-server"
+port = 8083
 
 [database]
 host = "unbound-postgres-rw"

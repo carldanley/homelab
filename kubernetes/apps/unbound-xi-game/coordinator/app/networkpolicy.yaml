@@ -45,6 +45,27 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: unbound-api-world-observation-coordinator-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: unbound-coordinator
+      app.kubernetes.io/component: world-control-plane
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: unbound-api
+              app.kubernetes.io/component: public-api
+      ports:
+        - protocol: TCP
+          port: 8082
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: unbound-coordinator-private-metrics
 spec:
   podSelector:
