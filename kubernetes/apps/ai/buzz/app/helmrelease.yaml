@@ -21,7 +21,7 @@ spec:
     # ships pairing. Forward-only: main's migrations preclude rollback to 0.2.0.
     image:
       repository: ghcr.io/block/buzz
-      tag: main@sha256:645adc1ae4e0e9c2043df55f5eb186a666e225cea8d0c0c3ac6b3db9d3879d40
+      tag: main@sha256:d9b19c6d19c6af601a81d711b7f95ac2fcb7955cdde726d1432ede685aa6772f
 
     relayUrl: "wss://buzz.${DOMAIN_5}"
 
