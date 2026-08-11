@@ -36,7 +36,7 @@ spec:
           app:
             image:
               repository: docker.io/library/telegraf
-              tag: 1.39.2
+              tag: 1.39.3
             args:
               - telegraf
               - --config
