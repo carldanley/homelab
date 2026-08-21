@@ -5,8 +5,6 @@ kind: Kustomization
 namespace: unbound-xi
 components:
   - ../../components/common
-resources:
-  - ./bug-bounty/ks.yaml
 patches:
   - patch: |-
       apiVersion: v1

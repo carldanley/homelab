@@ -4,12 +4,6 @@ kind: Kustomization
 namespace: unbound-xi-game
 components:
   - ../../components/common
-resources:
-  - ./api-server/ks.yaml
-  - ./api-server/release.yaml
-  - ./postgres/ks.yaml
-  - ./state-owner/ks.yaml
-  - ./state-owner/release.yaml
 patches:
   - patch: |-
       apiVersion: v1
