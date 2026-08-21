@@ -1,4 +1,0 @@
-schema_version = 1
-
-[admission]
-gateway_endpoint = "10.50.100.6:15420"
