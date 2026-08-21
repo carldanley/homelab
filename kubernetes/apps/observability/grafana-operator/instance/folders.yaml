@@ -69,14 +69,3 @@ spec:
   parentFolderRef: private-dashboards
   title: system-upgrade
   uid: private-system-upgrade
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaFolder
-metadata:
-  name: unbound-dashboards
-spec:
-  instanceSelector:
-    matchLabels:
-      dashboards: grafana
-  title: Unbound
-  uid: unbound-dashboards

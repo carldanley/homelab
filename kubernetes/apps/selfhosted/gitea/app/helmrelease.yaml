@@ -200,13 +200,6 @@ spec:
           # the string "true" rather than a JSON boolean.
           requiredClaimValue: "true"
           groupClaimName: gitea_groups
-          groupTeamMap: >-
-            {"unbound-dev-client":{"unbound-xi":["client"]},
-            "unbound-dev-research":{"unbound-xi":["research"]},
-            "unbound-dev-server":{"unbound-xi":["server"]},
-            "unbound-dev-website":{"unbound-xi":["websites"]},
-            "unbound-dev-lead":{"unbound-xi":["client","research","server","websites"]}}
-          groupTeamMapRemoval: true
 
       metrics:
         enabled: true

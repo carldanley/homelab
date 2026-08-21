@@ -1,14 +1,7 @@
 {% set ghcrSecretPath = "op://homelab kubernetes/talos-private-packages" %}
-{% set giteaSecretPath = "op://homelab kubernetes/bug-bounty-registry" %}
 ---
 apiVersion: v1alpha1
 kind: RegistryAuthConfig
 name: ghcr.io
 username: {{ ghcrSecretPath }}/username
 password: {{ ghcrSecretPath }}/ghcr-token
----
-apiVersion: v1alpha1
-kind: RegistryAuthConfig
-name: git.r1p.dev
-username: {{ giteaSecretPath }}/REGISTRY_USERNAME
-password: {{ giteaSecretPath }}/REGISTRY_TOKEN
