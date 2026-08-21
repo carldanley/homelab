@@ -51,5 +51,14 @@
       ],
       ignoreTests: true,
     },
+    {
+      description: "Auto-merge n8n",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/n8n-io/n8n"],
+      matchUpdateTypes: ["minor", "patch"],
+      automerge: true,
+      automergeType: "pr",
+      ignoreTests: false,
+    },
   ],
 }
