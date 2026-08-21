@@ -7,12 +7,6 @@ components:
 resources:
   - ./api-server/ks.yaml
   - ./api-server/release.yaml
-  - ./coordinator/ks.yaml
-  - ./coordinator/release.yaml
-  - ./game-server/ks.yaml
-  - ./game-server/release.yaml
-  - ./gateway/ks.yaml
-  - ./gateway/release.yaml
   - ./postgres/ks.yaml
   - ./state-owner/ks.yaml
   - ./state-owner/release.yaml
