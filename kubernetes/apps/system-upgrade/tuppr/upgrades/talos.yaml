@@ -7,6 +7,11 @@ spec:
   parallelism: 1
   policy:
     waitForVolumeDetach: true
+  maintenance:
+    windows:
+      - start: "0 3 * * 1,5"
+        duration: 3h
+        timezone: America/New_York
   talos:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
     version: v1.13.9
