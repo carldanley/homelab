@@ -84,6 +84,16 @@ spec:
         wipeDevicesFromOtherClusters: false
       crashCollector:
         disable: false
+      healthCheck:
+        muteHealthWarning:
+          AUTH_INSECURE_CLIENT_KEY_TYPE:
+            policy: mute
+          AUTH_INSECURE_KEYS_ALLOWED:
+            policy: mute
+          AUTH_INSECURE_KEYS_CREATABLE:
+            policy: mute
+          AUTH_INSECURE_ROTATING_SERVICE_KEY_TYPE:
+            policy: mute
       dashboard:
         enabled: true
         urlPrefix: /
@@ -97,6 +107,14 @@ spec:
         provider: host
         connections:
           requireMsgr2: true
+      security:
+        cephx:
+          csi:
+            # AES256K kernel mounts require Linux 7.0+; Talos currently uses 6.18.
+            keyType: aes
+          daemon:
+            keyRotationPolicy: KeyGeneration
+            keyGeneration: 2
       storage:
         useAllNodes: false
         useAllDevices: false
