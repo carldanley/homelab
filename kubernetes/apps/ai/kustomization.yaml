@@ -7,4 +7,3 @@ components:
   - ../../components/common
 resources:
   - ./qdrant/ks.yaml
-  - ./buzz/ks.yaml

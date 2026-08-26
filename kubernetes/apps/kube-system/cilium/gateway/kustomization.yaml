@@ -6,4 +6,3 @@ resources:
   - ./certificate.yaml
   - ./internal.yaml
   - ./external.yaml
-  - ./buzz-direct.yaml
