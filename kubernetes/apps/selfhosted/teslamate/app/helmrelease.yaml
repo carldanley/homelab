@@ -29,7 +29,7 @@ spec:
           fleet-key-generator:
             image:
               repository: docker.io/alpine/openssl
-              tag: 3.5.7
+              tag: 3.5.8
             command:
               - /bin/sh
               - -ec
