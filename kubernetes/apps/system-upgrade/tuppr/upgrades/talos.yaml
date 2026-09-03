@@ -14,7 +14,7 @@ spec:
         timezone: America/New_York
   talos:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
-    version: v1.13.9
+    version: v1.14.0
   healthChecks:
     - apiVersion: ceph.rook.io/v1
       kind: CephCluster
