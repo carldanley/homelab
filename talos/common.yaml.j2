@@ -15,13 +15,6 @@ machine:
     stableHostname: true
     apidCheckExtKeyUsage: true
     diskQuotaSupport: true
-    kubePrism:
-      enabled: true
-      port: 7445
-    hostDNS:
-      enabled: true
-      resolveMemberNames: true
-      forwardKubeDNSToHost: false
   kubelet:
     # Stays in v1alpha1 for now: a KubeletConfig document is mutually exclusive
     # with every machine.kubelet field, and disableManifestsDirectory has no
@@ -33,10 +26,6 @@ machine:
       imageGCLowThresholdPercent: 55
     defaultRuntimeSeccompProfileEnabled: true
     disableManifestsDirectory: true
-  network:
-    nameservers:
-    - 10.40.1.1
-    disableSearchDomain: true
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
@@ -106,6 +95,24 @@ nodeIP:
     - 10.40.1.0/24
 labels:
   topology.kubernetes.io/region: homelab
+---
+# Talos 1.14: machine.features.kubePrism, machine.features.hostDNS,
+# machine.network.nameservers and machine.network.disableSearchDomain are
+# deprecated in favor of these two documents. Values are unchanged.
+apiVersion: v1alpha1
+kind: KubePrismConfig
+port: 7445
+---
+apiVersion: v1alpha1
+kind: ResolverConfig
+nameservers:
+  - address: 10.40.1.1
+searchDomains:
+  disableDefault: true
+hostDNS:
+  enabled: true
+  forwardKubeDNSToHost: false
+  resolveMemberNames: true
 ---
 apiVersion: v1alpha1
 kind: TimeSyncConfig
