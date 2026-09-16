@@ -22,23 +22,6 @@ machine:
       enabled: true
       resolveMemberNames: true
       forwardKubeDNSToHost: false
-  files:
-    - op: create
-      path: /etc/cri/conf.d/20-customization.part
-      content: |
-        [plugins."io.containerd.cri.v1.images"]
-          discard_unpacked_layers = false
-    - op: overwrite
-      path: /etc/nfsmount.conf
-      permissions: 0o644
-      content: |
-        [ NFSMount_Global_Options ]
-        nfsvers=4.1
-        hard=True
-        nconnect=16
-        noatime=True
-        rsize=1048576
-        wsize=1048576
   kernel:
     modules:
       - name: nbd
@@ -114,3 +97,26 @@ ntp:
     - time.google.com
     - time.cloudflare.com
     - 0.pool.ntp.org
+---
+# Replaces the deprecated machine.files entry for /etc/cri/conf.d (Talos 1.14):
+# fragments are merged into the CRI containerd config in name order.
+apiVersion: v1alpha1
+kind: CRICustomizationConfig
+name: 20-customization
+content: |
+  [plugins."io.containerd.cri.v1.images"]
+    discard_unpacked_layers = false
+---
+# Replaces the deprecated machine.files entry for /etc/nfsmount.conf (Talos 1.14).
+apiVersion: v1alpha1
+kind: EtcFileConfig
+name: nfsmount.conf
+mode: 0o644
+contents: |
+  [ NFSMount_Global_Options ]
+  nfsvers=4.1
+  hard=True
+  nconnect=16
+  noatime=True
+  rsize=1048576
+  wsize=1048576
