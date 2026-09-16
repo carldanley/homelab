@@ -104,6 +104,11 @@ spec:
           serviceTemplate:
             metadata:
               name: uxi-postgres-lan
+              labels:
+                # Internal only: external-dns-cloudflare publishes solely
+                # resources labeled dns.homelab/external=true, so this name
+                # exists in UniFi's LAN DNS and nowhere else.
+                dns.homelab/external: "false"
               annotations:
                 lbipam.cilium.io/ips: 10.50.100.6
                 external-dns.alpha.kubernetes.io/hostname: postgres.${DOMAIN_9}
