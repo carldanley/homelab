@@ -31,8 +31,6 @@ machine:
   nodeLabels:
     devices.homelab/coral-m2: "true"
     intel.feature.node.kubernetes.io/gpu: "true"
-  sysctls:
-    vm.nr_hugepages: 1024                  # MS-01 with 32 GB and no Postgres: keep the smaller reservation
 ---
 apiVersion: v1alpha1
 kind: EthernetConfig
@@ -53,3 +51,9 @@ provisioning:
   diskSelector:
     match: disk.serial == "S7U8NJ0XC28279J" && !system_disk
   minSize: 4.0TB
+---
+# MS-01 with 32 GB and no Postgres: keep the smaller hugepage reservation.
+apiVersion: v1alpha1
+kind: SysctlConfig
+params:
+  vm.nr_hugepages: "1024"
