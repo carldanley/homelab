@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/grafana.integreatly.org/grafanadashboard_v1beta1.json
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: uxi-postgres
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      dashboards: grafana
+  datasources:
+    - datasourceName: Prometheus
+      inputName: DS_PROMETHEUS
+  # renovate: depName="CloudNativePG"
+  url: https://grafana.com/api/dashboards/20417/revisions/4/download
+  # The "Unbound" folder is created and permissioned by grafana-authz-reconciler
+  # (observability): team unbound-gms holds view access, so Authentik decides
+  # who can see this by deciding who becomes a Grafana Viewer.
+  folderUID: unbound-dashboards
