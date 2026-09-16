@@ -114,6 +114,7 @@ spec:
                     - kube-system
                     - rook-ceph
                     - system-upgrade
+                    - uxi
           plugins:
             balance:
               enabled:

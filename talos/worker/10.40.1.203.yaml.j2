@@ -31,6 +31,8 @@ machine:
   nodeLabels:
     devices.homelab/coral-m2: "true"
     intel.feature.node.kubernetes.io/gpu: "true"
+  sysctls:
+    vm.nr_hugepages: 1024                  # MS-01 with 32 GB and no Postgres: keep the smaller reservation
 ---
 apiVersion: v1alpha1
 kind: EthernetConfig
