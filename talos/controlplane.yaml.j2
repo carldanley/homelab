@@ -5,18 +5,6 @@ machine:
   ca:
     crt: {{ opSecretPath }}/machine-ca-crt
     key: {{ opSecretPath }}/machine-ca-key
-  features:
-    kubernetesTalosAPIAccess:
-      enabled: true
-      allowedRoles:
-        - os:admin
-        - os:operator
-      allowedKubernetesNamespaces:
-        - actions-runner-system
-        - flux-system
-        - system-upgrade
-  nodeLabels:
-    topology.kubernetes.io/zone: controlplane
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
@@ -24,7 +12,6 @@ cluster:
   aggregatorCA:
     crt: {{ opSecretPath }}/cluster-aggregator-ca-crt
     key: {{ opSecretPath }}/cluster-aggregator-ca-key
-  allowSchedulingOnControlPlanes: true
   apiServer:
     image: registry.k8s.io/kube-apiserver:{{ ENV.KUBERNETES_VERSION }}
     extraArgs:
@@ -60,3 +47,25 @@ cluster:
       bind-address: 0.0.0.0
   serviceAccount:
     key: {{ opSecretPath }}/cluster-service-account-key
+---
+# Talos 1.14 makes the control-plane role label and NoSchedule taint explicit
+# once KubeNodeConfig is used (they were implicit in v1alpha1). The label must
+# stay: Cilium's BGP peering selects on it. No taint is listed on purpose, which
+# is the same as the former cluster.allowSchedulingOnControlPlanes: true.
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  node-role.kubernetes.io/control-plane: ""
+  topology.kubernetes.io/zone: controlplane
+---
+# Talos API access from in-cluster workloads (flux, tuppr, ARC), formerly
+# machine.features.kubernetesTalosAPIAccess.
+apiVersion: v1alpha1
+kind: KubeTalosAPIAccessConfig
+allowedRoles:
+  - os:admin
+  - os:operator
+allowedKubernetesNamespaces:
+  - actions-runner-system
+  - flux-system
+  - system-upgrade

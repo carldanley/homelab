@@ -23,22 +23,20 @@ machine:
       resolveMemberNames: true
       forwardKubeDNSToHost: false
   kubelet:
+    # Stays in v1alpha1 for now: a KubeletConfig document is mutually exclusive
+    # with every machine.kubelet field, and disableManifestsDirectory has no
+    # document equivalent in Talos 1.14.
     image: ghcr.io/siderolabs/kubelet:{{ ENV.KUBERNETES_VERSION }}
     extraConfig:
       serializeImagePulls: false
       imageGCHighThresholdPercent: 65
       imageGCLowThresholdPercent: 55
     defaultRuntimeSeccompProfileEnabled: true
-    nodeIP:
-      validSubnets:
-      - 10.40.1.0/24
     disableManifestsDirectory: true
   network:
     nameservers:
     - 10.40.1.1
     disableSearchDomain: true
-  nodeLabels:
-    topology.kubernetes.io/region: homelab
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
@@ -98,6 +96,16 @@ kind: UdevRulesConfig
 rules:
   - # GPU
     SUBSYSTEM=="drm", KERNEL=="renderD*", GROUP="44", MODE="0660"
+---
+# Talos 1.14: machine.nodeLabels is deprecated in favor of KubeNodeConfig. Role
+# and node files add their own labels; the patch tool merges the maps.
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+nodeIP:
+  validSubnets:
+    - 10.40.1.0/24
+labels:
+  topology.kubernetes.io/region: homelab
 ---
 apiVersion: v1alpha1
 kind: TimeSyncConfig

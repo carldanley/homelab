@@ -28,9 +28,12 @@ machine:
           - vlanId: 50
             dhcp: false
             mtu: 1500
-  nodeLabels:
-    devices.homelab/coral-m2: "true"
-    intel.feature.node.kubernetes.io/gpu: "true"
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  devices.homelab/coral-m2: "true"
+  intel.feature.node.kubernetes.io/gpu: "true"
 ---
 apiVersion: v1alpha1
 kind: EthernetConfig

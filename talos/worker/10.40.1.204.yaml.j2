@@ -28,8 +28,11 @@ machine:
           - vlanId: 50
             dhcp: false
             mtu: 1500
-  nodeLabels:
-    gpu.homelab/amd: "true"
+---
+apiVersion: v1alpha1
+kind: KubeNodeConfig
+labels:
+  gpu.homelab/amd: "true"
 ---
 apiVersion: v1alpha1
 kind: EthernetConfig
