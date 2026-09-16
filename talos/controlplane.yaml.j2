@@ -12,20 +12,6 @@ cluster:
   aggregatorCA:
     crt: {{ opSecretPath }}/cluster-aggregator-ca-crt
     key: {{ opSecretPath }}/cluster-aggregator-ca-key
-  apiServer:
-    image: registry.k8s.io/kube-apiserver:{{ ENV.KUBERNETES_VERSION }}
-    extraArgs:
-      enable-aggregator-routing: true
-    certSANs:
-      - 127.0.0.1
-      - 10.40.1.250
-    disablePodSecurityPolicy: true
-  controllerManager:
-    image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
-    extraArgs:
-      bind-address: 0.0.0.0
-  coreDNS:
-    disabled: true
   etcd:
     advertisedSubnets:
       - 10.40.1.0/24
@@ -34,17 +20,7 @@ cluster:
       key: {{ opSecretPath }}/cluster-etcd-ca-key
     extraArgs:
       listen-metrics-urls: "http://0.0.0.0:2381"
-  extraManifests:
-    - # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-      https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.2/experimental-install.yaml
-  proxy:
-    disabled: true
-    image: registry.k8s.io/kube-proxy:{{ ENV.KUBERNETES_VERSION }}
   secretboxEncryptionSecret: {{ opSecretPath }}/cluster-secretbox-encryption-secret
-  scheduler:
-    image: registry.k8s.io/kube-scheduler:{{ ENV.KUBERNETES_VERSION }}
-    extraArgs:
-      bind-address: 0.0.0.0
   serviceAccount:
     key: {{ opSecretPath }}/cluster-service-account-key
 ---
@@ -69,3 +45,68 @@ allowedKubernetesNamespaces:
   - actions-runner-system
   - flux-system
   - system-upgrade
+---
+# Talos 1.14: cluster.apiServer, controllerManager, scheduler, proxy, coreDNS
+# and extraManifests are deprecated in favor of these documents. Values are
+# unchanged; disablePodSecurityPolicy is dropped because PodSecurityPolicy no
+# longer exists in Kubernetes.
+apiVersion: v1alpha1
+kind: KubeAPIServerConfig
+image: registry.k8s.io/kube-apiserver:{{ ENV.KUBERNETES_VERSION }}
+extraArgs:
+  enable-aggregator-routing: "true"
+certExtraSANs:
+  - 127.0.0.1
+  - 10.40.1.250
+# Document mode defaults startup probes on; the old layout ran without them and
+# with anonymous auth disabled (probes need anonymous /livez), so keep both as
+# they were. Enabling probes later means also allowing anonymous health paths.
+startupProbes: false
+---
+# Document mode declares the authorizer chain explicitly. Without these two
+# documents Talos renders "authorizers: []" and kube-apiserver refuses to start
+# (learned on cp02, 2026-09-16). Node first, then RBAC, as before.
+apiVersion: v1alpha1
+kind: KubeAuthorizerConfig
+name: node
+type: Node
+---
+apiVersion: v1alpha1
+kind: KubeAuthorizerConfig
+name: rbac
+type: RBAC
+---
+# Replaces the old --anonymous-auth=false flag, which document mode drops in
+# favor of the structured authentication configuration.
+apiVersion: v1alpha1
+kind: KubeAuthenticationConfig
+configuration:
+  anonymous:
+    enabled: false
+---
+apiVersion: v1alpha1
+kind: KubeControllerManagerConfig
+image: registry.k8s.io/kube-controller-manager:{{ ENV.KUBERNETES_VERSION }}
+extraArgs:
+  bind-address: 0.0.0.0
+---
+apiVersion: v1alpha1
+kind: KubeSchedulerConfig
+image: registry.k8s.io/kube-scheduler:{{ ENV.KUBERNETES_VERSION }}
+extraArgs:
+  bind-address: 0.0.0.0
+---
+apiVersion: v1alpha1
+kind: KubeProxyConfig
+enabled: false
+image: registry.k8s.io/kube-proxy:{{ ENV.KUBERNETES_VERSION }}
+---
+apiVersion: v1alpha1
+kind: KubeCoreDNSConfig
+enabled: false
+---
+apiVersion: v1alpha1
+kind: KubeExternalManifestConfig
+name: gateway-api
+# renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
+url: https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.2/experimental-install.yaml

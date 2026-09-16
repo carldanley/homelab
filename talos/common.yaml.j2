@@ -29,9 +29,6 @@ machine:
 cluster:
   ca:
     crt: {{ opSecretPath }}/cluster-ca-crt
-  clusterName: {{ ENV.CLUSTER_NAME }}
-  controlPlane:
-    endpoint: https://10.40.1.250:6443
   discovery:
     enabled: true
     registries:
@@ -40,14 +37,6 @@ cluster:
       service:
         disabled: false
   id: {{ opSecretPath }}/cluster-id
-  network:
-    cni:
-      name: none
-    dnsDomain: cluster.local
-    podSubnets:
-    - 172.22.0.0/16
-    serviceSubnets:
-    - 172.23.0.0/16
   secret: {{ opSecretPath }}/cluster-secret
   token: {{ opSecretPath }}/cluster-token
 ---
@@ -113,6 +102,22 @@ hostDNS:
   enabled: true
   forwardKubeDNSToHost: false
   resolveMemberNames: true
+---
+# Talos 1.14: cluster.clusterName, cluster.controlPlane.endpoint and
+# cluster.network are deprecated in favor of these documents. No CNI document
+# is declared on purpose: Cilium is installed by Flux, so no Talos-managed CNI.
+apiVersion: v1alpha1
+kind: KubeClusterConfig
+clusterName: {{ ENV.CLUSTER_NAME }}
+endpoint: https://10.40.1.250:6443
+---
+apiVersion: v1alpha1
+kind: KubeNetworkConfig
+dnsDomain: cluster.local
+podSubnets:
+  - 172.22.0.0/16
+serviceSubnets:
+  - 172.23.0.0/16
 ---
 apiVersion: v1alpha1
 kind: TimeSyncConfig
