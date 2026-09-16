@@ -92,6 +92,23 @@ spec:
       hugepages-2Mi: 4Gi # Requires vm.nr_hugepages >= 3072 on the host (talos/common.yaml.j2)
   monitoring:
     enablePodMonitor: false # see podmonitor.yaml
+  managed:
+    services:
+      additional:
+        # LAN access for trusted clients on the home network (the owner's
+        # laptop, admin tooling). Cilium announces the address over BGP and
+        # external-dns publishes the name in UniFi DNS. Auth is scram-sha-256
+        # over the cluster's TLS; nothing here is reachable from the internet.
+        - selectorType: rw
+          updateStrategy: patch
+          serviceTemplate:
+            metadata:
+              name: uxi-postgres-lan
+              annotations:
+                lbipam.cilium.io/ips: 10.50.100.6
+                external-dns.alpha.kubernetes.io/hostname: postgres.${DOMAIN_9}
+            spec:
+              type: LoadBalancer
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true

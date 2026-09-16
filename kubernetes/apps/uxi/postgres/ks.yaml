@@ -32,6 +32,10 @@ spec:
     substitute:
       # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql
       POSTGRESQL_VERSION: 18.6-minimal-trixie
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository
