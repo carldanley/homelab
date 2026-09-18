@@ -5,3 +5,10 @@ kind: RegistryAuthConfig
 name: ghcr.io
 username: {{ ghcrSecretPath }}/username
 password: {{ ghcrSecretPath }}/ghcr-token
+{% set giteaSecretPath = "op://homelab kubernetes/talos-gitea-package-read" %}
+---
+apiVersion: v1alpha1
+kind: RegistryAuthConfig
+name: git.r1p.dev
+username: {{ giteaSecretPath }}/REGISTRY_USERNAME
+password: {{ giteaSecretPath }}/REGISTRY_TOKEN
