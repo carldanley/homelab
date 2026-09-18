@@ -1,0 +1,40 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-gateway-lan
+  labels:
+    dns.homelab/external: 'false'
+  annotations:
+    lbipam.cilium.io/ips: 10.50.100.7
+    external-dns.alpha.kubernetes.io/hostname: play-ptr.${DOMAIN_9}
+spec:
+  selector:
+    app.kubernetes.io/name: uxi-ptr-server
+    app.kubernetes.io/component: gateway
+  ports:
+    - name: client
+      port: 21014
+      targetPort: client
+      protocol: UDP
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
+  externalTrafficPolicy: Cluster
+  loadBalancerSourceRanges:
+    - 10.0.0.0/8
+    - 172.16.0.0/12
+    - 192.168.0.0/16
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-gateway-headless
+spec:
+  selector:
+    app.kubernetes.io/name: uxi-ptr-server
+    app.kubernetes.io/component: gateway
+  ports:
+    - name: health
+      port: 21018
+      targetPort: health
+  clusterIP: None

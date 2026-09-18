@@ -1,0 +1,71 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: uxi-ptr-gateway
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: uxi-ptr-server
+      app.kubernetes.io/component: gateway
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 21018
+    - from:
+        - ipBlock:
+            cidr: 10.0.0.0/8
+        - ipBlock:
+            cidr: 172.16.0.0/12
+        - ipBlock:
+            cidr: 192.168.0.0/16
+      ports:
+        - protocol: UDP
+          port: 21014
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: uxi-ptr-server
+              app.kubernetes.io/component: state
+      ports:
+        - protocol: TCP
+          port: 21015
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: uxi-ptr-server
+              app.kubernetes.io/component: api
+      ports:
+        - protocol: TCP
+          port: 21017
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: uxi-ptr-server
+              app.kubernetes.io/component: worker
+      ports:
+        - protocol: TCP
+          port: 21016

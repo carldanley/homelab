@@ -1,0 +1,125 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: uxi-ptr-gateway
+  annotations:
+    reloader.stakater.com/auto: 'true'
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: uxi-ptr-server
+      app.kubernetes.io/component: gateway
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: uxi-ptr-server
+        app.kubernetes.io/component: gateway
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      nodeSelector:
+        gpu.homelab/amd: 'true'
+      containers:
+        - name: gateway
+          image: git.r1p.dev/unbound-xi/server:v0.1.1@sha256:993755604f68d4a4f8d1323a327477d5fafba25e72272ce1832d76e0da15c7e0
+          imagePullPolicy: IfNotPresent
+          command:
+            - unbound-gateway
+          args:
+            - serve
+          env:
+            - name: UNBOUND_CONFIG
+              value: /config/config.toml
+            - name: UNBOUND_LOG_FORMAT
+              value: json
+            - name: RUST_LOG
+              value: info
+            - name: UNBOUND_GATEWAY_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+          ports:
+            - name: client
+              containerPort: 21014
+              protocol: UDP
+            - name: health
+              containerPort: 21018
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+              cpu: '2'
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: tls
+              mountPath: /tls
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 120
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sleep
+                  - '5'
+      volumes:
+        - name: config
+          configMap:
+            name: uxi-ptr-gateway-config
+        - name: tls
+          secret:
+            secretName: wildcard-certificate-tls
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: uxi-ptr-server
+                  app.kubernetes.io/component: gateway
+              topologyKey: kubernetes.io/hostname
+  serviceName: uxi-ptr-gateway-headless
+  ordinals:
+    start: 1
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  minReadySeconds: 10

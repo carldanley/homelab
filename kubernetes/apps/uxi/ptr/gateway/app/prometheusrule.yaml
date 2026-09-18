@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-gateway
+spec:
+  groups:
+    - name: uxi-ptr-gateway
+      rules:
+        - alert: UnboundXiPtrGatewayReplicaUnavailable
+          expr: kube_statefulset_status_replicas_ready{namespace="uxi-ptr",statefulset="uxi-ptr-gateway"} < 3
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR gateway redundancy is reduced.

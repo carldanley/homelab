@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uxi-ptr-gateway-config
+data:
+  config.toml: |
+    [common]
+    dev_mode = false
+    content_dir = "/content"
+
+    [tls]
+    cert = "/tls/tls.crt"
+    key = "/tls/tls.key"
+
+    [gateway]
+    listen = "0.0.0.0:21014"
+    health_listen = "0.0.0.0:21018"
+    state_addr = "uxi-ptr-state:21015"
+    api_internal_addr = "uxi-ptr-api-internal:21017"

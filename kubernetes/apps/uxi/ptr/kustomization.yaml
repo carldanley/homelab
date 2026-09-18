@@ -9,3 +9,4 @@ resources:
   - ./postgres/ks.yaml
   - ./api/ks.yaml
   - ./state/ks.yaml
+  - ./gateway/ks.yaml
