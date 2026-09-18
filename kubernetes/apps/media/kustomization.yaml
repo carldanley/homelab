@@ -7,6 +7,7 @@ components:
   - ../../components/common
 resources:
   - ./tautulli/ks.yaml
+  - ./tracearr/ks.yaml
   - ./prowlarr/ks.yaml
   - ./radarr/ks.yaml
   - ./sonarr/ks.yaml

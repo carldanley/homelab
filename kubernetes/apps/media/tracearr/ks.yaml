@@ -1,0 +1,85 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tracearr-postgres
+  namespace: media
+spec:
+  dependsOn:
+  - name: onepassword-store
+    namespace: external-secrets
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: ceph-csi-drivers
+    namespace: rook-ceph
+  healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: tracearr-postgres
+    namespace: media
+  interval: 1h
+  path: ./kubernetes/apps/media/tracearr/postgres
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: media
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tracearr-redis
+  namespace: media
+spec:
+  healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: tracearr-redis
+    namespace: media
+  interval: 1h
+  path: ./kubernetes/apps/media/tracearr/redis
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: media
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tracearr
+  namespace: media
+spec:
+  dependsOn:
+  - name: cert-manager-secrets
+    namespace: cert-manager
+  - name: onepassword-store
+    namespace: external-secrets
+  - name: rook-ceph-cluster
+    namespace: rook-ceph
+  - name: ceph-csi-drivers
+    namespace: rook-ceph
+  - name: tracearr-postgres
+    namespace: media
+  - name: tracearr-redis
+    namespace: media
+  healthChecks:
+  - apiVersion: helm.toolkit.fluxcd.io/v2
+    kind: HelmRelease
+    name: tracearr
+    namespace: media
+  interval: 1h
+  path: ./kubernetes/apps/media/tracearr/app
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: domains-secret
+      optional: false
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: media

@@ -1,0 +1,19 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tracearr-postgres
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: tracearr-postgres
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/instance: tracearr
+    ports:
+    - protocol: TCP
+      port: 5432
