@@ -12,7 +12,7 @@ spec:
       namespace: kube-system
       sectionName: domain-9-subdomain-https
   hostnames:
-    - api-ptr.${DOMAIN_9}
+    - ptr.${DOMAIN_9}
   rules:
     - matches:
         - path:

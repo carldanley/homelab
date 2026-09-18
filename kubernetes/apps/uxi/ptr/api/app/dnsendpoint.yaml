@@ -7,7 +7,7 @@ metadata:
     dns.homelab/external: 'true'
 spec:
   endpoints:
-    - dnsName: api-ptr.${DOMAIN_9}
+    - dnsName: ptr.${DOMAIN_9}
       recordTTL: 60
       recordType: CNAME
       targets:
@@ -21,7 +21,7 @@ metadata:
     dns.homelab/external: 'false'
 spec:
   endpoints:
-    - dnsName: api-ptr.${DOMAIN_9}
+    - dnsName: ptr.${DOMAIN_9}
       recordTTL: 60
       recordType: CNAME
       targets:
