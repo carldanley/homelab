@@ -3,8 +3,9 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: uxi-postgres
+  name: uxi-ptr-postgres
 spec:
+  uid: uxi-ptr-postgres
   allowCrossNamespaceImport: true
   instanceSelector:
     matchLabels:

@@ -1,0 +1,33 @@
+---
+# The generic cnpg_* alerts in databases/cloudnative-pg apply to every cluster;
+# only the barman backup alerts are scoped per cluster, so they are repeated here.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-postgres
+spec:
+  groups:
+    - name: uxi-ptr-postgres.rules
+      rules:
+        - alert: UxiPtrPostgresBackupStale
+          expr: |-
+            (
+              time() - max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="uxi-ptr", job="uxi-ptr/uxi-ptr-postgres"}) > 129600
+            ) or absent(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="uxi-ptr", job="uxi-ptr/uxi-ptr-postgres"})
+          for: 30m
+          annotations:
+            summary: The latest available uxi-ptr-postgres backup is more than 36 hours old.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+
+        - alert: UxiPtrPostgresLatestBackupFailed
+          expr: |-
+            max(barman_cloud_cloudnative_pg_io_last_failed_backup_timestamp{namespace="uxi-ptr", job="uxi-ptr/uxi-ptr-postgres"})
+              > max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace="uxi-ptr", job="uxi-ptr/uxi-ptr-postgres"})
+          for: 15m
+          annotations:
+            summary: The latest uxi-ptr-postgres backup attempt failed.
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts

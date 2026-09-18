@@ -1,13 +1,9 @@
 ---
-# Game database for UnboundXI (uxi). Sized for the 10,000+ concurrent player
-# design target with the database kept out of the tick path: the map servers
-# hold live state in memory and write behind, so this cluster sees event-driven,
-# batched writes only. The data set stays in the single-digit gigabytes for a
-# long time; raise resources here (one line, rolling restart) when it grows.
+# PTR database: three instances preserve failover testing with smaller allocations.
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: uxi-postgres
+  name: uxi-ptr-postgres
 spec:
   instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:${POSTGRESQL_VERSION}
@@ -15,17 +11,17 @@ spec:
   storage:
     # openebs-hostpath is a directory on each node's dedicated 2 TB NVMe. The
     # size is not enforced by the class, so the real ceiling is the drive.
-    size: 100Gi
+    size: 50Gi
     storageClass: openebs-hostpath
   superuserSecret:
-    name: uxi-postgres-secret
+    name: uxi-ptr-postgres-secret
   enableSuperuserAccess: true
   bootstrap:
     initdb:
-      database: uxi
-      owner: uxi
+      database: uxi_ptr
+      owner: uxi_ptr
       secret:
-        name: uxi-postgres-app-secret
+        name: uxi-ptr-postgres-app-secret
       dataChecksums: true
       postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
@@ -61,15 +57,15 @@ spec:
       number: 1
       dataDurability: preferred
     parameters:
-      max_connections: "200"
-      shared_buffers: 3GB
-      effective_cache_size: 8GB
-      work_mem: 16MB
-      maintenance_work_mem: 512MB
-      wal_buffers: 64MB
+      max_connections: "100"
+      shared_buffers: 512MB
+      effective_cache_size: 1GB
+      work_mem: 4MB
+      maintenance_work_mem: 128MB
+      wal_buffers: 16MB
       min_wal_size: 1GB
-      max_wal_size: 8GB
-      max_slot_wal_keep_size: 16GB
+      max_wal_size: 2GB
+      max_slot_wal_keep_size: 4GB
       checkpoint_timeout: 15min
       checkpoint_completion_target: "0.9"
       wal_compression: lz4
@@ -85,11 +81,10 @@ spec:
       pg_stat_statements.track: top
   resources:
     requests:
-      cpu: "4"
-      memory: 8Gi
+      cpu: "1"
+      memory: 2Gi
     limits:
-      memory: 8Gi
-      hugepages-2Mi: 4Gi # Requires vm.nr_hugepages >= 3072 on the host (talos/common.yaml.j2)
+      memory: 2Gi
   monitoring:
     enablePodMonitor: false # see podmonitor.yaml
   managed:
@@ -103,20 +98,20 @@ spec:
           updateStrategy: patch
           serviceTemplate:
             metadata:
-              name: uxi-postgres-lan
+              name: uxi-ptr-postgres-lan
               labels:
                 # Internal only: external-dns-cloudflare publishes solely
                 # resources labeled dns.homelab/external=true, so this name
                 # exists in UniFi's LAN DNS and nowhere else.
                 dns.homelab/external: "false"
               annotations:
-                lbipam.cilium.io/ips: 10.50.100.6
-                external-dns.alpha.kubernetes.io/hostname: postgres.${DOMAIN_9}
+                lbipam.cilium.io/ips: 10.50.100.8
+                external-dns.alpha.kubernetes.io/hostname: postgres.ptr.${DOMAIN_9}
             spec:
               type: LoadBalancer
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: uxi-r2
-        serverName: uxi-postgres-v1
+        barmanObjectName: uxi-ptr-postgres-r2
+        serverName: uxi-ptr-postgres-v1

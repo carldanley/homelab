@@ -2,21 +2,21 @@
 apiVersion: barmancloud.cnpg.io/v1
 kind: ObjectStore
 metadata:
-  name: uxi-r2
+  name: uxi-ptr-postgres-r2
 spec:
   configuration:
     data:
       compression: bzip2
-    destinationPath: s3://batcave-uxi-postgres/
+    destinationPath: s3://batcave-uxi-ptr-postgres/
     endpointURL: https://d09aa6ad2c849681b113b8dbb5cd3820.r2.cloudflarestorage.com
     s3Credentials:
       accessKeyId:
-        name: uxi-postgres-secret
+        name: uxi-ptr-postgres-secret
         key: AWS_ACCESS_KEY_ID
       secretAccessKey:
-        name: uxi-postgres-secret
+        name: uxi-ptr-postgres-secret
         key: AWS_SECRET_ACCESS_KEY
     wal:
       compression: bzip2
       maxParallel: 8
-  retentionPolicy: 30d
+  retentionPolicy: 14d

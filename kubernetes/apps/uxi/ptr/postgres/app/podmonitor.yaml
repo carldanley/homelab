@@ -1,14 +1,14 @@
 ---
 # CloudNativePG 1.30 deprecates spec.monitoring.enablePodMonitor in favor of a
 # PodMonitor owned by the cluster manifest. Named after the cluster so the
-# scrape job label stays "uxi/uxi-postgres", which the PrometheusRule expects.
+# scrape job label stays "uxi-ptr/uxi-ptr-postgres", which the PrometheusRule expects.
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: uxi-postgres
+  name: uxi-ptr-postgres
 spec:
   selector:
     matchLabels:
-      cnpg.io/cluster: uxi-postgres
+      cnpg.io/cluster: uxi-ptr-postgres
   podMetricsEndpoints:
     - port: metrics
