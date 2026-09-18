@@ -21,8 +21,14 @@ cluster:
     extraArgs:
       listen-metrics-urls: "http://0.0.0.0:2381"
   secretboxEncryptionSecret: {{ opSecretPath }}/cluster-secretbox-encryption-secret
-  serviceAccount:
-    key: {{ opSecretPath }}/cluster-service-account-key
+---
+# The renderer decodes the existing base64 key from 1Password to PEM.
+# Keep the issuer identical to the former cluster.controlPlane.endpoint.
+apiVersion: v1alpha1
+kind: KubeServiceAccountConfig
+issuer:
+  privateKey: {{ opSecretPath }}/cluster-service-account-key
+  issuerURL: https://10.40.1.250:6443
 ---
 # Talos 1.14 makes the control-plane role label and NoSchedule taint explicit
 # once KubeNodeConfig is used (they were implicit in v1alpha1). The label must
