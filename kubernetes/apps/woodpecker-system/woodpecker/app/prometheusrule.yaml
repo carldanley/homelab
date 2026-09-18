@@ -18,11 +18,19 @@ spec:
             discord_channel: homelab-alerts
 
         - alert: WoodpeckerNoWorkers
+          # worker_count counts idle queue pollers, not all connected agents.
+          # Busy agents move from worker_count to running_steps.
           expr: |-
-            (max(woodpecker_worker_count{namespace="woodpecker-system", service="woodpecker-server"}) or vector(0)) < 1
+            (
+              max(woodpecker_worker_count{namespace="woodpecker-system", service="woodpecker-server"}) == 0
+              and
+              max(woodpecker_running_steps{namespace="woodpecker-system", service="woodpecker-server"}) == 0
+            )
+            and
+            max(up{namespace="woodpecker-system", service="woodpecker-server"}) == 1
           for: 5m
           annotations:
-            summary: Woodpecker has no connected workers.
+            summary: Woodpecker has had no idle workers or running workflows for 5 minutes.
           labels:
             severity: critical
             discord_channel: homelab-alerts

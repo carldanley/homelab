@@ -131,8 +131,13 @@ this prevents an unbounded build queue from consuming the cluster while still
 leaving room for bursty Go and Rust compilation.
 
 Prometheus scrapes the authenticated Woodpecker metrics endpoint. Alerts cover
-server availability, connected workers, sustained queueing, and unavailable
-agent replicas.
+server availability, absence of both idle workers and running workflows,
+sustained queueing, and unavailable agent replicas. `woodpecker_worker_count`
+counts idle queue pollers, not all connected agents: it can legitimately reach
+zero when both agents are building. `WoodpeckerNoWorkers` therefore requires
+both that metric and `woodpecker_running_steps` to remain zero for five minutes
+while the server is scrapeable. Missing server scrapes are handled separately
+by `WoodpeckerServerDown`.
 
 ## Backups and recovery
 
