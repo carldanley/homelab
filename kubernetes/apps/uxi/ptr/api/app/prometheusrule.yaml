@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-api
+spec:
+  groups:
+    - name: uxi-ptr-api
+      rules:
+        - alert: UnboundXiPtrApiReplicaUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="uxi-ptr",deployment="uxi-ptr-api"} < 3
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR api redundancy is reduced.

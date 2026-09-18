@@ -10,3 +10,4 @@ resources:
   - ./prometheusrule.yaml
   - ./scheduledbackup.yaml
   - ./grafanadashboard.yaml
+  - ./database.yaml

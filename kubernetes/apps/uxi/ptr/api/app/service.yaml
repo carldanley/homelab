@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-api
+spec:
+  selector:
+    app.kubernetes.io/name: uxi-ptr-server
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 21014
+      targetPort: client
+      protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-api-internal
+spec:
+  selector:
+    app.kubernetes.io/name: uxi-ptr-server
+    app.kubernetes.io/component: api
+  ports:
+    - name: internal
+      port: 21017
+      targetPort: health

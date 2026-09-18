@@ -7,3 +7,4 @@ components:
   - ../../../components/common
 resources:
   - ./postgres/ks.yaml
+  - ./api/ks.yaml

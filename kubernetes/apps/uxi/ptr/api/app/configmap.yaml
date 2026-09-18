@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uxi-ptr-api-config
+data:
+  config.toml: |
+    [common]
+    dev_mode = false
+    content_dir = "/content"
+
+    [api]
+    public_listen = "0.0.0.0:21014"
+    internal_listen = "0.0.0.0:21017"
+    gateways = []
+    worlds = [{ id = "unboundxi-ptr", name = "Public Test Realm", open = false }]
