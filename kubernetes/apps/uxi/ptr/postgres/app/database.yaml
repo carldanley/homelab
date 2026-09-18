@@ -1,6 +1,6 @@
 ---
 # Manage schemas in the existing PTR database; reuse its owner and credentials.
-# Only the API account schema is enabled during the initial rollout.
+# Separate schemas keep API and state-service migration histories independent.
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -13,5 +13,8 @@ spec:
   databaseReclaimPolicy: retain
   schemas:
     - name: account
+      owner: uxi_ptr
+      ensure: present
+    - name: world
       owner: uxi_ptr
       ensure: present

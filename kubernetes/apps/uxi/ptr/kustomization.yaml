@@ -8,3 +8,4 @@ components:
 resources:
   - ./postgres/ks.yaml
   - ./api/ks.yaml
+  - ./state/ks.yaml

@@ -1,0 +1,25 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-state
+spec:
+  groups:
+    - name: uxi-ptr-state
+      rules:
+        - alert: UnboundXiPtrStateUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="uxi-ptr",deployment="uxi-ptr-state"} < 1
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR state is unavailable.
+        - alert: UnboundXiPtrStateFlushStale
+          expr: unbound_state_flush_age_seconds{namespace="uxi-ptr"} > 5
+          for: 1m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR state persistence is falling behind.
