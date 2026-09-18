@@ -122,10 +122,13 @@ serviceSubnets:
 apiVersion: v1alpha1
 kind: TimeSyncConfig
 ntp:
+  # Keep all nodes on the same leap-smear policy. A noisy pool fallback caused
+  # recurring Ceph monitor clock skew; retry these sources if boot DNS is late.
   servers:
-    - time.google.com
-    - time.cloudflare.com
-    - 0.pool.ntp.org
+    - time1.google.com
+    - time2.google.com
+    - time3.google.com
+    - time4.google.com
 ---
 # Replaces the deprecated machine.files entry for /etc/cri/conf.d (Talos 1.14):
 # fragments are merged into the CRI containerd config in name order.
