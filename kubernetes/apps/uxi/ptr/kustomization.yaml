@@ -10,3 +10,4 @@ resources:
   - ./api/ks.yaml
   - ./state/ks.yaml
   - ./gateway/ks.yaml
+  - ./map-worker/ks.yaml

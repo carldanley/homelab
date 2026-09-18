@@ -1,0 +1,17 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-worker
+spec:
+  groups:
+    - name: uxi-ptr-worker
+      rules:
+        - alert: UnboundXiPtrWorkerUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="uxi-ptr",deployment="uxi-ptr-worker"} < 1
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR map-worker is unavailable.

@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: uxi-ptr-map-worker
+spec:
+  interval: 1h
+  timeout: 10m
+  path: ./kubernetes/apps/uxi/ptr/map-worker/app
+  prune: true
+  wait: true
+  dependsOn:
+    - name: uxi-ptr-api
+      namespace: uxi-ptr
+    - name: uxi-ptr-state
+      namespace: uxi-ptr
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: uxi-ptr

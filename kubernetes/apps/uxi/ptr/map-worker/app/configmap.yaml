@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uxi-ptr-worker-config
+data:
+  config.toml: |
+    [common]
+    dev_mode = false
+    content_dir = "/content"
+
+    [worker]
+    id = 1
+    claims_all = true
+    listen = "0.0.0.0:21016"
+    health_listen = "0.0.0.0:21019"
+    state_addr = "uxi-ptr-state:21015"
+    api_internal_addr = "uxi-ptr-api-internal:21017"
