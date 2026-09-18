@@ -21,7 +21,12 @@ tasks:
   render-template:
     internal: true
     desc: Render a template file using minijinja-cli
-    cmd: minijinja-cli --config-file {{ .ROOT_DIR }}/.minijinja.toml {{ .TEMPLATE_FILE }} | op inject > {{ .OUTPUT_FILE }}
+    # KubeServiceAccountConfig expects PEM; reuse the base64-encoded legacy key.
+    cmd: >-
+      minijinja-cli --config-file {{ .ROOT_DIR }}/.minijinja.toml {{ .TEMPLATE_FILE }}
+      | op inject
+      | yq 'with(select(.kind == "KubeServiceAccountConfig"); .issuer.privateKey |= @base64d)'
+      > {{ .OUTPUT_FILE }}
     env:
       KUBERNETES_VERSION: "{{ .KUBERNETES_VERSION }}"
       TALOS_VERSION: "{{ .TALOS_VERSION }}"
@@ -35,7 +40,7 @@ tasks:
         - TEMPLATE_FILE
         - OUTPUT_FILE
     preconditions:
-      - which minijinja-cli
+      - which minijinja-cli op yq
 
   apply-node:
     desc: Apply Talos config to a node [NODE=required] [MODE=auto] [DEBUG=false]
