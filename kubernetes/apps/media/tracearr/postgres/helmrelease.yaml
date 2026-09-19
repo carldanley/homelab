@@ -76,9 +76,9 @@ spec:
             resources:
               requests:
                 cpu: 100m
-                memory: 512Mi
-              limits:
                 memory: 1Gi
+              limits:
+                memory: 2Gi
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: false
@@ -105,6 +105,14 @@ spec:
             - maintenance_work_mem=64MB
             - -c
             - max_wal_size=1GB
+            - -c
+            - max_parallel_workers_per_gather=2
+            - -c
+            - max_parallel_workers=2
+            - -c
+            - timescaledb.max_background_workers=4
+            - -c
+            - max_worker_processes=12
     defaultPodOptions:
       automountServiceAccountToken: false
       enableServiceLinks: false
