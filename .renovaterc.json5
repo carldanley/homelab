@@ -19,6 +19,18 @@
     ":semanticCommits",
     ":timezone(America/New_York)",
   ],
+  packageRules: [
+    {
+      description: "UnboundXI services use independent SemVer updates within the reviewed 0.1.x line",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/^git\\.r1p\\.dev/unbound-xi/server-(api|gateway|state|worker)$/"],
+      allowedVersions: ">=0.1.3 <0.2.0",
+      versioning: "semver",
+      pinDigests: true,
+      groupName: null,
+      automerge: false,
+    },
+  ],
   dependencyDashboardTitle: "Renovate Dashboard",
   suppressNotifications: ["prEditedNotification", "prIgnoreNotification"],
   ignorePaths: ["**/resources/**"],
