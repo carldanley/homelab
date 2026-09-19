@@ -16,11 +16,10 @@ spec:
       protocol: UDP
   type: LoadBalancer
   allocateLoadBalancerNodePorts: false
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
   loadBalancerSourceRanges:
-    - 10.0.0.0/8
-    - 172.16.0.0/12
-    - 192.168.0.0/16
+    # Public client addresses are preserved through the VPS WireGuard tunnel.
+    - 0.0.0.0/0
 ---
 apiVersion: v1
 kind: Service

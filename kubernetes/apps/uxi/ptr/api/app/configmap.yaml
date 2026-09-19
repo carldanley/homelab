@@ -12,5 +12,5 @@ data:
     [api]
     public_listen = "0.0.0.0:21014"
     internal_listen = "0.0.0.0:21017"
-    gateways = ["ptr.${DOMAIN_9}:21014"]
+    gateways = ["gateway-ptr.${DOMAIN_9}:21014"]
     worlds = [{ id = "unboundxi-ptr", name = "Public Test Realm", open = false }]
