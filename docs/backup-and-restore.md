@@ -115,7 +115,7 @@ task kopiur:status
 Create a pinned manual snapshot:
 
 ```sh
-task kopiur:snapshot NS=media APP=tautulli
+task kopiur:snapshot NS=media APP=sonarr
 ```
 
 Useful Prometheus metrics:
