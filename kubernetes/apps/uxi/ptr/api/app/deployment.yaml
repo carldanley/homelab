@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: api
-          image: git.r1p.dev/unbound-xi/server-api:v0.1.3@sha256:30f1696181c27905867def6e4d40d22224e64d3c68782a3e1b2c21972805dbfa
+          image: git.r1p.dev/unbound-xi/server-api:v0.2.1@sha256:603ff1f76ad8744da487baeb18072b558efa5be13e9de469f2ae25b69dfa780c
           imagePullPolicy: IfNotPresent
           command:
             - unbound-api

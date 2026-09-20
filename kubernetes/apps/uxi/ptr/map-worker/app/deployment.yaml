@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: worker
-          image: git.r1p.dev/unbound-xi/server-worker:v0.1.4@sha256:5ed2b7bd7fd6366fbf0d9e80c5a60ebe09b23116a8baa51ffa24bdf2c1d75443
+          image: git.r1p.dev/unbound-xi/server-worker:v0.2.0@sha256:8c6e5fe12c6c31a586430b9040ce56f43c6928d6134efbda45069ee28ff2a36d
           imagePullPolicy: IfNotPresent
           command:
             - unbound-worker
