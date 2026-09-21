@@ -11,7 +11,8 @@ spec:
     matchLabels:
       dashboards: grafana
   datasources:
-    - datasourceName: Prometheus
+    # The upstream dashboard substitutes this input into datasource.uid.
+    - datasourceName: prometheus
       inputName: DS__NATS-PROMETHEUS
   # The Helm variant uses the same nats_* metric prefix as the chart's exporter.
   url: https://raw.githubusercontent.com/nats-io/prometheus-nats-exporter/v0.20.1/walkthrough/grafana-nats-dash-helm.json
