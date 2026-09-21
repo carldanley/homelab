@@ -2,41 +2,46 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: uxi-ptr-api
+  name: nats
 spec:
   podSelector:
     matchLabels:
-      app.kubernetes.io/name: uxi-ptr-server
-      app.kubernetes.io/component: api
+      app.kubernetes.io/name: nats
+      app.kubernetes.io/instance: nats
+      app.kubernetes.io/component: nats
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: gateway
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: worker
-      ports:
-        - protocol: TCP
-          port: 21017
-  egress:
-    - to:
         - namespaceSelector:
             matchLabels:
-              kubernetes.io/metadata.name: uxi-nats
-          podSelector:
+              uxi.homelab/nats-access: "true"
+      ports:
+        - protocol: TCP
+          port: 4222
+    - from:
+        - podSelector:
             matchLabels:
               app.kubernetes.io/name: nats
               app.kubernetes.io/instance: nats
               app.kubernetes.io/component: nats
       ports:
         - protocol: TCP
-          port: 4222
+          port: 6222
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: observability
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 8222
+        - protocol: TCP
+          port: 7777
+  egress:
     - to:
         - namespaceSelector:
             matchLabels:
@@ -52,7 +57,9 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              cnpg.io/cluster: uxi-ptr-postgres
+              app.kubernetes.io/name: nats
+              app.kubernetes.io/instance: nats
+              app.kubernetes.io/component: nats
       ports:
         - protocol: TCP
-          port: 5432
+          port: 6222

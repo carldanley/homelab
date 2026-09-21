@@ -1,0 +1,168 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: nats
+spec:
+  interval: 1h
+  url: https://nats-io.github.io/k8s/helm/charts/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nats
+spec:
+  interval: 1h
+  releaseName: nats
+  chart:
+    spec:
+      chart: nats
+      version: 2.14.6
+      sourceRef:
+        kind: HelmRepository
+        name: nats
+      interval: 1h
+  values:
+    fullnameOverride: nats
+
+    config:
+      cluster:
+        enabled: true
+        replicas: 3
+        # All clients are in-cluster and can reconnect to advertised pod addresses.
+        noAdvertise: false
+        routeURLs:
+          useFQDN: true
+      jetstream:
+        enabled: false
+      monitor:
+        enabled: true
+      merge:
+        # Separate subject spaces, with no imports or exports between accounts.
+        # Each account's credentials come from its own Secret in this namespace.
+        accounts:
+          PTR:
+            users$include: ../nats-auth/ptr.conf
+            limits:
+              max_connections: 128
+          PRODUCTION:
+            users$include: ../nats-auth/production.conf
+            limits:
+              max_connections: 512
+        max_payload: 8388608 # 8 MiB snapshots and inventory bursts
+        max_pending: 67108864 # 64 MiB per connection before disconnecting slow consumers
+        write_deadline: 5s
+
+    container:
+      env:
+        GOMEMLIMIT: 768MiB
+        GOMAXPROCS: "2"
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+      merge:
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+      patch:
+        - op: add
+          path: /volumeMounts/-
+          value:
+            name: auth
+            mountPath: /etc/nats-auth
+            readOnly: true
+
+    # The chart reloader watches the included credential files and reloads auth.
+    reloader:
+      enabled: true
+      merge:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+    podTemplate:
+      # Roll config changes so options that require a restart also take effect.
+      configChecksumAnnotation: true
+      merge:
+        spec:
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: nats
+                      app.kubernetes.io/instance: nats
+                      app.kubernetes.io/component: nats
+                  topologyKey: kubernetes.io/hostname
+      patch:
+        - op: add
+          path: /spec/volumes/-
+          value:
+            name: auth
+            projected:
+              sources:
+                - secret:
+                    name: uxi-ptr-nats
+                    items:
+                      - key: auth.conf
+                        path: ptr.conf
+                - secret:
+                    name: uxi-production-nats
+                    items:
+                      - key: auth.conf
+                        path: production.conf
+
+    podDisruptionBudget:
+      enabled: true
+      merge:
+        spec:
+          maxUnavailable: 1
+
+    # A single headless Service serves both client discovery and cluster routes.
+    service:
+      enabled: false
+    headlessService:
+      name: nats
+
+    promExporter:
+      enabled: true
+      podMonitor:
+        enabled: true
+      merge:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+
+    natsBox:
+      enabled: false

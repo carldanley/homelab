@@ -11,3 +11,14 @@ resources:
   - ./state/ks.yaml
   - ./gateway/ks.yaml
   - ./map-worker/ks.yaml
+patches:
+  - patch: |-
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: not-used
+        labels:
+          uxi.homelab/nats-access: "true"
+    target:
+      kind: Namespace
+      name: not-used
