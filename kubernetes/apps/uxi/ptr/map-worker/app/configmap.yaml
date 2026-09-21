@@ -12,7 +12,11 @@ data:
     [worker]
     id = 1
     claims_all = true
-    listen = "0.0.0.0:21016"
     health_listen = "0.0.0.0:21019"
-    state_addr = "uxi-ptr-state:21015"
     api_internal_addr = "uxi-ptr-api-internal:21017"
+
+    [bus]
+    url = "nats://nats.uxi-nats.svc.cluster.local:4222"
+    environment = "ptr"
+    username = "ptr"
+    password_file = "/secrets/nats/password"

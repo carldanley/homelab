@@ -58,23 +58,7 @@ spec:
         - podSelector:
             matchLabels:
               app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: state
-      ports:
-        - protocol: TCP
-          port: 21015
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
               app.kubernetes.io/component: api
       ports:
         - protocol: TCP
           port: 21017
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: worker
-      ports:
-        - protocol: TCP
-          port: 21016

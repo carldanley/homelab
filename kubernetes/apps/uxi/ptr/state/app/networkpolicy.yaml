@@ -22,18 +22,6 @@ spec:
       ports:
         - protocol: TCP
           port: 21020
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: gateway
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: worker
-      ports:
-        - protocol: TCP
-          port: 21015
   egress:
     - to:
         - namespaceSelector:

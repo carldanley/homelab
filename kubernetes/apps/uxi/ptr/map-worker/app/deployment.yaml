@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: worker
-          image: git.r1p.dev/unbound-xi/server-worker:v0.4.1@sha256:acbf28277df7172f3cc792bbd0e371e6e6f6b56cf0e020c1de9b9182cdd07958
+          image: git.r1p.dev/unbound-xi/server-worker:v0.5.0@sha256:99382445991d941ba6cafecc20567aa340977b360405634feacd6e72db9e9a15
           imagePullPolicy: IfNotPresent
           command:
             - unbound-worker
@@ -43,16 +43,7 @@ spec:
               value: json
             - name: RUST_LOG
               value: info
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: UNBOUND_WORKER_ADVERTISE
-              value: $(POD_IP):21016
           ports:
-            - name: lane
-              containerPort: 21016
-              protocol: TCP
             - name: health
               containerPort: 21019
               protocol: TCP
@@ -72,6 +63,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
+              readOnly: true
+            - name: nats
+              mountPath: /secrets/nats
               readOnly: true
           startupProbe:
             httpGet:
@@ -98,5 +92,11 @@ spec:
         - name: config
           configMap:
             name: uxi-ptr-worker-config
+        - name: nats
+          secret:
+            secretName: uxi-ptr-nats
+            items:
+              - key: NATS_PASSWORD
+                path: password
   strategy:
     type: Recreate

@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: state
-          image: git.r1p.dev/unbound-xi/server-state:v0.3.0@sha256:b5977d03aeaad48db3217fcac937ce9061d885f4beb14611b97b284c236cd062
+          image: git.r1p.dev/unbound-xi/server-state:v0.4.0@sha256:dae10b1423909aeff7078ff38f99c084f9accd84af20c008ba9300cb3a62d477
           imagePullPolicy: IfNotPresent
           command:
             - unbound-state
@@ -49,9 +49,6 @@ spec:
                   name: uxi-ptr-state-postgres
                   key: world-url
           ports:
-            - name: lane
-              containerPort: 21015
-              protocol: TCP
             - name: health
               containerPort: 21020
               protocol: TCP
@@ -74,6 +71,9 @@ spec:
               readOnly: true
             - name: postgres-ca
               mountPath: /postgres-ca
+              readOnly: true
+            - name: nats
+              mountPath: /secrets/nats
               readOnly: true
           startupProbe:
             httpGet:
@@ -106,5 +106,11 @@ spec:
             items:
               - key: ca.crt
                 path: ca.crt
+        - name: nats
+          secret:
+            secretName: uxi-ptr-nats
+            items:
+              - key: NATS_PASSWORD
+                path: password
   strategy:
     type: Recreate
