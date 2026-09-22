@@ -19,9 +19,10 @@ spec:
             severity: critical
 
         - alert: KopiurSnapshotStillRunning
+          # Discovered catalog entries and Unchanged runs are not active backups.
           expr: >-
             max by (namespace, name, policy, phase)
-            (kopiur_resource_phase{kind="Snapshot", phase!~"Succeeded|Failed"}) == 1
+            (kopiur_resource_phase{kind="Snapshot", phase=~"Pending|Running|Deleting"}) == 1
           for: 1h
           annotations:
             summary: Kopiur snapshot is still {{ $labels.phase }}
