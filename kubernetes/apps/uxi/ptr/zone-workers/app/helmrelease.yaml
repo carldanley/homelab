@@ -1,11 +1,12 @@
 ---
-# Zone groups for PTR: cities on workers of their own, the field and
-# dungeon zones of the base game, Zilart, Promathia and Aht Urhgan grouped
-# by region. Everything Wings of the Goddess and later, and the GM and
-# residential zones, is unlisted and falls to the claims-all worker
-# (../../map-worker). A map may appear in one group only; the chart refuses
-# a duplicate idBase, and a listed map is offered only to its group, never
-# to the claims-all worker, so an empty group means an ownerless zone.
+# Zone groups for PTR, kept small to start: each nation's city areas on
+# one worker, Jeuno on one, and the two levelling hot spots, Valkurm Dunes
+# and Qufim Island, on a worker each. Everything else is unlisted and falls
+# to the claims-all worker (../../map-worker), Aht Urhgan and Limbus among
+# it, since neither is accessible on PTR yet. A map may appear in one group
+# only; the chart refuses a duplicate idBase, and a listed map is offered
+# only to its group, never to the claims-all worker, so an empty group means
+# an ownerless zone.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -34,207 +35,27 @@ spec:
     namePrefix: uxi-ptr-zone
     image: git.r1p.dev/unbound-xi/server-worker:v0.10.0@sha256:d319b099bf5a7d2ab86f50b98ae7f9e1b7a3189027aba62e440553ec03101a4f
     groups:
-      # Southern San dOria
-      - name: southern-san-doria
+      # Southern San dOria, Northern San dOria, Port San dOria, Chateau dOraguille
+      - name: san-doria
         idBase: 100
-        zones: [230]
-      # Northern San dOria, Chateau dOraguille
-      - name: northern-san-doria
+        zones: [230, 231, 232, 233]
+      # Bastok Mines, Bastok Markets, Port Bastok, Metalworks
+      - name: bastok
         idBase: 200
-        zones: [231, 233]
-      # Port San dOria
-      - name: port-san-doria
+        zones: [234, 235, 236, 237]
+      # Windurst Waters, Windurst Walls, Port Windurst, Windurst Woods, Heavens Tower
+      - name: windurst
         idBase: 300
-        zones: [232]
-      # Bastok Mines
-      - name: bastok-mines
+        zones: [238, 239, 240, 241, 242]
+      # RuLude Gardens, Upper Jeuno, Lower Jeuno, Port Jeuno
+      - name: jeuno
         idBase: 400
-        zones: [234]
-      # Bastok Markets
-      - name: bastok-markets
+        zones: [243, 244, 245, 246]
+      # Valkurm Dunes
+      - name: valkurm-dunes
         idBase: 500
-        zones: [235]
-      # Port Bastok, Metalworks
-      - name: port-bastok
-        idBase: 600
-        zones: [236, 237]
-      # Windurst Waters
-      - name: windurst-waters
-        idBase: 700
-        zones: [238]
-      # Windurst Walls, Heavens Tower
-      - name: windurst-walls
-        idBase: 800
-        zones: [239, 242]
-      # Port Windurst
-      - name: port-windurst
-        idBase: 900
-        zones: [240]
-      # Windurst Woods
-      - name: windurst-woods
-        idBase: 1000
-        zones: [241]
-      # RuLude Gardens
-      - name: rulude-gardens
-        idBase: 1100
-        zones: [243]
-      # Upper Jeuno
-      - name: upper-jeuno
-        idBase: 1200
-        zones: [244]
-      # Lower Jeuno
-      - name: lower-jeuno
-        idBase: 1300
-        zones: [245]
-      # Port Jeuno
-      - name: port-jeuno
-        idBase: 1400
-        zones: [246]
-      # Aht Urhgan Whitegate
-      - name: whitegate
-        idBase: 1500
-        zones: [50]
-      # Al Zahbi
-      - name: al-zahbi
-        idBase: 1600
-        zones: [48]
-      # Nashmau
-      - name: nashmau
-        idBase: 1700
-        zones: [53]
-      # Tavnazian Safehold, Rabao, Selbina, Mhaura, Kazham, Norg
-      - name: towns
-        idBase: 1800
-        zones: [26, 247, 248, 249, 250, 252]
-      # Phanauet Channel, Manaclipper, Open sea route to Al Zahbi, Open sea route to Mhaura, Silver Sea route to Nashmau, Silver Sea route to Al Zahbi, Ship bound for Selbina, Ship bound for Mhaura, San dOria-Jeuno Airship, Bastok-Jeuno Airship, Windurst-Jeuno Airship, Kazham-Jeuno Airship, Ship bound for Selbina Pirates, Ship bound for Mhaura Pirates
-      - name: transit
-        idBase: 1900
-        zones: [1, 3, 46, 47, 58, 59, 220, 221, 223, 224, 225, 226, 227, 228]
-      # West Ronfaure, East Ronfaure, Horlais Peak, Ghelsba Outpost, Fort Ghelsba, Yughott Grotto, Bostaunieux Oubliette, King Ranperres Tomb
-      - name: ronfaure
-        idBase: 2000
-        zones: [100, 101, 139, 140, 141, 142, 167, 190]
-      # La Theine Plateau, Valkurm Dunes, Konschtat Highlands, Ordelles Caves, Gusgen Mines
-      - name: zulkheim
-        idBase: 2100
-        zones: [102, 103, 108, 193, 196]
-      # Jugner Forest, Batallia Downs, Davoi, Monastic Cavern, The Eldieme Necropolis
-      - name: norvallen
-        idBase: 2200
-        zones: [104, 105, 149, 150, 195]
-      # North Gustaberg, South Gustaberg, Palborough Mines, Waughroon Shrine, Zeruhn Mines, Dangruf Wadi
-      - name: gustaberg
-        idBase: 2300
-        zones: [106, 107, 143, 144, 172, 191]
-      # Pashhow Marshlands, Rolanberry Fields, Beadeaux, Qulun Dome, Crawlers Nest
-      - name: derfland
-        idBase: 2400
-        zones: [109, 110, 147, 148, 197]
-      # West Sarutabaruta, East Sarutabaruta, Giddeus, Balgas Dais, Toraimarai Canal, Full Moon Fountain, Inner Horutoto Ruins, Outer Horutoto Ruins
-      - name: sarutabaruta
-        idBase: 2500
-        zones: [115, 116, 145, 146, 169, 170, 192, 194]
-      # Tahrongi Canyon, Buburimu Peninsula, Maze of Shakhrami, Labyrinth of Onzozo
-      - name: kolshushu
-        idBase: 2600
-        zones: [117, 118, 198, 213]
-      # Meriphataud Mountains, Sauromugue Champaign, Castle Oztroja, Altar Room, Garlaige Citadel
-      - name: aragoneu
-        idBase: 2700
-        zones: [119, 120, 151, 152, 200]
-      # Qufim Island, Behemoths Dominion, Middle Delkfutts Tower, Upper Delkfutts Tower, Lower Delkfutts Tower, QuBia Arena
+        zones: [103]
+      # Qufim Island
       - name: qufim
-        idBase: 2800
-        zones: [126, 127, 157, 158, 184, 206]
-      # Beaucedine Glacier, Ranguemont Pass, Cloister of Frost, FeiYin
-      - name: fauregandi
-        idBase: 2900
-        zones: [111, 166, 203, 204]
-      # Xarcabard, Castle Zvahl Baileys, Castle Zvahl Keep, Throne Room
-      - name: valdeaunia
-        idBase: 3000
-        zones: [112, 161, 162, 165]
-      # The Sanctuary of ZiTah, RoMaeve, The Boyahda Tree, Dragons Aery, Cloister of Storms
-      - name: li-telor
-        idBase: 3100
-        zones: [121, 122, 153, 154, 202]
-      # Eastern Altepa Desert, Western Altepa Desert, Chamber of Oracles, Korroloka Tunnel, Quicksand Caves, Cloister of Tremors
-      - name: kuzotz
-        idBase: 3200
-        zones: [114, 125, 168, 173, 208, 209]
-      # Cape Teriggan, Valley of Sorrows, Kuftal Tunnel, Cloister of Gales, Gustav Tunnel
-      - name: vollbow
-        idBase: 3300
-        zones: [113, 128, 174, 201, 212]
-      # Yuhtunga Jungle, Ghoyus Reverie, Sea Serpent Grotto, Cloister of Tides
-      - name: elshimo-lowlands
-        idBase: 3400
-        zones: [123, 129, 176, 211]
-      # Yhoator Jungle, Temple of Uggalepih, Den of Rancor, Sacrificial Chamber, Ifrits Cauldron, Cloister of Flames
-      - name: elshimo-uplands
-        idBase: 3500
-        zones: [124, 159, 160, 163, 205, 207]
-      # RuAun Gardens, VeLugannon Palace, The Shrine of RuAvitau, Stellar Fulcrum, LaLoff Amphitheater, The Celestial Nexus, Hall of the Gods
-      - name: tu-lia
-        idBase: 3600
-        zones: [130, 177, 178, 179, 180, 181, 251]
-      # Dynamis-San dOria, Dynamis-Bastok, Dynamis-Windurst, Dynamis-Jeuno
-      - name: dynamis-cities
-        idBase: 3700
-        zones: [185, 186, 187, 188]
-      # Dynamis-Valkurm, Dynamis-Buburimu, Dynamis-Qufim, Dynamis-Tavnazia, Dynamis-Beaucedine, Dynamis-Xarcabard
-      - name: dynamis-outlands
-        idBase: 3800
-        zones: [39, 40, 41, 42, 134, 135]
-      # Oldton Movalpolos, Newton Movalpolos, Mine Shaft 2716
-      - name: movalpolos
-        idBase: 3900
-        zones: [11, 12, 13]
-      # Lufaise Meadows, Misareaux Coast, Phomiuna Aqueducts, Sacrarium, Riverne-Site B01, Riverne-Site A01, Monarch Linn, Sealions Den
-      - name: tavnazia
-        idBase: 4000
-        zones: [24, 25, 27, 28, 29, 30, 31, 32]
-      # Hall of Transference, Promyvion-Holla, Spire of Holla, Promyvion-Dem, Spire of Dem, Promyvion-Mea, Spire of Mea, Promyvion-Vahzl, Spire of Vahzl
-      - name: promyvion
-        idBase: 4100
-        zones: [14, 16, 17, 18, 19, 20, 21, 22, 23]
-      # Uleguerand Range, Bearclaw Pinnacle, PsoXja, The Shrouded Maw
-      - name: cop-north
-        idBase: 4200
-        zones: [5, 6, 9, 10]
-      # Carpenters Landing, Bibiki Bay, Attohwa Chasm, Boneyard Gully
-      - name: cop-fields
-        idBase: 4300
-        zones: [2, 4, 7, 8]
-      # AlTaieu, Grand Palace of HuXzoi, The Garden of RuHmet, Empyreal Paradox
-      - name: lumoria
-        idBase: 4400
-        zones: [33, 34, 35, 36]
-      # Temenos, Apollyon
-      - name: limbus
-        idBase: 4500
-        zones: [37, 38]
-      # Wajaom Woodlands, Bhaflau Thickets, Caedarva Mire
-      - name: aht-urhgan-fields
-        idBase: 4600
-        zones: [51, 52, 79]
-      # Mount Zhayolm, Halvung, Mamook, Aydeewa Subterrane
-      - name: west-aht-urhgan
-        idBase: 4700
-        zones: [61, 62, 65, 68]
-      # Arrapago Reef, Alzadaal Undersea Ruins, Nyzul Isle, Hazhalm Testing Grounds
-      - name: arrapago
-        idBase: 4800
-        zones: [54, 72, 77, 78]
-      # Ilrusi Atoll, Periqia, Lebros Cavern, Navukgo Execution Chamber, Mamool Ja Training Grounds, Leujaoam Sanctum
-      - name: assaults
-        idBase: 4900
-        zones: [55, 56, 63, 64, 66, 69]
-      # Zhayolm Remnants, Arrapago Remnants, Bhaflau Remnants, Silver Sea Remnants
-      - name: salvage
-        idBase: 5000
-        zones: [73, 74, 75, 76]
-      # Diorama Abdhaljs-Ghelsba, Abdhaljs Isle-Purgonorgo, Talacca Cove, The Ashu Talif, Jade Sepulcher, Chocobo Circuit, The Colosseum
-      - name: toau-arenas
-        idBase: 5100
-        zones: [43, 44, 57, 60, 67, 70, 71]
+        idBase: 600
+        zones: [126]
