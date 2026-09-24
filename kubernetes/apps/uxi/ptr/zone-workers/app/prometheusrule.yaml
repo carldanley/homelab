@@ -26,10 +26,13 @@ spec:
           annotations:
             summary: UnboundXI PTR zone group {{ $labels.statefulset }} is missing a standby.
         - alert: UnboundXiPtrZonesOwnerless
-          expr: max(unbound_state_zones_ownerless{namespace="uxi-ptr"}) > 0
+          # A dormant zone (released empty, waiting out the eviction delay)
+          # is ownerless by design and offered to nobody; only an ownerless
+          # zone that is not dormant has players or a group waiting on it.
+          expr: max(unbound_state_zones_ownerless{namespace="uxi-ptr"} - unbound_state_zones_dormant{namespace="uxi-ptr"}) > 0
           for: 5m
           labels:
             severity: warning
             discord_channel: homelab-alerts
           annotations:
-            summary: UnboundXI PTR has open zone instances with no live owner for five minutes.
+            summary: UnboundXI PTR has open zone instances with no live owner that are not dormant, for five minutes.
