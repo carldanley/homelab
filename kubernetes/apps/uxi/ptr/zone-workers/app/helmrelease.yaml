@@ -78,27 +78,22 @@ spec:
       - name: rulude-gardens
         idBase: 1100
         zones: [243]
-        replicas: 2
       # Upper Jeuno
       - name: upper-jeuno
         idBase: 1200
         zones: [244]
-        replicas: 2
       # Lower Jeuno
       - name: lower-jeuno
         idBase: 1300
         zones: [245]
-        replicas: 2
       # Port Jeuno
       - name: port-jeuno
         idBase: 1400
         zones: [246]
-        replicas: 2
       # Aht Urhgan Whitegate
       - name: whitegate
         idBase: 1500
         zones: [50]
-        replicas: 2
       # Al Zahbi
       - name: al-zahbi
         idBase: 1600
