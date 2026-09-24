@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: uxi-ptr-zone-workers
+spec:
+  interval: 1h
+  timeout: 20m
+  path: ./kubernetes/apps/uxi/ptr/zone-workers/app
+  prune: true
+  wait: true
+  dependsOn:
+    - name: uxi-ptr-api
+      namespace: uxi-ptr
+    - name: uxi-ptr-state
+      namespace: uxi-ptr
+    - name: uxi-ptr-social
+      namespace: uxi-ptr
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: uxi-ptr

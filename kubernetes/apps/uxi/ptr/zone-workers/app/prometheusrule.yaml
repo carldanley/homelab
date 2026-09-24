@@ -1,0 +1,35 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-zone-workers
+spec:
+  groups:
+    - name: uxi-ptr-zone-workers
+      rules:
+        - alert: UnboundXiPtrZoneGroupDown
+          # A listed map is offered only to its group: a group with no ready
+          # pod is a set of zones nobody can enter.
+          expr: kube_statefulset_status_replicas_ready{namespace="uxi-ptr",statefulset=~"uxi-ptr-zone-.*"} < 1
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR zone group {{ $labels.statefulset }} has no ready worker; its zones are ownerless.
+        - alert: UnboundXiPtrZoneGroupDegraded
+          expr: kube_statefulset_status_replicas_ready{namespace="uxi-ptr",statefulset=~"uxi-ptr-zone-.*"} < kube_statefulset_replicas{namespace="uxi-ptr",statefulset=~"uxi-ptr-zone-.*"}
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR zone group {{ $labels.statefulset }} is missing a standby.
+        - alert: UnboundXiPtrZonesOwnerless
+          expr: max(unbound_state_zones_ownerless{namespace="uxi-ptr"}) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR has open zone instances with no live owner for five minutes.

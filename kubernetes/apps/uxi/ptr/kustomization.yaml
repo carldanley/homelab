@@ -12,6 +12,7 @@ resources:
   - ./social/ks.yaml
   - ./gateway/ks.yaml
   - ./map-worker/ks.yaml
+  - ./zone-workers/ks.yaml
 patches:
   - patch: |-
       apiVersion: v1

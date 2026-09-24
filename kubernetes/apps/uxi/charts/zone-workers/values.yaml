@@ -1,0 +1,38 @@
+# One StatefulSet per entry of `groups`, all from the same image and the
+# same configuration file. A group's pods share one zone list; the first
+# holds every map on it and the rest are hot standbys (the directory
+# chooses the lowest id), so `replicas: 2` buys a takeover with no
+# scheduling wait, never a division of the work.
+namePrefix: uxi-zone
+labels:
+  app.kubernetes.io/name: uxi-ptr-server
+  app.kubernetes.io/component: zone-worker
+
+image: ""
+imagePullPolicy: IfNotPresent
+
+environment: ptr
+apiInternalAddr: uxi-ptr-api-internal:21017
+busUrl: nats://nats.uxi-nats.svc.cluster.local:4222
+busUsername: ptr
+natsSecretName: uxi-ptr-nats
+
+nodeSelector:
+  gpu.homelab/amd: 'true'
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    memory: 2Gi
+
+# Must exceed the worker's drain bound (10 s).
+terminationGracePeriodSeconds: 30
+
+groups: []
+#  - name: lower-jeuno   # StatefulSet <namePrefix>-<name>
+#    idBase: 1300        # unique among the fleet; pod n runs as idBase + n
+#    zones: [245]        # map ids; the group's pods claim these and nothing else
+#    replicas: 2         # optional, 1 by default
+#    resources: {}       # optional, overrides the chart's resources

@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.namePrefix }}-config
+  labels:
+    {{- include "zone-workers.labels" . | nindent 4 }}
+data:
+  config.toml: |
+    [common]
+    dev_mode = false
+    content_dir = "/content"
+
+    [worker]
+    # id 0 derives the id from id_base + ordinal; both come from each
+    # pod's environment. claims_all is off: a group serves its list alone.
+    id = 0
+    claims_all = false
+    health_listen = "0.0.0.0:21019"
+    api_internal_addr = {{ .Values.apiInternalAddr | quote }}
+
+    [bus]
+    url = {{ .Values.busUrl | quote }}
+    environment = {{ .Values.environment | quote }}
+    username = {{ .Values.busUsername | quote }}
+    password_file = "/secrets/nats/password"

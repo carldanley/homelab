@@ -1,0 +1,5 @@
+apiVersion: v2
+name: zone-workers
+description: UnboundXI zone groups. One StatefulSet per group of maps (server docs/spec/deployment.md, "Zone groups"), rendered from a list.
+type: application
+version: 0.1.0

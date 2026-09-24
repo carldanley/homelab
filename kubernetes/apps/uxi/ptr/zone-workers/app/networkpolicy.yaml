@@ -2,36 +2,26 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: uxi-ptr-api
+  name: uxi-ptr-zone-workers
 spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: uxi-ptr-server
-      app.kubernetes.io/component: api
+      app.kubernetes.io/component: zone-worker
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
-        - podSelector:
+        - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: gateway
-        - podSelector:
+              kubernetes.io/metadata.name: observability
+          podSelector:
             matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: worker
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: zone-worker
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: social
+              app.kubernetes.io/name: prometheus
       ports:
         - protocol: TCP
-          port: 21017
+          port: 21019
   egress:
     - to:
         - namespaceSelector:
@@ -60,7 +50,8 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              cnpg.io/cluster: uxi-ptr-postgres
+              app.kubernetes.io/name: uxi-ptr-server
+              app.kubernetes.io/component: api
       ports:
         - protocol: TCP
-          port: 5432
+          port: 21017

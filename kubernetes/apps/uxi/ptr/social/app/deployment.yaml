@@ -67,7 +67,6 @@ spec:
               # The icon cache is 64 MiB per replica and the audit buffer
               # holds at most 100,000 rows; 1 Gi leaves headroom for both.
               memory: 1Gi
-              cpu: '2'
           volumeMounts:
             - name: config
               mountPath: /config

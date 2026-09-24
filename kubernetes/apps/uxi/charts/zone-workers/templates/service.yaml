@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.namePrefix }}-headless
+  labels:
+    {{- include "zone-workers.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    {{- include "zone-workers.labels" . | nindent 4 }}
+  ports:
+    - name: health
+      port: 21019
+      targetPort: health

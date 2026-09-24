@@ -1,0 +1,131 @@
+{{- $root := . }}
+{{- $seen := dict }}
+{{- range .Values.groups }}
+{{- $name := printf "%s-%s" $root.Values.namePrefix .name }}
+{{- if hasKey $seen (toString .idBase) }}{{ fail (printf "zone-workers: idBase %v is used twice" .idBase) }}{{ end }}
+{{- $_ := set $seen (toString .idBase) .name }}
+{{- if not .zones }}{{ fail (printf "zone-workers: group %s lists no zones" .name) }}{{ end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "zone-workers.labels" $root | nindent 4 }}
+    uxi.homelab/zone-group: {{ .name | quote }}
+  annotations:
+    reloader.stakater.com/auto: 'true'
+    uxi.homelab/zones: {{ join "," (.zones | toStrings) | quote }}
+spec:
+  replicas: {{ .replicas | default 1 }}
+  serviceName: {{ $root.Values.namePrefix }}-headless
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      {{- include "zone-workers.labels" $root | nindent 6 }}
+      uxi.homelab/zone-group: {{ .name | quote }}
+  template:
+    metadata:
+      labels:
+        {{- include "zone-workers.labels" $root | nindent 8 }}
+        uxi.homelab/zone-group: {{ .name | quote }}
+    spec:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      terminationGracePeriodSeconds: {{ $root.Values.terminationGracePeriodSeconds }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      {{- with $root.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if gt (int (.replicas | default 1)) 1 }}
+      affinity:
+        podAntiAffinity:
+          # A standby on the same node as the holder is no standby.
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  uxi.homelab/zone-group: {{ .name | quote }}
+              topologyKey: kubernetes.io/hostname
+      {{- end }}
+      containers:
+        - name: worker
+          image: {{ required "zone-workers: image is required" $root.Values.image | quote }}
+          imagePullPolicy: {{ $root.Values.imagePullPolicy }}
+          command:
+            - unbound-worker
+          args:
+            - serve
+          env:
+            - name: UNBOUND_CONFIG
+              value: /config/config.toml
+            - name: UNBOUND_LOG_FORMAT
+              value: json
+            - name: RUST_LOG
+              value: info
+            - name: UNBOUND_WORKER_ID_BASE
+              value: {{ .idBase | quote }}
+            - name: UNBOUND_WORKER_ORDINAL
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+            - name: UNBOUND_WORKER_ZONES
+              value: {{ join "," (.zones | toStrings) | quote }}
+          ports:
+            - name: health
+              containerPort: 21019
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml (.resources | default $root.Values.resources) | nindent 12 }}
+          volumeMounts:
+            - name: config
+              mountPath: /config
+              readOnly: true
+            - name: nats
+              mountPath: /secrets/nats
+              readOnly: true
+          startupProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 120
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $root.Values.namePrefix }}-config
+        - name: nats
+          secret:
+            secretName: {{ $root.Values.natsSecretName }}
+            items:
+              - key: NATS_PASSWORD
+                path: password
+{{- end }}
