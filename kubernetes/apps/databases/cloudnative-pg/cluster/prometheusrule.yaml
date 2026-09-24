@@ -38,8 +38,18 @@ spec:
             severity: critical
 
         - alert: PGReplication
+          # Archive recovery can leave time-based lag high after a replica catches up.
+          # Suppress only when the primary confirms zero replay backlog for that replica.
+          # Missing primary metrics must not suppress the alert.
           expr: |-
             cnpg_pg_replication_lag > 300
+            unless on (namespace, job, pod)
+            label_replace(
+              max by (namespace, job, application_name) (
+                cnpg_pg_stat_replication_replay_diff_bytes
+              ) == 0,
+              "pod", "$1", "application_name", "(.+)"
+            )
           for: 5m
           annotations:
             summary: >-
