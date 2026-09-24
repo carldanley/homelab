@@ -13,6 +13,7 @@ resources:
   - ./gateway/ks.yaml
   - ./map-worker/ks.yaml
   - ./zone-workers/ks.yaml
+  - ./monitoring/ks.yaml
 patches:
   - patch: |-
       apiVersion: v1

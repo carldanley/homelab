@@ -1,0 +1,123 @@
+---
+# Utilization and performance alerts for every PTR service, beside the
+# availability alerts each component carries in its own directory. All of
+# them go to homelab-alerts until the thresholds are honed; a dedicated
+# channel for the UnboundXI group comes after that.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-utilization
+spec:
+  groups:
+    - name: uxi-ptr-resources
+      rules:
+        - alert: UnboundXiPtrContainerMemoryHigh
+          expr: |
+            max by (pod, container) (container_memory_working_set_bytes{namespace="uxi-ptr", container!="", image!=""})
+              / on (pod, container) group_left ()
+            kube_pod_container_resource_limits{namespace="uxi-ptr", resource="memory"} > 0.85
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR {{ $labels.pod }}/{{ $labels.container }} is at {{ $value | humanizePercentage }} of its memory limit.
+        - alert: UnboundXiPtrContainerMemoryCritical
+          expr: |
+            max by (pod, container) (container_memory_working_set_bytes{namespace="uxi-ptr", container!="", image!=""})
+              / on (pod, container) group_left ()
+            kube_pod_container_resource_limits{namespace="uxi-ptr", resource="memory"} > 0.95
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR {{ $labels.pod }}/{{ $labels.container }} is at {{ $value | humanizePercentage }} of its memory limit and about to be OOM-killed.
+        - alert: UnboundXiPtrContainerOOMKilled
+          expr: |
+            increase(kube_pod_container_status_restarts_total{namespace="uxi-ptr"}[15m]) > 0
+              and on (pod, container)
+            kube_pod_container_status_last_terminated_reason{namespace="uxi-ptr", reason="OOMKilled"} == 1
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR {{ $labels.pod }}/{{ $labels.container }} was OOM-killed in the last 15 minutes.
+        - alert: UnboundXiPtrContainerCpuAboveRequest
+          # No CPU limits by design: a container far above its request for a
+          # sustained stretch is a sizing signal, not a throttle.
+          expr: |
+            sum by (pod, container) (rate(container_cpu_usage_seconds_total{namespace="uxi-ptr", container!="", image!=""}[5m]))
+              / on (pod, container) group_left ()
+            kube_pod_container_resource_requests{namespace="uxi-ptr", resource="cpu"} > 1.5
+          for: 15m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR {{ $labels.pod }}/{{ $labels.container }} has used {{ $value | printf "%.1f" }}x its CPU request for 15 minutes; consider raising the request.
+    - name: uxi-ptr-workers
+      rules:
+        - alert: UnboundXiPtrWorkerTickOverBudget
+          # REQ-PERF-010: one tick fits in 0.4 s. p95 above it means the
+          # worker is falling behind its zones.
+          expr: |
+            histogram_quantile(0.95, sum by (pod, le) (rate(unbound_worker_tick_duration_seconds_bucket{namespace="uxi-ptr"}[5m]))) > 0.4
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR worker {{ $labels.pod }} p95 tick is {{ $value | humanizeDuration }}, over the 0.4 s budget.
+        - alert: UnboundXiPtrWorkerTickCritical
+          # REQ-PERF-004's p99 tripwire for the 400 ms profile.
+          expr: |
+            histogram_quantile(0.99, sum by (pod, le) (rate(unbound_worker_tick_duration_seconds_bucket{namespace="uxi-ptr"}[5m]))) > 0.51
+          for: 5m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR worker {{ $labels.pod }} p99 tick is {{ $value | humanizeDuration }}; the zone simulation is stalling.
+        - alert: UnboundXiPtrWorkerBatchAckSlow
+          expr: |
+            histogram_quantile(0.95, sum by (pod, le) (rate(unbound_worker_batch_ack_seconds_bucket{namespace="uxi-ptr"}[5m]))) > 0.4
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR worker {{ $labels.pod }} waits {{ $value | humanizeDuration }} (p95) for the state service to acknowledge a tick's batch.
+        - alert: UnboundXiPtrWorkerShedding
+          expr: |
+            sum by (pod) (increase(unbound_worker_gateway_datagrams_shed_total{namespace="uxi-ptr"}[10m])) > 0
+              or sum by (pod) (increase(unbound_worker_gateway_sessions_closed_total{namespace="uxi-ptr"}[10m])) > 0
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR worker {{ $labels.pod }} is shedding gateway output or closing sessions over the byte bound.
+        - alert: UnboundXiPtrStateBatchesRefused
+          expr: sum(increase(unbound_state_batches_refused_total{namespace="uxi-ptr"}[10m])) > 0
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR state service refused worker batches in the last 10 minutes; persistence is behind.
+        - alert: UnboundXiPtrBusVersionRefused
+          # A peer of another bus version is dropped per message and only
+          # this counter says so: a half-rolled set, or a stale pod. The
+          # counter is born on the first refusal, so the second clause
+          # catches a series that did not exist ten minutes ago.
+          expr: |
+            sum by (pod) (increase({__name__=~"unbound_.*_version_refused_total", namespace="uxi-ptr"}[10m])) > 0
+              or (
+                sum by (pod) ({__name__=~"unbound_.*_version_refused_total", namespace="uxi-ptr"}) > 0
+                  unless sum by (pod) (last_over_time({__name__=~"unbound_.*_version_refused_total", namespace="uxi-ptr"}[10m] offset 10m))
+              )
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR {{ $labels.pod }} is refusing messages from a peer of another bus version.
