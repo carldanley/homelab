@@ -1,6 +1,7 @@
 ---
 # Manage schemas in the existing PTR database; reuse its owner and credentials.
-# Separate schemas keep API and state-service migration histories independent.
+# Separate schemas keep the API, state-service and social-service migration
+# histories independent.
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -16,5 +17,8 @@ spec:
       owner: uxi_ptr
       ensure: present
     - name: world
+      owner: uxi_ptr
+      ensure: present
+    - name: social
       owner: uxi_ptr
       ensure: present

@@ -2,24 +2,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uxi-ptr-state
+  name: uxi-ptr-social
   annotations:
     reloader.stakater.com/auto: 'true'
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: uxi-ptr-server
-      app.kubernetes.io/component: state
+      app.kubernetes.io/component: social
   template:
     metadata:
       labels:
         app.kubernetes.io/name: uxi-ptr-server
-        app.kubernetes.io/component: state
+        app.kubernetes.io/component: social
     spec:
       automountServiceAccountToken: false
       enableServiceLinks: false
-      terminationGracePeriodSeconds: 60
+      # Must exceed [social] shutdown_drain_ms (8 s by default).
+      terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
         runAsUser: 10001
@@ -29,11 +30,11 @@ spec:
       nodeSelector:
         gpu.homelab/amd: 'true'
       containers:
-        - name: state
-          image: git.r1p.dev/unbound-xi/server-state:v0.8.0@sha256:4e4b44a1dfb1b42a6cd462fcad18472d49c0d3ed7069fdd214e0bd7ea03e08fe
+        - name: social
+          image: git.r1p.dev/unbound-xi/server-social:v0.1.0@sha256:0ffdbe8f06ed75dfcb9b2223f2aec05c0295a0c35c77f7ae3af14405934a4caf
           imagePullPolicy: IfNotPresent
           command:
-            - unbound-state
+            - unbound-social
           args:
             - serve
           env:
@@ -43,14 +44,14 @@ spec:
               value: json
             - name: RUST_LOG
               value: info
-            - name: UNBOUND_DATABASE_WORLD_URL
+            - name: UNBOUND_DATABASE_SOCIAL_URL
               valueFrom:
                 secretKeyRef:
-                  name: uxi-ptr-state-postgres
-                  key: world-url
+                  name: uxi-ptr-social-postgres
+                  key: social-url
           ports:
             - name: health
-              containerPort: 21020
+              containerPort: 21021
               protocol: TCP
           securityContext:
             allowPrivilegeEscalation: false
@@ -60,11 +61,13 @@ spec:
                 - ALL
           resources:
             requests:
-              cpu: 1000m
-              memory: 2Gi
+              cpu: 250m
+              memory: 256Mi
             limits:
-              memory: 8Gi
-              cpu: '4'
+              # The icon cache is 64 MiB per replica and the audit buffer
+              # holds at most 100,000 rows; 1 Gi leaves headroom for both.
+              memory: 1Gi
+              cpu: '2'
           volumeMounts:
             - name: config
               mountPath: /config
@@ -99,7 +102,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: uxi-ptr-state-config
+            name: uxi-ptr-social-config
         - name: postgres-ca
           secret:
             secretName: uxi-ptr-postgres-ca
@@ -112,5 +115,19 @@ spec:
             items:
               - key: NATS_PASSWORD
                 path: password
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: uxi-ptr-server
+                  app.kubernetes.io/component: social
+              topologyKey: kubernetes.io/hostname
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      # Five eligible nodes for three replicas: bring the new replica up on
+      # a free node before an old one leaves, so the queue group never
+      # drops below three during a roll.
+      maxSurge: 1
+      maxUnavailable: 0

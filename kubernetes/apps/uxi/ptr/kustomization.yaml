@@ -9,6 +9,7 @@ resources:
   - ./postgres/ks.yaml
   - ./api/ks.yaml
   - ./state/ks.yaml
+  - ./social/ks.yaml
   - ./gateway/ks.yaml
   - ./map-worker/ks.yaml
 patches:

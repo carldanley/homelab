@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: uxi-ptr-social-config
+data:
+  config.toml: |
+    [common]
+    dev_mode = false
+    content_dir = "/content"
+
+    [social]
+    # id stays 0: a Deployment has no ordinal, so each replica draws a
+    # random non-zero id at start. The database URL comes from the
+    # environment (UNBOUND_DATABASE_SOCIAL_URL); every other bound keeps
+    # the defaults from docs/spec/social-service.md, "Bounds".
+    health_listen = "0.0.0.0:21021"
+    api_internal_addr = "uxi-ptr-api-internal:21017"
+
+    [bus]
+    url = "nats://nats.uxi-nats.svc.cluster.local:4222"
+    environment = "ptr"
+    username = "ptr"
+    password_file = "/secrets/nats/password"

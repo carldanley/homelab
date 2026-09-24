@@ -2,32 +2,27 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: uxi-ptr-api
+  name: uxi-ptr-social
 spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: uxi-ptr-server
-      app.kubernetes.io/component: api
+      app.kubernetes.io/component: social
   policyTypes:
     - Ingress
     - Egress
   ingress:
+    # The service is reached on the bus; its only listener is the probes.
     - from:
-        - podSelector:
+        - namespaceSelector:
             matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: gateway
-        - podSelector:
+              kubernetes.io/metadata.name: observability
+          podSelector:
             matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: worker
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: uxi-ptr-server
-              app.kubernetes.io/component: social
+              app.kubernetes.io/name: prometheus
       ports:
         - protocol: TCP
-          port: 21017
+          port: 21021
   egress:
     - to:
         - namespaceSelector:
@@ -53,6 +48,14 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: uxi-ptr-server
+              app.kubernetes.io/component: api
+      ports:
+        - protocol: TCP
+          port: 21017
     - to:
         - podSelector:
             matchLabels:

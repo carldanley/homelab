@@ -2,31 +2,24 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: uxi-ptr-gateway
+  name: uxi-ptr-social
 spec:
   interval: 1h
   timeout: 10m
-  path: ./kubernetes/apps/uxi/ptr/gateway/app
+  path: ./kubernetes/apps/uxi/ptr/social/app
   prune: true
   wait: true
   dependsOn:
+    # The release contract rolls the social service after the state
+    # service and before the gateways and workers.
+    - name: uxi-ptr-postgres
+      namespace: uxi-ptr
     - name: uxi-ptr-api
       namespace: uxi-ptr
     - name: uxi-ptr-state
       namespace: uxi-ptr
-    - name: uxi-ptr-social
-      namespace: uxi-ptr
-    - name: cilium-gateway
-      namespace: kube-system
-    - name: reflector
-      namespace: kube-system
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
   targetNamespace: uxi-ptr
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: domains-secret
-        optional: false

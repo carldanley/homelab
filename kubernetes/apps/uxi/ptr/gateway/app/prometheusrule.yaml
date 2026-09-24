@@ -15,3 +15,11 @@ spec:
             discord_channel: homelab-alerts
           annotations:
             summary: UnboundXI PTR gateway redundancy is reduced.
+        - alert: UnboundXiPtrGatewaySocialUnreachable
+          expr: min(unbound_gateway_social_alive{namespace="uxi-ptr"}) == 0
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR gateway sees no live social service replica; chat, party, linkshell and social frames are refused.

@@ -1,0 +1,33 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: uxi-ptr-social
+spec:
+  groups:
+    - name: uxi-ptr-social
+      rules:
+        - alert: UnboundXiPtrSocialUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="uxi-ptr",deployment="uxi-ptr-social"} < 1
+          for: 2m
+          labels:
+            severity: critical
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR social service is unavailable; the gateways refuse chat, party, linkshell and social frames.
+        - alert: UnboundXiPtrSocialReplicaUnavailable
+          expr: kube_deployment_status_replicas_available{namespace="uxi-ptr",deployment="uxi-ptr-social"} < 3
+          for: 10m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR social redundancy is reduced.
+        - alert: UnboundXiPtrSocialAuditDropping
+          expr: sum(rate(unbound_social_audit_dropped_total{namespace="uxi-ptr"}[5m])) > 0
+          for: 5m
+          labels:
+            severity: warning
+            discord_channel: homelab-alerts
+          annotations:
+            summary: UnboundXI PTR social audit buffer is dropping rows; PostgreSQL is slow or away.

@@ -1,0 +1,16 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: uxi-ptr-social
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: uxi-ptr-server
+      app.kubernetes.io/component: social
+  podMetricsEndpoints:
+    - port: health
+      path: /metrics
+      interval: 30s
+  podTargetLabels:
+    - app.kubernetes.io/component
