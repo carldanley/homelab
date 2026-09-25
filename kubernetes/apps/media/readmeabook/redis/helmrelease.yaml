@@ -1,0 +1,93 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: readmeabook-redis
+spec:
+  interval: 1h
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      app:
+        type: deployment
+        replicas: 1
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: public.ecr.aws/docker/library/redis
+              tag: 8.10.2@sha256:d5ac52db24d4e70566fe9944f22cf5bdc2bc739b05c0f426335161ea6c23f3b3
+            command:
+              - redis-server
+            args:
+              - --maxmemory
+              - 128mb
+              # Bull queue keys must not be evicted under memory pressure.
+              - --maxmemory-policy
+              - noeviction
+              - --appendonly
+              - 'no'
+              - --save
+              - ''
+            probes:
+              readiness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - redis-cli
+                      - ping
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              liveness: *probes
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command:
+                      - redis-cli
+                      - ping
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 25m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    service:
+      app:
+        controller: app
+        ports:
+          tcp:
+            port: 6379
+    persistence:
+      data:
+        type: emptyDir
+        globalMounts:
+          - path: /data

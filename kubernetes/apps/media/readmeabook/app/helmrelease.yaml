@@ -1,0 +1,166 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: readmeabook
+spec:
+  interval: 1h
+  timeout: 15m
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      readmeabook:
+        replicas: 1
+        strategy: Recreate
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          init-db:
+            image:
+              repository: ghcr.io/home-operations/postgres-init
+              tag: 18
+            envFrom:
+              - secretRef:
+                  name: readmeabook-db-init-secret
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 568
+              runAsGroup: 568
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+        containers:
+          app:
+            image:
+              repository: ghcr.io/kikootwo/readmeabook
+              tag: 1.2.3@sha256:a769c582af85cadb8b048ebd1069ee1946b4ff1930ba8da2978c9fef6fc29638
+            env:
+              TZ: America/New_York
+              PUID: "568"
+              PGID: "568"
+              UMASK: "002"
+              PUBLIC_URL: https://readmeabook.${DOMAIN_5}
+              REDIS_URL: redis://readmeabook-redis.media.svc.cluster.local:6379
+              PLEX_CLIENT_IDENTIFIER: readmeabook-homelab
+              LOG_LEVEL: info
+              APP_READY_TIMEOUT: "180"
+            envFrom:
+              - secretRef:
+                  name: readmeabook-secret
+            probes:
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &port 3030
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 6
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 60
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                cpu: "2"
+                memory: 2Gi
+            # The upstream entrypoint remaps users, writes /etc/environment,
+            # syncs the database schema, then drops the app to PUID/PGID.
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop:
+                  - ALL
+                add:
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - FOWNER
+                  - KILL # Supervisor checks/signals the app after switching to UID 568.
+                  - SETGID
+                  - SETUID
+
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 568
+        fsGroupChangePolicy: OnRootMismatch
+        supplementalGroups:
+          - 65536
+        seccompProfile:
+          type: RuntimeDefault
+
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+
+    persistence:
+      config:
+        existingClaim: readmeabook
+        advancedMounts:
+          readmeabook:
+            app:
+              - path: /app/config
+                subPath: config
+              - path: /app/cache
+                subPath: cache
+      media:
+        type: nfs
+        server: nas.batcave
+        path: /mnt/zpool/media
+        advancedMounts:
+          readmeabook:
+            app:
+              - path: /data
+      tmp:
+        type: emptyDir
+      next-cache:
+        type: emptyDir
+        advancedMounts:
+          readmeabook:
+            app:
+              - path: /app/.next/cache
+
+    route:
+      app:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            url: https://readmeabook.${DOMAIN_5}/api/health
+            conditions: ["[STATUS] == 200"]
+        hostnames:
+          - readmeabook.${DOMAIN_5}
+        parentRefs:
+          - name: internal
+            namespace: kube-system
+            sectionName: domain-5-subdomain-https
