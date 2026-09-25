@@ -12,3 +12,17 @@ spec:
       recordType: CNAME
       targets:
         - internal.${DOMAIN_5}
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: audiobookshelf-external
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: audiobookshelf.${DOMAIN_5}
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - external.${DOMAIN_5}
