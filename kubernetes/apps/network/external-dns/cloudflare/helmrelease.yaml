@@ -62,9 +62,9 @@ spec:
     resources:
       requests:
         cpu: 13m
-        memory: 42M
+        memory: 64Mi
       limits:
-        memory: 42M
+        memory: 128Mi
 
     serviceMonitor:
       enabled: true
