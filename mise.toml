@@ -15,7 +15,7 @@ kustomize = "5.8.2"
 jq = "1.8.2"
 k9s = "0.51.0"
 task = "3.54.0"
-uv = "0.12.23"
+uv = "0.13.0"
 yq = "4.54.1"
 
 # Used by the Talos templates. This goes through Cargo because minijinja-cli's
