@@ -9,11 +9,16 @@ spec:
       rules:
         - alert: SmartDeviceHighTemperature
           expr: |
-            smartctl_device_temperature > 65
+            (smartctl_device_temperature{temperature_type="current"} > 65)
+            * on(instance, device, namespace, service, endpoint, container)
+              group_left(model_name, serial_number)
+              smartctl_device
           for: 5m
           annotations:
             summary: >-
-              Mounted drive {{ $labels.device }} on device {{ $labels.instance }} has a temperature higher than {{ $value }}°C
+              Drive {{ $labels.device }} on {{ $labels.node }} is {{ $value }}°C
+            description: >-
+              {{ $labels.model_name }} (serial {{ $labels.serial_number }}) on {{ $labels.node }} has been above 65°C for 5 minutes. Current temperature: {{ $value }}°C.
           labels:
             severity: critical
 
