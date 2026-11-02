@@ -8,3 +8,4 @@ components:
 resources:
   - ./plex/ks.yaml
   - ./adguard/ks.yaml
+  - ./immich-frames/ks.yaml

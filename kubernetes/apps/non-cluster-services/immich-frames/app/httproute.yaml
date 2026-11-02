@@ -1,0 +1,40 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: immich-left-frame
+spec:
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: domain-4-subdomain-https
+  hostnames:
+    - "left-frame.${DOMAIN_4}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: immich-left-frame
+          port: 3000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: immich-right-frame
+spec:
+  parentRefs:
+    - name: internal
+      namespace: kube-system
+      sectionName: domain-4-subdomain-https
+  hostnames:
+    - "right-frame.${DOMAIN_4}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: immich-right-frame
+          port: 3000

@@ -1,0 +1,56 @@
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: immich-left-frame
+  labels:
+    kubernetes.io/service-name: immich-left-frame
+addressType: IPv4
+ports:
+  - protocol: TCP
+    port: 3000
+    name: http
+endpoints:
+  - addresses:
+      - "10.20.157.76"
+    conditions:
+      ready: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-left-frame
+spec:
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: http
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: immich-right-frame
+  labels:
+    kubernetes.io/service-name: immich-right-frame
+addressType: IPv4
+ports:
+  - protocol: TCP
+    port: 3000
+    name: http
+endpoints:
+  - addresses:
+      - "10.20.157.26"
+    conditions:
+      ready: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-right-frame
+spec:
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: http
