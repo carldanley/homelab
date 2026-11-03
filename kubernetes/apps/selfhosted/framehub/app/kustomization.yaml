@@ -6,3 +6,17 @@ resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
   - ./dnsendpoint.yaml
+patches:
+  # Match by kind because the backup component's name is still ${APP} here.
+  # hub.json is mode 0600, so the mover must inherit the app's UID.
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: SnapshotPolicy
+    patch: |-
+      - op: add
+        path: /spec/mover
+        value:
+          inheritSecurityContextFrom:
+            pvcConsumer:
+              container: app
