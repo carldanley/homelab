@@ -15,3 +15,21 @@ configMapGenerator:
       - config.yaml=./config.yaml
 generatorOptions:
   disableNameSuffixHash: true
+patches:
+  # Match by kind because the backup component's name is still ${APP} here.
+  # Hermes starts s6 as root, then writes private data as UID/GID 10000.
+  # Use that identity explicitly; the pod's startup user cannot be inherited.
+  - target:
+      group: kopiur.home-operations.com
+      version: v1alpha1
+      kind: SnapshotPolicy
+    patch: |-
+      - op: add
+        path: /spec/mover
+        value:
+          podSecurityContext:
+            fsGroup: 10000
+          securityContext:
+            runAsUser: 10000
+            runAsGroup: 10000
+            runAsNonRoot: true
