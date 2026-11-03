@@ -10,9 +10,6 @@ resources:
   - ./helmrelease.yaml
   - ./pvc.yaml
 configMapGenerator:
-  - name: hermes-bootstrap
-    files:
-      - install-claude.py=./install-claude.py
   - name: hermes-config
     files:
       - config.yaml=./config.yaml
