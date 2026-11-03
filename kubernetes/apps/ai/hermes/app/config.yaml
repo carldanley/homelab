@@ -1,0 +1,18 @@
+---
+# Mounted as Hermes's managed overlay; user settings remain on the PVC.
+terminal:
+  backend: local
+  cwd: /opt/data/workspace
+
+dashboard:
+  # Cilium's per-node Envoy and internal proxy addresses. Ingress is separately
+  # restricted to Cilium's ingress identity by the app's network policy.
+  trusted_proxies:
+    - 172.22.0.0/16
+    - 10.40.1.200/29
+
+delegation:
+  worktree_isolation: true
+
+worktrees:
+  archive_dirty: false

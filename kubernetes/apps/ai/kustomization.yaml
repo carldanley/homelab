@@ -6,4 +6,5 @@ namespace: ai
 components:
   - ../../components/common
 resources:
+  - ./hermes/ks.yaml
   - ./qdrant/ks.yaml

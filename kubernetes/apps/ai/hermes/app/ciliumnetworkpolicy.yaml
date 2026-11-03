@@ -1,0 +1,17 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: hermes
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: hermes
+      app.kubernetes.io/name: hermes
+  ingress:
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "9119"
+              protocol: TCP
