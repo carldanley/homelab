@@ -16,13 +16,37 @@ spec:
         replicas: 1
         strategy: Recreate
         annotations:
-          configmap.reloader.stakater.com/reload: hermes-config
+          configmap.reloader.stakater.com/reload: hermes-config,hermes-bootstrap
           secret.reloader.stakater.com/reload: hermes-secret
-        containers:
-          app:
-            image:
+        initContainers:
+          install-claude:
+            image: &hermesImage
               repository: docker.io/nousresearch/hermes-agent
               tag: v0.22.6@sha256:d27689bc6e8581ec884a7227c9101fdaebf6c853cff8859020dac14f21452b4d
+            command:
+              - /usr/bin/python3
+              - /etc/hermes-bootstrap/install-claude.py
+            env:
+              HOME: /opt/data
+              HERMES_HOME: /opt/data
+            securityContext:
+              runAsNonRoot: true
+              runAsUser: 10000
+              runAsGroup: 10000
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 512Mi
+        containers:
+          app:
+            image: *hermesImage
             args:
               - gateway
               - run
@@ -35,6 +59,9 @@ spec:
               HERMES_DASHBOARD_PORT: &port 9119
               HERMES_DASHBOARD_PUBLIC_URL: "https://hermes.${DOMAIN_5}"
               API_SERVER_ENABLED: "false"
+              CLAUDE_CONFIG_DIR: /opt/data/.claude
+              CLAUDE_SUBSCRIPTION_DIRECTSDK_COMMAND: /opt/data/.local/bin/claude
+              DISABLE_UPDATES: "1"
             envFrom:
               - secretRef:
                   name: hermes-secret
@@ -146,6 +173,14 @@ spec:
         existingClaim: hermes
         globalMounts:
           - path: /opt/data
+      bootstrap:
+        type: configMap
+        name: hermes-bootstrap
+        advancedMounts:
+          app:
+            install-claude:
+              - path: /etc/hermes-bootstrap
+                readOnly: true
       config:
         type: configMap
         name: hermes-config
