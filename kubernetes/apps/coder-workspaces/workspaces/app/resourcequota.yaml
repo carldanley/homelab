@@ -33,14 +33,14 @@ metadata:
   name: coder-workspaces
 spec:
   hard:
-    pods: "4"
+    pods: "8"
     requests.cpu: "8"
     requests.memory: 32Gi
     requests.ephemeral-storage: 8Gi
     limits.cpu: "32"
     limits.memory: 128Gi
     limits.ephemeral-storage: 32Gi
-    persistentvolumeclaims: "4"
+    persistentvolumeclaims: "20"
     requests.storage: 800Gi
     services.loadbalancers: "0"
     services.nodeports: "0"
