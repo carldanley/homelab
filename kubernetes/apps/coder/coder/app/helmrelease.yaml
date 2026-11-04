@@ -45,6 +45,11 @@ spec:
           value: "false"
         - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
           value: "false"
+        # Required by the remote MCP endpoint; password login remains enabled.
+        - name: CODER_OAUTH2_PROVIDER_ENABLE
+          value: "true"
+        - name: CODER_EXPERIMENTS
+          value: mcp-server-http
         - name: CODER_PROVISIONER_DAEMONS
           value: "1"
         - name: CODER_TELEMETRY_ENABLE
