@@ -10,6 +10,11 @@ spec:
       app.kubernetes.io/name: *app
   interval: 1h
   path: ./kubernetes/apps/coder-workspaces/workspaces/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
   prune: true
   sourceRef:
     kind: GitRepository

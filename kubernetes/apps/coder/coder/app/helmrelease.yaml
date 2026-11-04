@@ -33,6 +33,7 @@ spec:
       service:
         type: ClusterIP
       serviceAccount:
+        # Provisioner permissions are bound only in coder-workspaces.
         workspacePerms: false
         enableDeployments: false
       env:
@@ -44,8 +45,6 @@ spec:
           value: "false"
         - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
           value: "false"
-        # Keep the control plane healthy; templates and Kubernetes workspace
-        # permissions are configured in a later, separately reviewed step.
         - name: CODER_PROVISIONER_DAEMONS
           value: "1"
         - name: CODER_TELEMETRY_ENABLE
@@ -105,7 +104,7 @@ spec:
             patch: |-
               - op: add
                 path: /spec/template/spec/automountServiceAccountToken
-                value: false
+                value: true
               - op: add
                 path: /spec/template/spec/enableServiceLinks
                 value: false

@@ -9,6 +9,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
+    - name: coder-workspaces
+      namespace: coder-workspaces
     - name: cloudnative-pg-cluster
       namespace: databases
     - name: cilium-gateway

@@ -9,7 +9,8 @@ spec:
     - Ingress
     - Egress
   ingress: []
-  # Template-specific policies will allow Coder, Git, and build dependencies.
+  # Coder connectivity is allowed separately; Git and build dependencies remain
+  # denied until a template-specific policy permits them.
   egress:
     - to:
         - namespaceSelector:

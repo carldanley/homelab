@@ -1,0 +1,20 @@
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: coder-workspace-control-plane
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: coder-workspace
+  egress:
+    # The agent downloads its binary and maintains its connection through the
+    # internal HTTPS gateway. Restrict TLS SNI to Coder on the shared gateway.
+    - toEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+          serverNames:
+            - coder.${DOMAIN_5}
