@@ -1,0 +1,46 @@
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: coder-workspaces
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: "2"
+        memory: 8Gi
+        ephemeral-storage: 2Gi
+      default:
+        cpu: "8"
+        memory: 32Gi
+        ephemeral-storage: 8Gi
+      min:
+        cpu: 100m
+        memory: 128Mi
+      max:
+        cpu: "8"
+        memory: 32Gi
+        ephemeral-storage: 8Gi
+    - type: PersistentVolumeClaim
+      min:
+        storage: 1Gi
+      max:
+        storage: 200Gi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: coder-workspaces
+spec:
+  hard:
+    pods: "4"
+    requests.cpu: "8"
+    requests.memory: 32Gi
+    requests.ephemeral-storage: 8Gi
+    limits.cpu: "32"
+    limits.memory: 128Gi
+    limits.ephemeral-storage: 32Gi
+    persistentvolumeclaims: "4"
+    requests.storage: 800Gi
+    services.loadbalancers: "0"
+    services.nodeports: "0"
