@@ -9,8 +9,8 @@ spec:
     - Ingress
     - Egress
   ingress: []
-  # Coder connectivity is allowed separately; Git and build dependencies remain
-  # denied until a template-specific policy permits them.
+  # Cilium policies allow Coder and public internet access for workspace pods.
+  # DNS is allowed here; other LAN and cluster destinations remain isolated.
   egress:
     - to:
         - namespaceSelector:
