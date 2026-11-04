@@ -1,0 +1,114 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: coder
+spec:
+  interval: 1h
+  url: https://helm.coder.com/v2
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: coder
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: coder
+      version: 2.38.6
+      sourceRef:
+        kind: HelmRepository
+        name: coder
+      interval: 1h
+  values:
+    coder:
+      image:
+        tag: v2.38.6@sha256:c9245405c482ede17699d65deb8c21488a17feff5497fc84d6a350c395da2bdd
+      replicaCount: 1
+      strategy:
+        type: Recreate
+      annotations:
+        secret.reloader.stakater.com/reload: coder-secret
+      service:
+        type: ClusterIP
+      serviceAccount:
+        workspacePerms: false
+        enableDeployments: false
+      env:
+        - name: CODER_ACCESS_URL
+          value: https://coder.${DOMAIN_5}
+        - name: CODER_PG_CONN_MAX_OPEN
+          value: "10"
+        - name: CODER_DISABLE_PASSWORD_AUTH
+          value: "false"
+        - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
+          value: "false"
+        # Keep the control plane healthy; templates and Kubernetes workspace
+        # permissions are configured in a later, separately reviewed step.
+        - name: CODER_PROVISIONER_DAEMONS
+          value: "1"
+        - name: CODER_TELEMETRY_ENABLE
+          value: "false"
+        - name: CODER_UPDATE_CHECK
+          value: "false"
+        - name: CODER_PROMETHEUS_ENABLE
+          value: "true"
+        - name: CODER_CACHE_DIRECTORY
+          value: /home/coder/.cache
+      envFrom:
+        - secretRef:
+            name: coder-secret
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+        seccompProfile:
+          type: RuntimeDefault
+      podSecurityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      resources:
+        requests:
+          cpu: "1"
+          memory: 2Gi
+          ephemeral-storage: 1Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi
+          ephemeral-storage: 2Gi
+      volumes:
+        - name: cache
+          emptyDir:
+            sizeLimit: 1Gi
+        - name: temp
+          emptyDir:
+            sizeLimit: 512Mi
+      volumeMounts:
+        - name: cache
+          mountPath: /home/coder/.cache
+        - name: temp
+          mountPath: /tmp
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              labelSelector: app.kubernetes.io/instance=coder
+            patch: |-
+              - op: add
+                path: /spec/template/spec/automountServiceAccountToken
+                value: false
+              - op: add
+                path: /spec/template/spec/enableServiceLinks
+                value: false
+              - op: add
+                path: /spec/template/spec/hostUsers
+                value: false

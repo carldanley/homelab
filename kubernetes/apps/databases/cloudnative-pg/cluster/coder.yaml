@@ -1,0 +1,35 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: coder-database
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: coder-database-secret
+    template:
+      type: kubernetes.io/basic-auth
+      metadata:
+        labels:
+          cnpg.io/reload: "true"
+      data:
+        username: coder
+        password: "{{ .password }}"
+  data:
+    - secretKey: password
+      remoteRef:
+        key: coder
+        property: CODER_POSTGRES_PASS
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: coder
+spec:
+  name: coder
+  owner: coder
+  cluster:
+    name: postgres
+  databaseReclaimPolicy: retain
