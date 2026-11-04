@@ -8,13 +8,15 @@ spec:
     matchLabels:
       app.kubernetes.io/name: coder-workspace
   egress:
-    # The agent downloads its binary and maintains its connection through the
-    # internal HTTPS gateway. Restrict TLS SNI to Coder on the shared gateway.
-    - toEntities:
-        - ingress
+    # Cilium evaluates pod-originated Gateway traffic against the selected
+    # backend pod and port. Allow only Coder; its ingress policy requires the
+    # HTTPS gateway, so direct workspace-to-control-plane traffic stays denied.
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: coder
+            k8s:app.kubernetes.io/instance: coder
+            k8s:app.kubernetes.io/name: coder
       toPorts:
         - ports:
-            - port: "443"
+            - port: "8080"
               protocol: TCP
-          serverNames:
-            - coder.${DOMAIN_5}
