@@ -45,6 +45,11 @@ spec:
           value: "false"
         - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
           value: "false"
+        # Workspace Git access; credentials come from coder-secret.
+        - name: CODER_EXTERNAL_AUTH_0_ID
+          value: github
+        - name: CODER_EXTERNAL_AUTH_0_TYPE
+          value: github
         # Required by the remote MCP endpoint; password login remains enabled.
         - name: CODER_OAUTH2_PROVIDER_ENABLE
           value: "true"
