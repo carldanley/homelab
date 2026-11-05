@@ -9,3 +9,4 @@ resources:
   - ./networkpolicy.yaml
   - ./ciliumnetworkpolicy.yaml
   - ./homelab-diagnostics.yaml
+  - ./externalsecret.yaml
