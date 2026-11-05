@@ -1,0 +1,32 @@
+# Cluster-scoped so the app's namespace transformer cannot relocate this rule.
+apiVersion: cilium.io/v2
+kind: CiliumClusterwideNetworkPolicy
+metadata:
+  name: happier-coder-private-egress
+specs:
+  - endpointSelector:
+      matchLabels:
+        k8s:io.kubernetes.pod.namespace: coder-workspaces
+        k8s:app.kubernetes.io/name: coder-workspace
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: ai
+              k8s:app.kubernetes.io/name: happier-proxy
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP
+  - endpointSelector:
+      matchLabels:
+        k8s:io.kubernetes.pod.namespace: homelab-workspaces
+        k8s:app.kubernetes.io/name: homelab-workspace
+    egress:
+      - toEndpoints:
+          - matchLabels:
+              k8s:io.kubernetes.pod.namespace: ai
+              k8s:app.kubernetes.io/name: happier-proxy
+        toPorts:
+          - ports:
+              - port: "8080"
+                protocol: TCP

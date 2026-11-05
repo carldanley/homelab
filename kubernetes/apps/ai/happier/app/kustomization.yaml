@@ -4,6 +4,18 @@ namespace: ai
 resources:
   - ./dnsendpoint.yaml
   - ./helmrelease.yaml
-  - ./proxy.yaml
-  - ./files.yaml
-  - ./network.yaml
+  - ./api-poddisruptionbudget.yaml
+  - ./proxy-configmap.yaml
+  - ./proxy-deployment.yaml
+  - ./proxy-service.yaml
+  - ./api-headless-service.yaml
+  - ./proxy-poddisruptionbudget.yaml
+  - ./happier-httproute.yaml
+  - ./files-deployment.yaml
+  - ./files-service.yaml
+  - ./files-poddisruptionbudget.yaml
+  - ./files-networkpolicy.yaml
+  - ./proxy-files-ciliumnetworkpolicy.yaml
+  - ./proxy-ciliumnetworkpolicy.yaml
+  - ./api-ingress-networkpolicy.yaml
+  - ./coder-private-egress-ciliumclusterwidenetworkpolicy.yaml
