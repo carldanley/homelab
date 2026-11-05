@@ -8,10 +8,10 @@ spec:
   releaseName: happier-redis
   chart:
     spec:
-      chart: ./charts/redis-ha
-      reconcileStrategy: Revision
+      chart: redis-ha
+      version: 4.39.0
       sourceRef:
-        kind: GitRepository
+        kind: HelmRepository
         name: happier-redis
         namespace: ai
   values:
