@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./poddisruptionbudget.yaml
-  - ./headless-service.yaml
-  - ./networkpolicy.yaml
-  - ./workspace-networkpolicy.yaml
+  - ./service.yaml
+  - ./networkpolicies.yaml

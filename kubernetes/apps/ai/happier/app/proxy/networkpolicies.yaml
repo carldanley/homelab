@@ -36,3 +36,22 @@ spec:
               protocol: TCP
             - port: "9090"
               protocol: TCP
+---
+# Extend the proxy's existing egress allowlist without changing network.yaml.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: happier-proxy-files
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: happier-proxy
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: ai
+            k8s:app.kubernetes.io/name: happier-files
+      toPorts:
+        - ports:
+            - port: '8080'
+              protocol: TCP

@@ -7,5 +7,4 @@ resources:
   - ./service.yaml
   - ./httproute.yaml
   - ./poddisruptionbudget.yaml
-  - ./networkpolicy.yaml
-  - ./files-networkpolicy.yaml
+  - ./networkpolicies.yaml

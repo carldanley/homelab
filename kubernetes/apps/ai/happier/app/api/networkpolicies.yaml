@@ -1,3 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: happier-api-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: happier
+      app.kubernetes.io/controller: api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: happier-proxy
+      ports:
+        - port: 3005
+          protocol: TCP
+        - port: 9090
+          protocol: TCP
+---
 # Cluster-scoped so the app's namespace transformer cannot relocate this rule.
 apiVersion: cilium.io/v2
 kind: CiliumClusterwideNetworkPolicy
