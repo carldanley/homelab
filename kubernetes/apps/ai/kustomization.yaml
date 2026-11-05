@@ -9,12 +9,6 @@ resources:
   - ./hermes/ks.yaml
   - ./qdrant/ks.yaml
   - ./happier/ks.yaml
-  - ./happier/ks-database.yaml
-  - ./happier/ks-happier.yaml
-  - ./happier/ks-bucket.yaml
-  - ./happier/ks-redis.yaml
-  - ./happier/ks-credentials.yaml
-  - ./happier/ks-migration.yaml
 patches:
   - patch: |-
       apiVersion: v1
