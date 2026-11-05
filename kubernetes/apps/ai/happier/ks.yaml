@@ -1,0 +1,40 @@
+---
+# Draft scaffold: do not resume until README acceptance gates are resolved.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: happier-database
+  namespace: ai
+spec:
+  suspend: true
+  interval: 1h
+  path: ./kubernetes/apps/ai/happier/database
+  prune: true
+  targetNamespace: databases
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: happier
+  namespace: ai
+spec:
+  suspend: true
+  interval: 1h
+  path: ./kubernetes/apps/ai/happier/app
+  prune: true
+  targetNamespace: ai
+  dependsOn:
+    - name: happier-database
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: domains-secret
+        optional: false
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system

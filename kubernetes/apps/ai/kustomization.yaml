@@ -8,3 +8,4 @@ components:
 resources:
   - ./hermes/ks.yaml
   - ./qdrant/ks.yaml
+  - ./happier/ks.yaml
