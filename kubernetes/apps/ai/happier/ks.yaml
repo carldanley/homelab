@@ -1,5 +1,4 @@
 ---
-# Application stages remain suspended pending operator acceptance.
 # Database credentials reconcile independently to gate the shared PostgreSQL role.
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -38,7 +37,6 @@ metadata:
   name: happier-database
   namespace: ai
 spec:
-  suspend: true
   dependsOn:
     - name: cloudnative-pg-cluster
       namespace: databases
@@ -59,7 +57,6 @@ metadata:
   name: happier
   namespace: ai
 spec:
-  suspend: true
   interval: 1h
   path: ./kubernetes/apps/ai/happier/app
   prune: true
@@ -115,7 +112,6 @@ metadata:
   name: happier-redis
   namespace: ai
 spec:
-  suspend: true
   interval: 1h
   path: ./kubernetes/apps/ai/happier/redis
   prune: true
@@ -133,7 +129,6 @@ metadata:
   name: happier-credentials
   namespace: ai
 spec:
-  suspend: true
   interval: 1h
   path: ./kubernetes/apps/ai/happier/credentials
   prune: true
@@ -151,7 +146,6 @@ metadata:
   name: happier-migration
   namespace: ai
 spec:
-  suspend: true
   interval: 1h
   path: ./kubernetes/apps/ai/happier/migration
   prune: true
@@ -162,7 +156,7 @@ spec:
   healthChecks:
     - apiVersion: batch/v1
       kind: Job
-      name: happier-migration
+      name: happier-migrate-fc8c6c32
       namespace: ai
   timeout: 15m
   sourceRef:

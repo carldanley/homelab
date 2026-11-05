@@ -40,7 +40,6 @@ spec:
               PORT: "3005"
               S3_REGION: us-east-1
               S3_USE_SSL: "false"
-              # File publication route must be completed before unsuspending.
               S3_PUBLIC_URL: https://happier.${DOMAIN_5}/files
               S3_HOST:
                 valueFrom:
