@@ -1,0 +1,11 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: happier
+  namespace: databases
+spec:
+  name: happier
+  owner: happier
+  cluster:
+    name: postgres
+  databaseReclaimPolicy: retain

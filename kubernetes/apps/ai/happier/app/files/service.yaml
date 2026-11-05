@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: happier-files
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: happier-files
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: happier-redis
+  namespace: ai
+spec:
+  type: ClusterIP
+  selector:
+    release: happier-redis
+    app: redis-ha-haproxy
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+      protocol: TCP

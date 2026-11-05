@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  # Job templates are immutable: change this digest suffix with every image upgrade.
+  # Keep completed Jobs for Flux health checks; do not add TTL cleanup.
+  name: happier-migrate-fc8c6c32
+  namespace: ai
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      automountServiceAccountToken: false
+      enableServiceLinks: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migration
+          image: ghcr.io/happier-dev/relay-server:cli-v0.2.20@sha256:fc8c6c326f1fa43d98005d0410dd1f5ecedd7cf2290c232f9ff4072e58690560
+          command:
+            - /usr/local/bin/run-server
+            - --migrate-only
+            - /opt/happier/server/happier-server
+          env:
+            - name: HAPPIER_SERVER_FLAVOR
+              value: full
+            - name: HAPPIER_DB_PROVIDER
+              value: postgres
+          envFrom:
+            - secretRef:
+                name: happier-secret
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi

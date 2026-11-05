@@ -1,0 +1,60 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: happier-redis
+  namespace: ai
+spec:
+  interval: 1h
+  releaseName: happier-redis
+  chart:
+    spec:
+      chart: redis-ha
+      version: 4.39.0
+      sourceRef:
+        kind: HelmRepository
+        name: happier-redis
+        namespace: ai
+  values:
+    replicas: 3
+    auth: true
+    existingSecret: happier-redis-secret
+    authKey: password
+    image:
+      repository: public.ecr.aws/docker/library/redis
+      tag: 8.10.3@sha256:f245f4c83b84a9e9a0588da1c9456e579455310f0945d5db52cd2ba27f2000cc
+    hardAntiAffinity: true
+    podDisruptionBudget:
+      minAvailable: 2
+    serviceAccount:
+      create: true
+      automountToken: false
+    rbac:
+      create: false
+    persistentVolume:
+      enabled: true
+      storageClass: ceph-block
+      accessModes:
+        - ReadWriteOnce
+      size: 2Gi
+    redis:
+      config:
+        appendonly: "yes"
+        appendfsync: everysec
+        maxmemory-policy: noeviction
+    sentinel:
+      quorum: 2
+      auth: true
+      existingSecret: happier-redis-secret
+      authKey: password
+    haproxy:
+      enabled: true
+      replicas: 2
+      image:
+        repository: public.ecr.aws/docker/library/haproxy
+        tag: 3.3.10-alpine@sha256:29c775f541ba6364ac95de998a8d3d16eb4882470c4fd7bbe8de8315edfdd883
+      hardAntiAffinity: true
+      podDisruptionBudget:
+        minAvailable: 1
+      serviceAccount:
+        create: true
+        automountToken: false
