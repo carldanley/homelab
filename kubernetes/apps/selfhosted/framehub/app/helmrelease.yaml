@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/carldanley/imframe
-              tag: 0.4.0@sha256:11279a61fbe06d4d4752bbc78d6ce0e0a44a81bfb5be641bebba6158753d81a0
+              tag: 0.4.1@sha256:4ff3e7ebacbeda275a92e21b559df4984cc5d3b1b92fc6716af7c085ce4dcdfb
             env:
               IMFRAME_MODE: hub
               DATA_DIR: /data
