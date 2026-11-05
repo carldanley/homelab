@@ -24,6 +24,17 @@ spec:
         connectionLimit: 20
         passwordSecret:
           name: coder-database-secret
+      - name: happier
+        ensure: present
+        login: true
+        superuser: false
+        createdb: false
+        createrole: false
+        replication: false
+        bypassrls: false
+        connectionLimit: 20
+        passwordSecret:
+          name: happier-database-secret
   postgresql:
     parameters:
       max_connections: "200"

@@ -1,5 +1,37 @@
 ---
-# Source-only stages remain suspended pending operator acceptance.
+# Application stages remain suspended pending operator acceptance.
+# Database credentials reconcile independently to gate the shared PostgreSQL role.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: happier-database-credentials
+  namespace: ai
+spec:
+  suspend: false
+  interval: 1h
+  path: ./kubernetes/apps/ai/happier/database-credentials
+  prune: true
+  targetNamespace: databases
+  dependsOn:
+    - name: onepassword-store
+      namespace: external-secrets
+  healthChecks:
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: happier-database
+      namespace: databases
+  healthCheckExprs:
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      inProgress: "!has(status.conditions) || !status.conditions.exists(c, c.type == 'Ready')"
+      failed: "has(status.conditions) && status.conditions.exists(c, c.type == 'Ready' && c.status == 'False')"
+      current: "has(status.conditions) && status.conditions.exists(c, c.type == 'Ready' && c.status == 'True')"
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -7,6 +39,11 @@ metadata:
   namespace: ai
 spec:
   suspend: true
+  dependsOn:
+    - name: cloudnative-pg-cluster
+      namespace: databases
+  wait: true
+  timeout: 5m
   interval: 1h
   path: ./kubernetes/apps/ai/happier/database
   prune: true
