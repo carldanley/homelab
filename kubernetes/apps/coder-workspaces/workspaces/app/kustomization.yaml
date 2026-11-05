@@ -8,3 +8,4 @@ resources:
   - ./rbac.yaml
   - ./networkpolicy.yaml
   - ./ciliumnetworkpolicy.yaml
+  - ./homelab-diagnostics.yaml
