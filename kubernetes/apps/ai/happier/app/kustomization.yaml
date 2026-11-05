@@ -3,3 +3,6 @@ kind: Kustomization
 namespace: ai
 resources:
   - ./dnsendpoint.yaml
+  - ./helmrelease.yaml
+  - ./proxy.yaml
+  - ./network.yaml
