@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: happier-redis
+  namespace: ai
+spec:
+  interval: 1h
+  url: https://github.com/DandyDeveloper/charts
+  ref:
+    commit: 6224454507be15acba7a619c33fa6148a06bcf85
