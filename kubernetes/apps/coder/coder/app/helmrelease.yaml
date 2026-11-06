@@ -39,6 +39,8 @@ spec:
       env:
         - name: CODER_ACCESS_URL
           value: https://coder.${DOMAIN_5}
+        - name: CODER_MAX_TOKEN_LIFETIME
+          value: "26280h"
         - name: CODER_PG_CONN_MAX_OPEN
           value: "10"
         - name: CODER_DISABLE_PASSWORD_AUTH
