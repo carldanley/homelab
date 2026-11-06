@@ -183,7 +183,7 @@ spec:
           automountServiceAccountToken: false
           containers:
             - name: reconciler
-              image: docker.io/library/python:3.15.2-alpine3.24@sha256:2b4b04f31a4a009c1fadf7ce9338471f288488199cf43dcd1af71f244ea550aa
+              image: docker.io/library/python:3.15.2-alpine3.24@sha256:d499023466546cd88a358f80b46fba4016f32597bc4482bb1c47b483a07d457d
               command:
                 - python
                 - -B
