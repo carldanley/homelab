@@ -131,7 +131,7 @@ spec:
   healthChecks:
     - apiVersion: batch/v1
       kind: Job
-      name: happier-migrate-fc8c6c32
+      name: happier-migrate-fc8c6c32-v2
       namespace: ai
   timeout: 15m
   sourceRef:
