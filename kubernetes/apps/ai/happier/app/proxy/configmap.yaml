@@ -52,11 +52,16 @@ data:
       http-response deny deny_status 403 if { res.hdr(Content-Type) -m beg -i text/html }
       server reader happier-files.ai.svc.cluster.local:8080 check resolvers kubernetes resolve-prefer ipv4 init-addr none
     backend api
-      balance roundrobin
+      # Cilium Gateway appends the downstream peer IP to XFF. Only its reserved
+      # ingress identity may reach this proxy; ignore client-supplied XFF prefixes.
+      # Keep polling GET/POST and WebSocket upgrades together without client cookies.
+      balance hash req.hdr_ip(x-forwarded-for,-1)
+      hash-type consistent
+      # DNS answers can occupy different template slots on each proxy replica.
+      # Build the same ring from pod addresses, not slot IDs.
+      default-server hash-key addr
+      # IP/backend membership changes require Engine.IO to reconnect; state is local.
       option redispatch
-      cookie SRV insert indirect nocache dynamic httponly secure attr SameSite=Lax
-      # Public routing salt, not an authentication secret; identical on both replicas.
-      dynamic-cookie-key happier-api-routing-v1
       option httpchk
       http-check connect port 9090
       http-check send meth GET uri /ready ver HTTP/1.1 hdr Host localhost
