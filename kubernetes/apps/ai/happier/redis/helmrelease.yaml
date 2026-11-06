@@ -51,7 +51,7 @@ spec:
       replicas: 2
       image:
         repository: public.ecr.aws/docker/library/haproxy
-        tag: 3.3.10-alpine@sha256:29c775f541ba6364ac95de998a8d3d16eb4882470c4fd7bbe8de8315edfdd883
+        tag: 3.4.7-alpine@sha256:5312d37032c079c4937d45ef63758852434351f3b425a3703521fd999837abcf
       hardAntiAffinity: true
       podDisruptionBudget:
         minAvailable: 1
