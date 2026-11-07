@@ -1,0 +1,31 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: jellyfin-external
+  labels:
+    dns.homelab/external: "true"
+spec:
+  endpoints:
+    - dnsName: "jellyfin.${DOMAIN_5}"
+      recordTTL: 60
+      recordType: A
+      targets:
+        - "${JELLYFIN_WAN_IP}"
+      providerSpecific:
+        - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: "false"
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: jellyfin-internal
+  labels:
+    dns.homelab/external: "false"
+spec:
+  endpoints:
+    - dnsName: "jellyfin.${DOMAIN_5}"
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - "internal.${DOMAIN_5}"

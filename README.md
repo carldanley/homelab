@@ -130,6 +130,7 @@ For random notes I've taken the time to jot down, see the following links:
 - [Checking Synology SSD Cache](./docs/checking-synology-ssd-cache.md)
 - [Powerwall Dashboard](./docs/powerwall-dashboard.md)
 - [Backup and Restore](./docs/backup-and-restore.md)
+- [Jellyfin on TrueNAS](./docs/jellyfin.md)
 
 For fonts, see [Noto Emoji Animations](https://googlefonts.github.io/noto-emoji-animation/).
 

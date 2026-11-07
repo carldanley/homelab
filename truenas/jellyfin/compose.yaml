@@ -1,0 +1,33 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.4@sha256:7da5184caa38c553f219f6772476540081f392a68049e2b68c923f6daf877f8e
+    container_name: jellyfin
+    user: "568:568"
+    group_add:
+      - "107" # TrueNAS render group
+    network_mode: host
+    environment:
+      TZ: America/New_York
+    devices:
+      - source: /dev/dri/by-path/pci-0000:c9:00.0-render
+        target: /dev/dri/renderD128
+        permissions: rwm
+    volumes:
+      - /mnt/zpool/jellyfin/config:/config
+      - /mnt/zpool/jellyfin/cache:/cache
+      - /mnt/zpool/jellyfin/transcodes:/transcodes
+      - /mnt/zpool/jellyfin/recordings:/recordings
+      - /mnt/zpool/media/movies:/data/movies:ro
+      - /mnt/zpool/media/series:/data/series:ro
+      - /mnt/zpool/media/music:/data/music:ro
+      - /mnt/zpool/media/dvr:/data/dvr:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    cpus: 8
+    mem_limit: 8g
+    restart: unless-stopped

@@ -1,0 +1,31 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: jellyfin
+  annotations:
+    gatus.home-operations.com/endpoint: |-
+      ui:
+        hide-hostname: true
+        hide-port: true
+        hide-url: true
+spec:
+  gatewayClassName: cilium
+  addresses:
+    - type: IPAddress
+      value: 10.50.50.3
+  listeners:
+    - name: jellyfin-https
+      protocol: HTTPS
+      port: 443
+      hostname: "jellyfin.${DOMAIN_5}"
+      allowedRoutes:
+        namespaces:
+          from: Selector
+          selector:
+            matchLabels:
+              kubernetes.io/metadata.name: non-cluster-services
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-certificate-tls
