@@ -13,17 +13,6 @@ spec:
   superuserSecret:
     name: cloudnative-pg-secret
   enableSuperuserAccess: true
-  managed:
-    roles:
-      - name: coder
-        ensure: present
-        login: true
-        superuser: false
-        createdb: false
-        createrole: false
-        connectionLimit: 20
-        passwordSecret:
-          name: coder-database-secret
   postgresql:
     parameters:
       max_connections: "200"
