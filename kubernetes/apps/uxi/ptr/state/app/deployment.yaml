@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: state
-          image: git.r1p.dev/unbound-xi/server-state:v0.9.0@sha256:b3019d8df7e7cd0fde8b47a25d587ae1ba7e17359c8d059cb14eb42b8fb79edd
+          image: git.r1p.dev/unbound-xi/server-state:v0.10.0@sha256:5539c0d5a6cfe9a0101e2348cdc7a706aad8f4933db9dc4572a9ee02374f271c
           imagePullPolicy: IfNotPresent
           command:
             - unbound-state
