@@ -1,12 +1,10 @@
 ---
-# Zone groups for PTR, kept small to start: each nation's city areas on
-# one worker, Jeuno on one, and the two levelling hot spots, Valkurm Dunes
-# and Qufim Island, on a worker each. Everything else is unlisted and falls
-# to the claims-all worker (../../map-worker), Aht Urhgan and Limbus among
-# it, since neither is accessible on PTR yet. A map may appear in one group
-# only; the chart refuses a duplicate idBase, and a listed map is offered
-# only to its group, never to the claims-all worker, so an empty group means
-# an ownerless zone.
+# Each nation's city areas run on one worker. Other zones present in the
+# image fall to the claims-all worker (../../map-worker). Jeuno, Valkurm
+# Dunes and Qufim Island are absent from the v0.12.0 content index; workers
+# configured for those zones refuse to start. Add groups only for zones
+# shipped in the image. A map may appear in one group only; a listed map
+# is offered only to its group, never to the claims-all worker.
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -47,15 +45,3 @@ spec:
       - name: windurst
         idBase: 300
         zones: [238, 239, 240, 241, 242]
-      # RuLude Gardens, Upper Jeuno, Lower Jeuno, Port Jeuno
-      - name: jeuno
-        idBase: 400
-        zones: [243, 244, 245, 246]
-      # Valkurm Dunes
-      - name: valkurm-dunes
-        idBase: 500
-        zones: [103]
-      # Qufim Island
-      - name: qufim
-        idBase: 600
-        zones: [126]
