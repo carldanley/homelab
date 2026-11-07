@@ -72,9 +72,6 @@ spec:
       namespace: *namespace
     - name: openebs
       namespace: openebs-system
-    # Shared reconciliation pauses if Happier database credentials are not Ready.
-    - name: happier-database-credentials
-      namespace: ai
   healthCheckExprs:
     - apiVersion: postgresql.cnpg.io/v1
       kind: Cluster
