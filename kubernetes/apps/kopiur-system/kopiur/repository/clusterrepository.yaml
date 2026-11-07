@@ -6,7 +6,6 @@ metadata:
 spec:
   allowedNamespaces:
     list:
-      - ai
       - home-automation
       - identity
       - kopiur-system
