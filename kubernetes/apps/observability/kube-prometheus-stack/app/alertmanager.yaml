@@ -38,7 +38,7 @@ spec:
   automountServiceAccountToken: true
   externalUrl: "https://alerts.${DOMAIN_5}"
   hostNetwork: false
-  image: quay.io/prometheus/alertmanager:v0.34.2
+  image: quay.io/prometheus/alertmanager:v0.35.0
   imagePullPolicy: IfNotPresent
   listenLocal: false
   logFormat: logfmt
