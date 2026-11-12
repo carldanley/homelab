@@ -20,5 +20,5 @@ yq = "4.54.3"
 
 # Used by the Talos templates. This goes through Cargo because minijinja-cli's
 # prebuilt installer is not managed by mise's aqua registry consistently.
-rust = "1.99.1"
+rust = "1.100.0"
 "cargo:minijinja-cli" = "3.1.0"
