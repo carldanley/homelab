@@ -31,6 +31,7 @@ spec:
       retries: 3
   values:
     namePrefix: uxi-ptr-zone
+    workerPtr: true
     image: git.r1p.dev/unbound-xi/server-worker:v0.13.0@sha256:0f91dec682fece9525e717ff49b906c5873f7d2a38a8d645fa23873807871c75
     groups:
       # Southern San dOria, Northern San dOria, Port San dOria, Chateau dOraguille

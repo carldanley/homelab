@@ -39,6 +39,8 @@ spec:
           env:
             - name: UNBOUND_CONFIG
               value: /config/config.toml
+            - name: UNBOUND_WORKER_PTR
+              value: 'true'
             - name: UNBOUND_LOG_FORMAT
               value: json
             - name: RUST_LOG

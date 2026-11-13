@@ -12,6 +12,7 @@ image: ""
 imagePullPolicy: IfNotPresent
 
 environment: ptr
+workerPtr: false
 apiInternalAddr: uxi-ptr-api-internal:21017
 busUrl: nats://nats.uxi-nats.svc.cluster.local:4222
 busUsername: ptr
