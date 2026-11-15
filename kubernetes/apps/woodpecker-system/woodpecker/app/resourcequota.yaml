@@ -29,13 +29,14 @@ metadata:
 spec:
   hard:
     pods: "30"
-    requests.cpu: "12"
-    requests.memory: 24Gi
+    # Shared by both workflow slots, their service pods, and Woodpecker itself.
+    requests.cpu: "24"
+    requests.memory: 48Gi
     requests.ephemeral-storage: 100Gi
-    limits.cpu: "24"
-    limits.memory: 48Gi
+    limits.cpu: "48"
+    limits.memory: 96Gi
     limits.ephemeral-storage: 300Gi
     persistentvolumeclaims: "25"
     requests.storage: 250Gi
     services: "30"
-    secrets: "50"
+    secrets: "200"
