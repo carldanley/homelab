@@ -32,7 +32,7 @@ spec:
   values:
     namePrefix: uxi-ptr-zone
     workerPtr: true
-    image: git.r1p.dev/unbound-xi/server-worker:v0.13.0@sha256:0f91dec682fece9525e717ff49b906c5873f7d2a38a8d645fa23873807871c75
+    image: git.r1p.dev/unbound-xi/server-worker:v0.14.0@sha256:be686225061e1a899c0c57a4ce808ca386f73d62d70365119f5833b8e89bfa97
     groups:
       # Southern San dOria, Northern San dOria, Port San dOria, Chateau dOraguille
       - name: san-doria
