@@ -31,7 +31,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: social
-          image: git.r1p.dev/unbound-xi/server-social:v0.5.0@sha256:1ff7d64a439a128d5af8205614a57d84e8f148fb4c14e0a97f390bf1860a3669
+          image: git.r1p.dev/unbound-xi/server-social:v0.5.1@sha256:4a6d0ce72039cbcf292388c011a0121ea0fa8947eb89db4dac14d7a82cd5ebc5
           imagePullPolicy: IfNotPresent
           command:
             - unbound-social
