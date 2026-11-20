@@ -2,5 +2,25 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./grafanadashboard.yaml
+  - ./grafanadashboard-uxi-ptr-services.yaml
+  - ./grafanadashboard-uxi-game.yaml
+  - ./grafanadashboard-uxi-services.yaml
   - ./prometheusrule.yaml
+
+configMapGenerator:
+  - name: grafana-dashboard-uxi-ptr-services
+    files:
+      - uxi-ptr-services.json=./resources/uxi-ptr-services.json
+  # Imported from unboundxi/server/deploy/grafana/dashboards. The Services
+  # dashboard's scrape-health panel uses the cluster's PodMonitor component label.
+  - name: grafana-dashboard-uxi-game
+    files:
+      - uxi-game.json=./resources/uxi-game.json
+  - name: grafana-dashboard-uxi-services
+    files:
+      - uxi-services.json=./resources/uxi-services.json
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/managed-by: grafana-operator

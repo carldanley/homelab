@@ -1,0 +1,643 @@
+{
+  "uid": "uxi-game",
+  "title": "UnboundXI — Game",
+  "description": "Aggregate gameplay: who plays what, how fast they progress, how fights go, what they use and how they talk. No figure here names a player.",
+  "tags": ["unboundxi", "game"],
+  "editable": false,
+  "graphTooltip": 1,
+  "timezone": "browser",
+  "refresh": "1m",
+  "schemaVersion": 41,
+  "version": 1,
+  "time": { "from": "now-24h", "to": "now" },
+  "links": [
+    { "title": "Services", "type": "link", "url": "/d/uxi-services", "icon": "dashboard", "keepTime": true }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "label": "Data source",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": { "text": "Prometheus", "value": "prometheus" },
+        "hide": 0
+      },
+      {
+        "name": "job",
+        "label": "Job",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(unbound_worker_played_seconds_total, player_job)", "refId": "job" },
+        "definition": "label_values(unbound_worker_played_seconds_total, player_job)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "sort": 1
+      },
+      {
+        "name": "band",
+        "label": "Level band",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(unbound_worker_played_seconds_total, band)", "refId": "band" },
+        "definition": "label_values(unbound_worker_played_seconds_total, band)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "sort": 1
+      },
+      {
+        "name": "zone",
+        "label": "Zone",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(unbound_worker_players, zone)", "refId": "zone" },
+        "definition": "label_values(unbound_worker_players, zone)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": { "text": "All", "value": "$__all" },
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Overview — now",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "text",
+      "title": "Reading these figures",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
+      "options": {
+        "mode": "markdown",
+        "content": "Aggregates only: job, level band (or level), zone, monster family, content slug, reason, solo or party. Nothing names a character, account or session.\n\nPanels marked **lab** read the same figure `cargo xtask lab-sweep` prints: *kill time* is its median time to kill from engage, *experience per played hour* its `--chain` pace. Pick the job and band here, then sweep the same job and levels (docs/spec/deployment.md, \"The admin dashboards\").\n\nFigures over **the time range** use the picker above; *now* panels read the last scrape."
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Players online",
+      "description": "Characters in zone on every worker, under the job, band and zone picked.",
+      "gridPos": { "h": 3, "w": 3, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum(unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"})", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Sessions on gateways",
+      "description": "Connections admitted and running on every gateway, the ones still on their way into a zone included.",
+      "gridPos": { "h": 3, "w": 3, "x": 9, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum(unbound_gateway_sessions)", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Logins in range",
+      "description": "Sessions the gateways admitted over the time range.",
+      "gridPos": { "h": 3, "w": 3, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum(increase(unbound_gateway_sessions_total[$__range]))", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Sessions ended in range",
+      "description": "Admitted sessions that ended over the time range: by the client's own logout, or disconnected for any other reason.",
+      "gridPos": { "h": 3, "w": 3, "x": 15, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (reason) (increase(unbound_gateway_session_ends_total[$__range]))", "legendFormat": "{{reason}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value_and_name", "orientation": "horizontal" }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Median session length",
+      "description": "The middle session's length, admission to end, among sessions that ended over the time range; interpolated within its bucket.",
+      "gridPos": { "h": 3, "w": 3, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.5, sum by (le) (increase(unbound_gateway_session_seconds_bucket[$__range])))", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value" }
+    },
+    {
+      "id": 8,
+      "type": "piechart",
+      "title": "Solo or in a party now",
+      "description": "Characters in zone by whether their social card names a party (an alliance counts as a party).",
+      "gridPos": { "h": 6, "w": 3, "x": 21, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (group) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"})", "legendFormat": "{{group}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "pieType": "donut", "legend": { "displayMode": "list", "placement": "bottom", "values": ["value"] }, "displayLabels": [] }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Players online, solo and in a party",
+      "gridPos": { "h": 3, "w": 15, "x": 6, "y": 4 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (group) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"})", "legendFormat": "{{group}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 30 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "right" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Logins and session ends per hour",
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(unbound_gateway_sessions_total[$__rate_interval])) * 3600", "legendFormat": "logins" },
+        { "refId": "B", "expr": "sum by (reason) (rate(unbound_gateway_session_ends_total[$__rate_interval])) * 3600", "legendFormat": "ended: {{reason}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "custom": { "fillOpacity": 10 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "id": 11,
+      "type": "bargauge",
+      "title": "Session length, sessions ended in range",
+      "description": "Sessions that ended over the time range, by length: each bar counts the sessions longer than the bound before it and at most its own, in seconds (60 a minute, 3600 an hour, 86400 a day).",
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (le) (increase(unbound_gateway_session_seconds_bucket[$__range]))", "legendFormat": "{{le}}", "instant": true, "format": "heatmap" }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.le}", "unit": "none", "decimals": 0, "color": { "mode": "continuous-BlPu" } }, "overrides": [] },
+      "options": { "orientation": "vertical", "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 20,
+      "type": "row",
+      "title": "Population",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "panels": []
+    },
+    {
+      "id": 21,
+      "type": "bargauge",
+      "title": "Players by job now",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (player_job) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"}))", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 22,
+      "type": "bargauge",
+      "title": "Players by level band now",
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (band) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"})", "legendFormat": "{{band}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "min": 0, "displayName": "${__field.labels.band}", "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 23,
+      "type": "bargauge",
+      "title": "Players by zone now",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (zone) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"}) > 0)", "legendFormat": "{{zone}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.zone}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 24,
+      "type": "bargauge",
+      "title": "Hours played by job in range",
+      "description": "Character-hours in zone over the time range: what jobs people actually spend their time on, not only who is on now.",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (player_job) (increase(unbound_worker_played_seconds_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / 3600)", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "h", "decimals": 1, "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 25,
+      "type": "table",
+      "title": "Hours played by job and level band in range",
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (player_job, band) (increase(unbound_worker_played_seconds_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / 3600", "instant": true, "format": "table" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "h", "decimals": 1 }, "overrides": [] },
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true }, "renameByName": { "Value": "hours" } } },
+        { "id": "groupingToMatrix", "options": { "columnField": "band", "rowField": "player_job", "valueField": "hours" } }
+      ],
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
+      "id": 26,
+      "type": "timeseries",
+      "title": "Players online by job",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (player_job) (unbound_worker_players{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"})", "legendFormat": "{{player_job}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 20 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "right" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "id": 30,
+      "type": "row",
+      "title": "Progression",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 33 },
+      "panels": []
+    },
+    {
+      "id": 31,
+      "type": "bargauge",
+      "title": "Median played time to the next level, by level",
+      "description": "Played seconds from reaching a level to reaching the next, for the jobs picked, among level-ups over the time range. Timed within one stay on a worker, from a level-up seen there or a bar at nothing on arrival; levels never seen reached are not timed.",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 34 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort(histogram_quantile(0.5, sum by (level, le) (increase(unbound_worker_level_up_seconds_bucket{player_job=~\"$job\"}[$__range]))) >= 0)", "legendFormat": "{{level}} → next", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.level} → next", "unit": "s", "decimals": 0, "min": 0, "color": { "mode": "continuous-GrYlRd" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 32,
+      "type": "table",
+      "title": "Level-ups timed in range, by job and level",
+      "description": "How many level-ups were timed and their mean played time, for the jobs picked.",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 34 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (player_job, level) (increase(unbound_worker_level_up_seconds_count{player_job=~\"$job\"}[$__range])) > 0", "instant": true, "format": "table" },
+        { "refId": "B", "expr": "sum by (player_job, level) (increase(unbound_worker_level_up_seconds_sum{player_job=~\"$job\"}[$__range])) / (sum by (player_job, level) (increase(unbound_worker_level_up_seconds_count{player_job=~\"$job\"}[$__range])) > 0)", "instant": true, "format": "table" }
+      ],
+      "fieldConfig": { "defaults": { "decimals": 0 }, "overrides": [
+        { "matcher": { "id": "byName", "options": "Value #B" }, "properties": [ { "id": "unit", "value": "s" }, { "id": "displayName", "value": "mean played time" } ] },
+        { "matcher": { "id": "byName", "options": "Value #A" }, "properties": [ { "id": "displayName", "value": "level-ups" } ] }
+      ] },
+      "transformations": [
+        { "id": "merge", "options": {} },
+        { "id": "organize", "options": { "excludeByName": { "Time": true } } },
+        { "id": "sortBy", "options": { "sort": [ { "field": "level" } ] } }
+      ],
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
+      "id": 33,
+      "type": "bargauge",
+      "title": "Experience per played hour, by job — lab",
+      "description": "Experience paid for kills over the time range, divided by the hours played in the same job and band: the live figure beside the lab's --chain pace.",
+      "gridPos": { "h": 9, "w": 8, "x": 0, "y": 43 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (player_job) (increase(unbound_worker_experience_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / (sum by (player_job) (increase(unbound_worker_played_seconds_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / 3600))", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 34,
+      "type": "bargauge",
+      "title": "Experience per played hour, by level band — lab",
+      "gridPos": { "h": 9, "w": 8, "x": 8, "y": 43 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (band) (increase(unbound_worker_experience_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / (sum by (band) (increase(unbound_worker_played_seconds_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / 3600)", "legendFormat": "{{band}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.band}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 35,
+      "type": "timeseries",
+      "title": "Experience paid per hour, solo and shared",
+      "description": "Experience paid across the world per hour, by whether the kill paid one earner or shared between several.",
+      "gridPos": { "h": 9, "w": 8, "x": 16, "y": 43 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (group) (rate(unbound_worker_experience_total{player_job=~\"$job\",band=~\"$band\"}[$__rate_interval])) * 3600", "legendFormat": "{{group}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "id": 40,
+      "type": "row",
+      "title": "Combat",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 52 },
+      "panels": []
+    },
+    {
+      "id": 41,
+      "type": "bargauge",
+      "title": "Median kill time by level gap — lab",
+      "description": "Seconds from a monster's engage to its death, over the time range, by its level less its claimer's: the lab's median time to kill from engage (even is its even match).",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.5, sum by (gap, le) (increase(unbound_worker_kill_seconds_bucket{player_job=~\"$job\",band=~\"$band\"}[$__range])))", "legendFormat": "{{gap}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.gap}", "unit": "s", "decimals": 1, "min": 0, "color": { "mode": "continuous-GrYlRd" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 42,
+      "type": "bargauge",
+      "title": "Median even-match kill time by job — lab",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort(histogram_quantile(0.5, sum by (player_job, le) (increase(unbound_worker_kill_seconds_bucket{gap=\"even\",player_job=~\"$job\",band=~\"$band\"}[$__range]))))", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "s", "decimals": 1, "min": 0, "color": { "mode": "continuous-GrYlRd" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 43,
+      "type": "stat",
+      "title": "Kills and median kill time, solo and party",
+      "description": "Kills timed over the time range and their median engage-to-death seconds, by whether the claim was held alone or by a party.",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.5, sum by (group, le) (increase(unbound_worker_kill_seconds_bucket{player_job=~\"$job\",band=~\"$band\"}[$__range])))", "legendFormat": "median {{group}}", "instant": true },
+        { "refId": "B", "expr": "sum by (group) (increase(unbound_worker_kill_seconds_count{player_job=~\"$job\",band=~\"$band\"}[$__range]))", "legendFormat": "kills {{group}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 1, "min": 0, "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [
+        { "matcher": { "id": "byFrameRefID", "options": "B" }, "properties": [ { "id": "unit", "value": "none" }, { "id": "decimals", "value": 0 }, { "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } } ] }
+      ] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value_and_name", "orientation": "horizontal" }
+    },
+    {
+      "id": 44,
+      "type": "bargauge",
+      "title": "Player melee hit rate by job",
+      "description": "Share of player melee swings that hit (crits included), over the time range.",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 61 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (player_job) (increase(unbound_worker_strikes_total{attacker=\"player\",strike=\"melee\",outcome=~\"hit|critical\",player_job=~\"$job\"}[$__range])) / sum by (player_job) (increase(unbound_worker_strikes_total{attacker=\"player\",strike=\"melee\",player_job=~\"$job\"}[$__range]))", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "percentunit", "decimals": 1, "min": 0, "max": 1, "color": { "mode": "continuous-RdYlGr" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "gradient", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 45,
+      "type": "bargauge",
+      "title": "Player critical rate by job",
+      "description": "Share of player melee hits that crit, over the time range.",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 61 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (player_job) (increase(unbound_worker_strikes_total{attacker=\"player\",strike=\"melee\",outcome=\"critical\",player_job=~\"$job\"}[$__range])) / sum by (player_job) (increase(unbound_worker_strikes_total{attacker=\"player\",strike=\"melee\",outcome=~\"hit|critical\",player_job=~\"$job\"}[$__range]))", "legendFormat": "{{player_job}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.player_job}", "unit": "percentunit", "decimals": 1, "min": 0, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 46,
+      "type": "table",
+      "title": "Outcome shares by attacker and strike",
+      "description": "Each outcome's share of its attacker's strikes of that kind over the time range: swings hit, crit or miss; magic rolls land or are resisted. The monster's and pets' rows carry no job.",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 61 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (attacker, strike, outcome) (increase(unbound_worker_strikes_total{player_job=~\"$job|none\"}[$__range])) / ignoring (outcome) group_left sum by (attacker, strike) (increase(unbound_worker_strikes_total{player_job=~\"$job|none\"}[$__range]))", "instant": true, "format": "table" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "decimals": 1 }, "overrides": [] },
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true }, "indexByName": { "attacker": 0, "strike": 1, "outcome": 2, "Value": 3 }, "renameByName": { "Value": "share" } } },
+        { "id": "sortBy", "options": { "sort": [ { "field": "attacker" } ] } }
+      ],
+      "options": { "showHeader": true, "cellHeight": "sm" }
+    },
+    {
+      "id": 47,
+      "type": "bargauge",
+      "title": "Magic resist rate by caster",
+      "description": "Share of magic land rolls resisted, over the time range: the players' spells and weapon skills' magic by the players' rolls, the monsters' spells by theirs.",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 69 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (attacker) (increase(unbound_worker_strikes_total{strike=\"magic\",outcome=\"resisted\",player_job=~\"$job|none\"}[$__range])) / sum by (attacker) (increase(unbound_worker_strikes_total{strike=\"magic\",player_job=~\"$job|none\"}[$__range]))", "legendFormat": "{{attacker}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.attacker}", "unit": "percentunit", "decimals": 1, "min": 0, "max": 1, "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 48,
+      "type": "bargauge",
+      "title": "Knockouts per played hour, by level band",
+      "description": "Knockouts over the time range divided by the hours played in the same band: how dangerous each band is.",
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 69 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (band) (increase(unbound_worker_knockouts_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / (sum by (band) (increase(unbound_worker_played_seconds_total{player_job=~\"$job\",band=~\"$band\"}[$__range])) / 3600)", "legendFormat": "{{band}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.band}", "unit": "none", "decimals": 2, "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 49,
+      "type": "bargauge",
+      "title": "Knockouts by zone in range",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 69 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (zone) (increase(unbound_worker_knockouts_total{player_job=~\"$job\",band=~\"$band\",zone=~\"$zone\"}[$__range])))", "legendFormat": "{{zone}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.zone}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 50,
+      "type": "bargauge",
+      "title": "Raises accepted in range",
+      "description": "Raises the knocked out accepted: a Raise cast on them, or a Reraise they held, by tier.",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 69 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (kind, tier) (increase(unbound_worker_raises_total[$__range]))", "legendFormat": "{{kind}} {{tier}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.kind} ${__field.labels.tier}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 51,
+      "type": "timeseries",
+      "title": "Kills per hour by monster family",
+      "description": "The ten families killed most, per hour, in the zones picked.",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 77 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "topk(10, sum by (family) (rate(unbound_worker_kills_total{zone=~\"$zone\"}[$__rate_interval])) * 3600)", "legendFormat": "{{family}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 1, "custom": { "fillOpacity": 10 } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "id": 60,
+      "type": "row",
+      "title": "Actions",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 85 },
+      "panels": []
+    },
+    {
+      "id": 61,
+      "type": "bargauge",
+      "title": "Top spells cast in range",
+      "gridPos": { "h": 10, "w": 6, "x": 0, "y": 86 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(topk(15, sum by (action) (increase(unbound_worker_actions_used_total{kind=\"spell\",player_job=~\"$job\"}[$__range]))))", "legendFormat": "{{action}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.action}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "purple" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 62,
+      "type": "bargauge",
+      "title": "Top abilities used in range",
+      "gridPos": { "h": 10, "w": 6, "x": 6, "y": 86 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(topk(15, sum by (action) (increase(unbound_worker_actions_used_total{kind=\"ability\",player_job=~\"$job\"}[$__range]))))", "legendFormat": "{{action}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.action}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 63,
+      "type": "bargauge",
+      "title": "Top weapon skills in range",
+      "gridPos": { "h": 10, "w": 6, "x": 12, "y": 86 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(topk(15, sum by (action) (increase(unbound_worker_actions_used_total{kind=\"weapon_skill\",player_job=~\"$job\"}[$__range]))))", "legendFormat": "{{action}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.action}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 64,
+      "type": "bargauge",
+      "title": "Refused actions by reason in range",
+      "description": "Player actions the world refused, by the refusal it told: the most common show where players fight the rules.",
+      "gridPos": { "h": 10, "w": 6, "x": 18, "y": 86 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (reason) (increase(unbound_worker_actions_refused_total[$__range])))", "legendFormat": "{{reason}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.reason}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 70,
+      "type": "row",
+      "title": "Social",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 96 },
+      "panels": []
+    },
+    {
+      "id": 71,
+      "type": "timeseries",
+      "title": "Chat lines delivered per hour by channel",
+      "description": "Counts only; no line's text is kept here.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 97 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sum by (kind) (rate(unbound_social_lines_total{outcome=\"delivered\"}[$__rate_interval])) * 3600", "legendFormat": "{{kind}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "right" }, "tooltip": { "mode": "multi", "sort": "desc" } }
+    },
+    {
+      "id": 72,
+      "type": "bargauge",
+      "title": "Chat lines refused in range, by reason",
+      "gridPos": { "h": 8, "w": 4, "x": 12, "y": 97 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "sort_desc(sum by (outcome) (increase(unbound_social_lines_total{outcome!=\"delivered\"}[$__range])))", "legendFormat": "{{outcome}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "${__field.labels.outcome}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "red" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 73,
+      "type": "bargauge",
+      "title": "Parties by size now",
+      "gridPos": { "h": 8, "w": 4, "x": 16, "y": 97 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "max by (size) (unbound_social_party_size)", "legendFormat": "party of {{size}}", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "displayName": "party of ${__field.labels.size}", "unit": "none", "decimals": 0, "min": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "orientation": "horizontal", "namePlacement": "top", "sizing": "manual", "maxVizHeight": 36, "text": { "titleSize": 14, "valueSize": 18 }, "displayMode": "basic", "reduceOptions": { "calcs": ["lastNotNull"] }, "showUnfilled": true }
+    },
+    {
+      "id": 74,
+      "type": "stat",
+      "title": "Parties and linkshells now",
+      "gridPos": { "h": 8, "w": 4, "x": 20, "y": 97 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "refId": "A", "expr": "max(unbound_social_parties)", "legendFormat": "parties", "instant": true },
+        { "refId": "B", "expr": "max(unbound_social_linkshells)", "legendFormat": "linkshells", "instant": true }
+      ],
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "value", "graphMode": "none", "textMode": "value_and_name", "orientation": "vertical" }
+    }
+  ]
+}
