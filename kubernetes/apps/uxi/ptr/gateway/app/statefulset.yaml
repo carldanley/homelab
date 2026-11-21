@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: gateway
-          image: git.r1p.dev/unbound-xi/server-gateway:v0.14.1@sha256:85b85a513712363cd2c5d023fc3a58f30cdf56a89c83111b998ae67134875ce1
+          image: git.r1p.dev/unbound-xi/server-gateway:v0.15.0@sha256:9a738d94139a42c884307f09b11cd52ce2f4d86584e14992a6777fcd4d491c7b
           imagePullPolicy: IfNotPresent
           command:
             - unbound-gateway
@@ -47,6 +47,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.labels['apps.kubernetes.io/pod-index']
+            # This pod's own public endpoint, which a world-entry ticket may name.
+            - name: UNBOUND_GATEWAY_ADVERTISE
+              value: gateway-$(UNBOUND_GATEWAY_ID)-ptr.${DOMAIN_9}:2102$(UNBOUND_GATEWAY_ID)
           ports:
             - name: client
               containerPort: 21014
