@@ -12,6 +12,10 @@ spec:
     - port: health
       path: /metrics
       interval: 30s
+      relabelings:
+        # Zone workers are workers: one service name for every worker pod.
+        - targetLabel: service
+          replacement: worker
   podTargetLabels:
     - app.kubernetes.io/component
     - uxi.homelab/zone-group

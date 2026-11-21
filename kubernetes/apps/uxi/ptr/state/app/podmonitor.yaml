@@ -12,5 +12,8 @@ spec:
     - port: health
       path: /metrics
       interval: 30s
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_label_app_kubernetes_io_component]
+          targetLabel: service
   podTargetLabels:
     - app.kubernetes.io/component

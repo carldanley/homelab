@@ -1,0 +1,57 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: uxi-ptr-gateway-external
+  labels:
+    dns.homelab/external: 'true'
+spec:
+  endpoints:
+    - dnsName: gateway-1-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - gateway-ptr.${DOMAIN_9}
+      providerSpecific:
+        - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: 'false'
+    - dnsName: gateway-2-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - gateway-ptr.${DOMAIN_9}
+      providerSpecific:
+        - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: 'false'
+    - dnsName: gateway-3-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: CNAME
+      targets:
+        - gateway-ptr.${DOMAIN_9}
+      providerSpecific:
+        - name: external-dns.alpha.kubernetes.io/cloudflare-proxied
+          value: 'false'
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: uxi-ptr-gateway-internal
+  labels:
+    dns.homelab/external: 'false'
+spec:
+  endpoints:
+    - dnsName: gateway-1-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: A
+      targets:
+        - 10.50.100.21
+    - dnsName: gateway-2-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: A
+      targets:
+        - 10.50.100.22
+    - dnsName: gateway-3-ptr.${DOMAIN_9}
+      recordTTL: 60
+      recordType: A
+      targets:
+        - 10.50.100.23

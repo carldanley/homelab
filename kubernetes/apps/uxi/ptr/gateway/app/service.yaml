@@ -21,6 +21,67 @@ spec:
     # Public client addresses are preserved through the VPS WireGuard tunnel.
     - 0.0.0.0/0
 ---
+# One address per gateway pod, so a client can be sent to a named gateway.
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-gateway-1
+  annotations:
+    lbipam.cilium.io/ips: 10.50.100.21
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: uxi-ptr-gateway-1
+  ports:
+    - name: client
+      port: 21021
+      targetPort: client
+      protocol: UDP
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
+  externalTrafficPolicy: Local
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-gateway-2
+  annotations:
+    lbipam.cilium.io/ips: 10.50.100.22
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: uxi-ptr-gateway-2
+  ports:
+    - name: client
+      port: 21022
+      targetPort: client
+      protocol: UDP
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
+  externalTrafficPolicy: Local
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uxi-ptr-gateway-3
+  annotations:
+    lbipam.cilium.io/ips: 10.50.100.23
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: uxi-ptr-gateway-3
+  ports:
+    - name: client
+      port: 21023
+      targetPort: client
+      protocol: UDP
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
+  externalTrafficPolicy: Local
+  loadBalancerSourceRanges:
+    - 0.0.0.0/0
+---
 apiVersion: v1
 kind: Service
 metadata:

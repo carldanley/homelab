@@ -5,6 +5,7 @@ resources:
   - ./configmap.yaml
   - ./statefulset.yaml
   - ./service.yaml
+  - ./dnsendpoint.yaml
   - ./networkpolicy.yaml
   - ./poddisruptionbudget.yaml
   - ./podmonitor.yaml
