@@ -109,7 +109,7 @@ spec:
 
       initContainers:
         - name: init-db
-          image: ghcr.io/home-operations/postgres-init:18
+          image: ghcr.io/home-operations/postgres-init:19
           envFrom:
             - secretRef:
                 name: woodpecker-secret
