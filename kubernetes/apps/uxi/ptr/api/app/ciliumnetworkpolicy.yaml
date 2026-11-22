@@ -53,6 +53,9 @@ spec:
               - matchPattern: '*'
     - toFQDNs:
         - matchName: discord.com
+        # The cluster resolver follows the search path itself (autopath), so
+        # the name the pod is answered under is the namespaced one.
+        - matchName: discord.com.uxi-ptr.svc.cluster.local
       toPorts:
         - ports:
             - port: '443'
