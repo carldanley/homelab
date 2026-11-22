@@ -27,3 +27,33 @@ spec:
             http:
               - method: GET
                 path: /metrics
+---
+# Login with Discord: the API server calls Discord's API, and nothing else
+# outside the cluster. The DNS rule lets Cilium learn the name's addresses.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: uxi-ptr-api-egress
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: uxi-ptr-server
+      app.kubernetes.io/component: api
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: '53'
+              protocol: ANY
+          rules:
+            dns:
+              - matchPattern: '*'
+    - toFQDNs:
+        - matchName: discord.com
+      toPorts:
+        - ports:
+            - port: '443'
+              protocol: TCP
