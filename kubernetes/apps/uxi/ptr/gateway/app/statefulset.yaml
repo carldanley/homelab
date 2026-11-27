@@ -30,7 +30,7 @@ spec:
         gpu.homelab/amd: 'true'
       containers:
         - name: gateway
-          image: git.r1p.dev/unbound-xi/server-gateway:v0.16.0@sha256:c3b7bdc1c84efaf449ba3f29b9ba160912c48613cebefe2d00ee367ab22c099c
+          image: git.r1p.dev/unbound-xi/server-gateway:v0.16.1@sha256:347a224734c7cefd7da2e8581e254aaa72afca824f75cc081a9993def4eb3512
           imagePullPolicy: IfNotPresent
           command:
             - unbound-gateway
